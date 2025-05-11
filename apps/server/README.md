@@ -33,4 +33,45 @@ nx build server
 - name: string (required)
 - email: string (required, unique)
 - password: string
-- createdAt: Date (default: now) 
+- createdAt: Date (default: now)
+
+## Environment Variables
+
+This application uses environment variables for configuration. For local development, you have two options:
+
+### Option 1: Create a .env file
+
+Create a `.env` file in the root of the project with the following variables:
+
+```
+# Server Configuration
+PORT=3333
+NODE_ENV=development
+
+# MongoDB Connection
+MONGODB_URI=mongodb://localhost:27017/sos-academy
+
+# JWT Authentication
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRATION=1d
+
+# Cors Configuration
+CORS_ORIGIN=http://localhost:4200
+
+# Logging
+LOG_LEVEL=debug
+```
+
+### Option 2: Use the default development configuration
+
+The application includes a default development configuration in `src/common/config/development.env.ts`. If no environment variables are set, the application will use these default values.
+
+## Important Environment Variables
+
+- `PORT`: The port on which the server will run (default: 3333)
+- `NODE_ENV`: The environment mode (development, production, test)
+- `MONGODB_URI`: The MongoDB connection string
+- `JWT_SECRET`: Secret key for JWT token generation
+- `JWT_EXPIRATION`: JWT token expiration time
+- `CORS_ORIGIN`: Allowed origins for CORS
+- `LOG_LEVEL`: Logging level (debug, info, warn, error)
