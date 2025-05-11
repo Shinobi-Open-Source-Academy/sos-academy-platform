@@ -45,7 +45,7 @@ Create a `.env` file in the root of the project with the following variables:
 
 ```
 # Server Configuration
-PORT=3333
+PORT=4200
 NODE_ENV=development
 
 # MongoDB Connection
@@ -56,7 +56,7 @@ JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRATION=1d
 
 # Cors Configuration
-CORS_ORIGIN=http://localhost:4200
+CORS_ORIGIN=http://localhost:3000
 
 # Logging
 LOG_LEVEL=debug
@@ -68,10 +68,10 @@ The application includes a default development configuration in `src/common/conf
 
 ## Important Environment Variables
 
-- `PORT`: The port on which the server will run (default: 3333)
+- `PORT`: The port on which the server will run (default: 4200)
 - `NODE_ENV`: The environment mode (development, production, test)
 - `MONGODB_URI`: The MongoDB connection string
 - `JWT_SECRET`: Secret key for JWT token generation
 - `JWT_EXPIRATION`: JWT token expiration time
-- `CORS_ORIGIN`: Allowed origins for CORS
+- `CORS_ORIGIN`: Allowed origins for CORS (default: http://localhost:3000)
 - `LOG_LEVEL`: Logging level (debug, info, warn, error)

@@ -9,7 +9,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next dev --turbopack",
+        "command": "next dev -p 3000",
         "cwd": "apps/frontend"
       }
     },
@@ -23,7 +23,7 @@
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next start",
+        "command": "next start -p 3000",
         "cwd": "apps/frontend"
       }
     },

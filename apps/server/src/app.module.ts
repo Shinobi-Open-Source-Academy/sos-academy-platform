@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { databaseConfig } from './common/config/database.config';
 import { envConfig } from './common/config/env.config';
+
+// Import modules
+import { UserModule } from './modules/user/user.module';
+import { ProjectModule } from './modules/project/project.module';
+import { CommunityModule } from './modules/community/community.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
 
 @Module({
   imports: [
@@ -12,13 +19,11 @@ import { envConfig } from './common/config/env.config';
       isGlobal: true,
       load: [() => envConfig],
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodb.uri'),
-      }),
-      inject: [ConfigService],
-    }),
+    MongooseModule.forRoot(databaseConfig.uri),
+    UserModule,
+    ProjectModule,
+    CommunityModule,
+    CalendarModule
   ],
   controllers: [AppController],
   providers: [AppService],

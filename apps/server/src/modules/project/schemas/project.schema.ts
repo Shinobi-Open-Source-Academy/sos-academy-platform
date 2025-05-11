@@ -1,0 +1,74 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { ProjectRank, ProjectStatus } from '@sos-academy/shared';
+
+export type ProjectDocument = Project & Document;
+
+@Schema({
+  timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (_, ret) => {
+      delete ret.__v;
+      return ret;
+    },
+  },
+})
+export class Project {
+  @Prop({ required: true })
+  name: string;
+
+  @Prop()
+  description: string;
+
+  @Prop({
+    type: String,
+    enum: ProjectRank,
+    required: true,
+  })
+  rank: ProjectRank;
+
+  @Prop({
+    type: String,
+    enum: ProjectStatus,
+    default: ProjectStatus.CREATED,
+  })
+  status: ProjectStatus;
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  })
+  owner: MongooseSchema.Types.ObjectId;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  members: MongooseSchema.Types.ObjectId[];
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Community',
+    required: true,
+  })
+  community: MongooseSchema.Types.ObjectId;
+
+  @Prop()
+  startDate: Date;
+
+  @Prop()
+  endDate: Date;
+
+  @Prop()
+  githubRepo: string;
+
+  @Prop({ default: [] })
+  technologies: string[];
+
+  @Prop()
+  thumbnail: string;
+}
+
+export const ProjectSchema = SchemaFactory.createForClass(Project);

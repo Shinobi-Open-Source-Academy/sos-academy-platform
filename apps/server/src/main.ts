@@ -9,6 +9,9 @@ import { AppModule } from './app.module';
 import { envConfig } from './common/config/env.config';
 
 async function bootstrap() {
+  // Log the NODE_ENV value when starting
+  Logger.log(`Starting server with NODE_ENV: ${envConfig.nodeEnv}`);
+  
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
   

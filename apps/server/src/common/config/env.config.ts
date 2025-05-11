@@ -6,7 +6,7 @@ const getEnvValue = (key: string, defaultValue: string) => {
 };
 
 export const envConfig = {
-  port: parseInt(getEnvValue('PORT', '3333'), 10),
+  port: parseInt(getEnvValue('PORT', '4200'), 10),
   nodeEnv: getEnvValue('NODE_ENV', 'development'),
   mongodb: {
     uri: getEnvValue('MONGODB_URI', 'mongodb://localhost:27017/sos-academy'),
