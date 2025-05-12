@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Application Confirmation - SOS Academy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .footer {
+            font-size: 12px;
+            text-align: center;
+            color: #6c757d;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .timeline {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .timeline h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://sos-academy.org/logo.png" alt="SOS Academy Logo" class="logo">
+        <h1>Mentor Application Received</h1>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{name}},</p>
+        
+        <p>Thank you for applying to become a mentor at SOS Academy. We've received your application on {{date}} and are excited about your interest in contributing to our community.</p>
+        
+        <p>The role of mentors at SOS Academy is crucial to our mission of providing quality education and guidance to aspiring developers. We value the time and expertise you're willing to share with our community.</p>
+        
+        <div class="timeline">
+            <h3>What Happens Next</h3>
+            <p>Our team will carefully review your application within the next {{applicationReviewPeriod}}. Here's what you can expect:</p>
+            <ol>
+                <li>Application review by our team</li>
+                <li>If selected, we'll invite you for a brief video interview</li>
+                <li>Final confirmation and onboarding process</li>
+                <li>Getting started with your first mentoring sessions</li>
+            </ol>
+        </div>
+        
+        <p>While you wait, you're welcome to explore our mentorship program and resources:</p>
+        
+        <p><a href="https://sos-academy.org/mentor-resources" class="button">Explore Mentor Resources</a></p>
+        
+        <p>If you have any questions or need to update your application, please contact us at <a href="mailto:mentors@sos-academy.org">mentors@sos-academy.org</a>.</p>
+        
+        <p>Thank you for your interest in making a difference in our community!</p>
+        
+        <p>Best regards,<br>
+        The SOS Academy Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2023 SOS Academy. All rights reserved.</p>
+        <p>You're receiving this email because you applied to be a mentor at SOS Academy.</p>
+        <div class="social-links">
+            <a href="https://twitter.com/sosacademy">Twitter</a>
+            <a href="https://github.com/sos-academy">GitHub</a>
+            <a href="https://linkedin.com/company/sos-academy">LinkedIn</a>
+        </div>
+    </div>
+</body>
+</html> 

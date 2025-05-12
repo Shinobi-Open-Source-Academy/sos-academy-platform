@@ -6,25 +6,29 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { MembershipLevel, UserRole } from '@sos-academy/shared';
+import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
 
 export class CreateUserDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(6)
-  password: string;
+  password?: string;
 
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;
+
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
 
   @IsOptional()
   @IsEnum(MembershipLevel)
@@ -41,4 +45,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsString({ each: true })
   skills?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  interests?: string[];
 }
