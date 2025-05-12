@@ -10,29 +10,37 @@ import { EmailService } from './email.service';
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get('EMAIL_HOST', 'smtp.sendgrid.net'),
-          secure: false,
-          auth: {
-            user: configService.get('EMAIL_USER', 'apikey'),
-            pass: configService.get('EMAIL_PASSWORD'),
+      useFactory: (configService: ConfigService) => {
+        // Determine the templates directory path based on environment
+        const templatesDir =
+          process.env.NODE_ENV === 'production'
+            ? join(process.cwd(), 'templates')
+            : join(__dirname, 'templates');
+
+        return {
+          transport: {
+            host: configService.get('EMAIL_HOST', 'smtp.sendgrid.net'),
+            secure: false,
+            auth: {
+              user: configService.get('EMAIL_USER', 'apikey'),
+              pass: configService.get('EMAIL_PASSWORD'),
+            },
           },
-        },
-        defaults: {
-          from: `"SOS Academy" <${configService.get(
-            'EMAIL_FROM',
-            'no-reply@sos-academy.org'
-          )}>`,
-        },
-        template: {
-          dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
+          defaults: {
+            from: `"SOS Academy" <${configService.get(
+              'EMAIL_FROM',
+              'no-reply@sos-academy.org'
+            )}>`,
           },
-        },
-      }),
+          template: {
+            dir: templatesDir,
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
     }),
   ],
   providers: [EmailService],
