@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import SectionHeading from "./ui/SectionHeading";
-import CommunityCard from "./ui/CommunityCard";
+import { useState, useRef, useEffect } from 'react';
+import SectionHeading from './ui/SectionHeading';
+import CommunityCard from './ui/CommunityCard';
+import ArrowRightIcon from './icons/ArrowRightIcon';
+import VideoIcon from './icons/VideoIcon';
 import {
   COMMUNITIES,
   COMMUNITIES_CONSTANTS,
-} from "@/app/constants/communities";
+} from '@/app/constants/communities';
 
 export default function Communities() {
   const [isInView, setIsInView] = useState(false);
@@ -74,20 +76,7 @@ export default function Communities() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
               <div className="text-center md:text-left md:w-2/3">
                 <div className="inline-flex mb-4 items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
+                  <VideoIcon />
                 </div>
                 <h3 className="text-3xl font-bold mb-4 text-white bg-clip-text bg-gradient-to-r from-white to-gray-200">
                   {WEEKLY_CALLS.TITLE}
@@ -96,22 +85,9 @@ export default function Communities() {
                   {WEEKLY_CALLS.DESCRIPTION}
                 </p>
 
-                <button className="mt-6 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-transform duration-300 hover:scale-105 inline-flex items-center group">
+                <button className="mt-6 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-transform duration-300 hover:scale-105 inline-flex items-center group cursor-pointer">
                   <span>Join Next Call</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
+                  <ArrowRightIcon className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
 
