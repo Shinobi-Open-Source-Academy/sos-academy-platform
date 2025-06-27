@@ -40,9 +40,9 @@ export const COMMUNITIES_CONSTANTS = {
   },
   STATS: {
     COMMUNITIES_COUNT: "5",
-    MEMBERS_COUNT: "30+",
+    MEMBERS_COUNT: "30",
     MENTORS_COUNT: "10",
-    PROJECTS_COUNT: "50+",
+    PROJECTS_COUNT: "50",
   },
   ANIMATION: {
     STAGGER_DELAY: 0.15, // seconds between each card animation

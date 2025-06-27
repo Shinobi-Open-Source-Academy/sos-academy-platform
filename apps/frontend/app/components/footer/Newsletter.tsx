@@ -83,15 +83,16 @@ export default function Newsletter() {
               className="px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary w-full"
               disabled={isLoading}
             />
-            <button
-              type="submit"
-              className={`btn-primary whitespace-nowrap shrink-0 ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Joining...' : 'Subscribe'}
-            </button>
+         <button
+           type="submit"
+           disabled={isLoading}
+           className={`relative overflow-hidden whitespace-nowrap shrink-0 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group ${
+             isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl'
+           }`}
+          >
+            <span className="relative z-10">{isLoading ? 'Joining...' : 'Subscribe'}</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+        </button>
           </form>
         )}
         {error && (

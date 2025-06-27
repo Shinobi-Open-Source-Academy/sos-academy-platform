@@ -86,29 +86,33 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           {links.map((link) => (
             <Link
-              key={link.href}
-              href={link.href}
-              className={`relative text-base px-1 py-1 ${
-                activeLink === link.href.split("#")[1]
-                  ? "text-white"
-                  : "text-gray-300 hover:text-white"
-              } transition-colors duration-200`}
-              onClick={() => setActiveLink(link.href.split("#")[1])}
+            key={link.href}
+            href={link.href}
+            className={`relative text-base px-1 py-1 ${
+              activeLink === link.href.split("#")[1]
+              ? "text-white"
+              : "text-gray-300 hover:text-transparent hover:bg-gradient-to-r hover:from-primary hover:to-gray-200 hover:bg-clip-text"
+            } transition-colors duration-200`}
+            onClick={() => setActiveLink(link.href.split("#")[1])}
             >
               {link.label}
               <span 
-                className={`absolute left-0 bottom-0 w-full h-0.5 bg-primary transform scale-x-0 origin-left transition-transform duration-300 ${
-                  activeLink === link.href.split("#")[1] ? "scale-x-100" : ""
-                }`}>
-              </span>
-            </Link>
+              className={`absolute left-0 bottom-0 w-full h-0.5 bg-primary transform scale-x-0 origin-left transition-transform duration-300 ${
+                activeLink === link.href.split("#")[1] ? "scale-x-100" : ""
+              }`}
+              />
+              </Link>
           ))}
-          <Link 
-            href="/#join" 
-            className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg hover:shadow-primary/20 focus:ring-2 focus:ring-primary/50 focus:outline-none"
-          >
-            Join Us
-          </Link>
+        <Link 
+          href="/#join" 
+          onClick={() => setIsMenuOpen(false)}
+          className="relative overflow-hidden px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+        >
+         <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+           Join Us
+         </span>
+         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
+        </Link>
         </nav>
 
         {/* Mobile Menu Button */}

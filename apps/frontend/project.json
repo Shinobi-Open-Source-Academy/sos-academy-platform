@@ -6,33 +6,40 @@
   "tags": [],
   "// targets": "to see all targets run: nx show project frontend --web",
   "targets": {
-    "dev": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next dev -p 3000",
-        "cwd": "apps/frontend"
-      }
-    },
-    "build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next build",
-        "cwd": "apps/frontend"
-      }
-    },
-    "start": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next start -p 3000",
-        "cwd": "apps/frontend"
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next lint",
-        "cwd": "apps/frontend"
-      }
+  "dev": {
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "next dev -p 3000",
+      "cwd": "apps/frontend"
+    }
+  },
+  "serve": {
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "next dev -p 3000",
+      "cwd": "apps/frontend"
+    }
+  },
+  "build": {
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "next build",
+      "cwd": "apps/frontend"
+    }
+  },
+  "start": {
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "next start -p 3000",
+      "cwd": "apps/frontend"
+    }
+  },
+  "lint": {
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "next lint",
+      "cwd": "apps/frontend"
     }
   }
+}
 }

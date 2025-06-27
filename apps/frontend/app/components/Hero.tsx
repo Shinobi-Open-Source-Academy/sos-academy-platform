@@ -210,7 +210,7 @@ export default function Hero() {
         }}
       >
         {/* Subtle separator line */}
-        <div className="relative max-w-3xl mx-auto mb-6 sm:mb-10">
+        <div className="relative max-w-3xl mt-36 mx-auto mb-6 sm:mb-10">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-700/30"></div>
           </div>

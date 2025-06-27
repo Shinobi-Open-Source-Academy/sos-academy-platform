@@ -5,10 +5,8 @@ import SectionHeading from './ui/SectionHeading';
 import CommunityCard from './ui/CommunityCard';
 import ArrowRightIcon from './icons/ArrowRightIcon';
 import VideoIcon from './icons/VideoIcon';
-import {
-  COMMUNITIES,
-  COMMUNITIES_CONSTANTS,
-} from '@/app/constants/communities';
+import { COMMUNITIES, COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import CountUp from 'react-countup';
 
 export default function Communities() {
   const [isInView, setIsInView] = useState(false);
@@ -30,9 +28,7 @@ export default function Communities() {
       observer.observe(sectionRef.current);
     }
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -85,10 +81,14 @@ export default function Communities() {
                   {WEEKLY_CALLS.DESCRIPTION}
                 </p>
 
-                <button className="mt-6 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-transform duration-300 hover:scale-105 inline-flex items-center group cursor-pointer">
-                  <span>Join Next Call</span>
-                  <ArrowRightIcon className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
-                </button>
+               <button className="relative overflow-hidden mt-6 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl inline-flex items-center cursor-pointer">
+                <span className="relative z-10 flex items-center gap-2">
+                 Join Next Call
+                <ArrowRightIcon className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+               </button>
+
               </div>
 
               <div className="relative md:w-1/3 w-full rounded-xl overflow-hidden">
@@ -109,7 +109,15 @@ export default function Communities() {
                   <div className="grid grid-cols-3 gap-4 mt-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white">
-                        {STATS.MEMBERS_COUNT}
+                        <CountUp
+                          start={0}
+                          end={Number(STATS.MEMBERS_COUNT)}
+                          duration={4}
+                          separator=","
+                          enableScrollSpy={true}
+                          scrollSpyDelay={100}
+                        />
+                        +
                       </div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider">
                         Members
@@ -117,7 +125,14 @@ export default function Communities() {
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white">
-                        {STATS.MENTORS_COUNT}
+                        <CountUp
+                          start={0}
+                          end={Number(STATS.MENTORS_COUNT)}
+                          duration={4}
+                          separator=","
+                          enableScrollSpy={true}
+                          scrollSpyDelay={100}
+                        />
                       </div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider">
                         Mentors
@@ -125,8 +140,17 @@ export default function Communities() {
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white">
-                        {STATS.PROJECTS_COUNT}
+                        <CountUp
+                          start={0}
+                          end={Number(STATS.PROJECTS_COUNT)}
+                          duration={3}
+                          separator=","
+                          enableScrollSpy={true}
+                          scrollSpyDelay={100}
+                        />
+                        +
                       </div>
+                      
                       <p className="text-xs text-gray-400 uppercase tracking-wider">
                         Projects
                       </p>

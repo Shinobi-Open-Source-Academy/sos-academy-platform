@@ -255,9 +255,12 @@ export default function FeaturedProjects() {
               projects. We&apos;ll help you connect with maintainers, understand
               project requirements, and make your first contributions.
             </p>
-            <button className="btn-primary hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
-              Get Started
-            </button>
+            <button
+              className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            >
+             <span className="relative z-10">Get Started</span>
+             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+           </button>
           </div>
         </div>
       </div>
