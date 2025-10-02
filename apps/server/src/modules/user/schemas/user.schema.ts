@@ -56,6 +56,13 @@ export class User {
   communities: MongooseSchema.Types.ObjectId[];
 
   @Prop({
+    type: [String],
+    default: [],
+    required: false,
+  })
+  communityIds: string[];
+
+  @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Project' }],
     default: [],
     required: false,
@@ -79,6 +86,30 @@ export class User {
 
   @Prop({ default: [], required: false })
   interests: string[];
+
+  @Prop({ 
+    type: String,
+    enum: ['subscription', 'mentor-application'],
+    default: 'subscription',
+    required: false,
+  })
+  source: 'subscription' | 'mentor-application';
+
+  @Prop({ 
+    type: Object,
+    required: false,
+  })
+  githubProfile?: {
+    login: string;
+    avatarUrl: string;
+    htmlUrl: string;
+  };
+
+  @Prop({ required: false })
+  expertise?: string;
+
+  @Prop({ required: false })
+  motivation?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

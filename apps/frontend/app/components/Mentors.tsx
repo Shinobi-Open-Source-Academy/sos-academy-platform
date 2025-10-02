@@ -4,9 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import SectionHeading from "./ui/SectionHeading";
 import MentorCard from "./MentorCard";
 import { MENTORS } from "../config/mentors";
+import MentorApplicationModal from "./MentorApplicationModal";
 
 export default function Mentors() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMentorApplicationModalOpen, setIsMentorApplicationModalOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,17 +67,20 @@ export default function Mentors() {
           }}
         >
           <button
-           className="relative overflow-hidden cursor-pointer px-6 py-3 mr-4 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            onClick={() => setIsMentorApplicationModalOpen(true)}
+            className="relative overflow-hidden cursor-pointer px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
           >
             <span className="relative z-10">Become a Mentor</span>
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
           </button>
-          <button className="relative btn-secondary overflow-hidden group cursor-pointer">
-           <span className="relative z-10">Schedule a Call</span>
-           <span className="absolute bottom-0 left-1/2 w-0 h-[3px] bg-primary transition-all duration-300 ease-in-out group-hover:w-[60%] transform -translate-x-1/2"></span>
-          </button>
         </div>
       </div>
+
+      {/* Mentor Application Modal */}
+      <MentorApplicationModal
+        isOpen={isMentorApplicationModalOpen}
+        onClose={() => setIsMentorApplicationModalOpen(false)}
+      />
     </section>
   );
 }

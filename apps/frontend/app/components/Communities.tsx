@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import SectionHeading from './ui/SectionHeading';
 import CommunityCard from './ui/CommunityCard';
-import ArrowRightIcon from './icons/ArrowRightIcon';
 import VideoIcon from './icons/VideoIcon';
 import { COMMUNITIES, COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
 import CountUp from 'react-countup';
@@ -81,13 +80,6 @@ export default function Communities() {
                   {WEEKLY_CALLS.DESCRIPTION}
                 </p>
 
-               <button className="relative overflow-hidden mt-6 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl inline-flex items-center cursor-pointer">
-                <span className="relative z-10 flex items-center gap-2">
-                 Join Next Call
-                <ArrowRightIcon className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-                </span>
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
-               </button>
 
               </div>
 
@@ -114,8 +106,6 @@ export default function Communities() {
                           end={Number(STATS.MEMBERS_COUNT)}
                           duration={4}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                         +
                       </div>
@@ -130,8 +120,6 @@ export default function Communities() {
                           end={Number(STATS.MENTORS_COUNT)}
                           duration={4}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                       </div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider">
@@ -145,8 +133,6 @@ export default function Communities() {
                           end={Number(STATS.PROJECTS_COUNT)}
                           duration={3}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                         +
                       </div>

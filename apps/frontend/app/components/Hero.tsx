@@ -10,10 +10,12 @@ import HeroButton from "./ui/HeroButton";
 import LogoAnimation from "./ui/LogoAnimation";
 import CompanyMarquee from "./ui/CompanyMarquee";
 import ArrowRightFillIcon from './icons/ArrowRightFillIcon';
+import SubscriptionModal from "./SubscriptionModal";
 
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const [dots, setDots] = useState<
     Array<{
@@ -176,17 +178,27 @@ export default function Hero() {
                 "opacity 1s ease-out 0.2s, transform 1s ease-out 0.2s",
             }}
           >
-            <HeroButton
-              text={HERO_CONFIG.JOIN_BUTTON_TEXT}
-              href={HERO_CONFIG.JOIN_URL}
-              isPrimary
-              icon={<ArrowRightFillIcon />}
-            />
+            <button
+              onClick={() => setIsSubscriptionModalOpen(true)}
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            >
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                {HERO_CONFIG.JOIN_BUTTON_TEXT}
+                <ArrowRightFillIcon />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
+            </button>
 
-            <HeroButton
-              text={HERO_CONFIG.LEARN_MORE_BUTTON_TEXT}
-              href={HERO_CONFIG.LEARN_MORE_URL}
-            />
+            <button
+              onClick={() => window.location.href = '/documentation'}
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            >
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                Get Started
+                <ArrowRightFillIcon />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
+            </button>
           </div>
         </div>
 
@@ -233,6 +245,12 @@ export default function Hero() {
           direction={HERO_CONFIG.MARQUEE_DIRECTION}
         />
       </div>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+      />
     </section>
   );
 }

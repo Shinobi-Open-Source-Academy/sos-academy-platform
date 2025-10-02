@@ -3,8 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
-  MinLength,
 } from 'class-validator';
 
 export class MentorApplicationDto {
@@ -16,36 +14,15 @@ export class MentorApplicationDto {
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @MinLength(6)
-  password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  bio: string;
+  expertise?: string;
 
   @IsOptional()
   @IsString()
-  profilePicture?: string;
-
-  @IsNotEmpty()
-  @IsString({ each: true })
-  skills: string[];
-
-  @IsOptional()
-  @IsString({ each: true })
-  interests?: string[];
-
-  @IsOptional()
-  @IsUrl()
-  githubProfile?: string;
-
-  @IsOptional()
-  @IsUrl()
-  linkedinProfile?: string;
+  githubHandle?: string;
 
   @IsOptional()
   @IsString()
-  experience?: string;
+  motivation?: string;
 }

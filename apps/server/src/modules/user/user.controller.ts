@@ -18,6 +18,7 @@ import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
+import { SubscribeUserDto } from './dto/subscribe-user.dto';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -64,6 +65,20 @@ export class UserController {
       communityJoinDto.name,
     );
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
+  }
+
+  @Post('subscribe')
+  @HttpCode(HttpStatus.CREATED)
+  async subscribe(@Body() subscribeUserDto: SubscribeUserDto) {
+    const user = await this.userService.createOrUpdateFromSubscription(subscribeUserDto);
+    return new UserResponseDto(JSON.parse(JSON.stringify(user)));
+  }
+
+  @Post('mentor-application')
+  @HttpCode(HttpStatus.CREATED)
+  async mentorApplication(@Body() mentorApplicationDto: MentorApplicationDto) {
+    const mentor = await this.userService.createMentorApplication(mentorApplicationDto);
+    return new UserResponseDto(JSON.parse(JSON.stringify(mentor)));
   }
 
   @Post('apply/mentor')

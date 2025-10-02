@@ -1,40 +1,109 @@
-# SosAcademyPlatform
+# SOS Academy Platform
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+🚀 **Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/npm-workspaces-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
 
-## Run tasks
+## 🎯 MVP Features
 
-To run tasks with Nx use:
+- **User Subscription**: Join communities with email and community selection
+- **Mentor Applications**: Apply to become a mentor with streamlined process
+- **Community Management**: 5 specialized communities (JavaScript, Python, Go, Java, Ruby)
+- **Email Notifications**: Automated confirmation emails with Monday meeting cadence
+- **GitHub Integration**: Automatic profile enrichment from GitHub handles
+- **Beautiful UI**: Modern, responsive design with modal-based forms
+
+## 🏗️ Architecture
+
+- **Frontend**: Next.js 15 + React 19 + TypeScript + Tailwind CSS
+- **Backend**: NestJS + MongoDB + Mongoose
+- **Email**: SendGrid integration with Handlebars templates
+- **Monorepo**: Nx workspace for efficient development
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- MongoDB (local or cloud)
+- SendGrid account (for emails)
+
+### Environment Setup
+Create a `.env` file in the root directory:
+
+```env
+# Server Configuration
+PORT=4200
+NODE_ENV=development
+
+# MongoDB Connection
+MONGODB_URI=mongodb://localhost:27017/sos-academy
+
+# JWT Authentication
+JWT_SECRET=your_jwt_secret_key_here_change_in_production
+JWT_EXPIRATION=1d
+
+# Cors Configuration
+CORS_ORIGIN=http://localhost:3000
+
+# Email Configuration (SendGrid)
+EMAIL_HOST=smtp.sendgrid.net
+EMAIL_USER=apikey
+EMAIL_PASSWORD=your_sendgrid_api_key_here
+EMAIL_FROM=no-reply@sos-academy.org
+
+# GitHub API (Optional - for higher rate limits)
+GITHUB_TOKEN=your_github_token_here_optional
+```
+
+### Development
 
 ```sh
-npx nx <target> <project-name>
+# Install dependencies
+npm install
+
+# Start MongoDB (if running locally)
+mongod
+
+# Start the backend server
+npx nx serve server
+
+# Start the frontend (in another terminal)
+npx nx serve frontend
 ```
 
-For example:
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4200
+
+### Build for Production
 
 ```sh
-npx nx build myproject
+# Build both frontend and backend
+npx nx build frontend
+npx nx build server
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 📋 API Endpoints
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### User Management
+- `POST /api/users/subscribe` - Subscribe to communities
+- `POST /api/users/mentor-application` - Apply as mentor
+- `GET /api/users` - Get all users
+- `GET /api/users/:id` - Get user by ID
 
-## Versioning and releasing
+### Subscription Flow
+1. User fills subscription form with email, name, communities, and optional GitHub handle
+2. Backend creates/updates user record with `status: 'pending'`
+3. GitHub profile is enriched if handle provided
+4. Confirmation email sent with community details and Monday meeting cadence
 
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](hhttps://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Mentor Application Flow
+1. User fills mentor application form
+2. Backend creates user record with `source: 'mentor-application'` and `status: 'pending'`
+3. GitHub profile is enriched if handle provided
+4. Confirmation email sent with manual review timeline (3-5 business days)
 
 ## Add new projects
 

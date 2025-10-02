@@ -130,15 +130,18 @@ export class EmailService {
    * Send a community join confirmation email
    * @param to User's email address
    * @param name User's name (optional)
+   * @param communities Selected communities (optional)
    */
   async sendCommunityJoinConfirmation(
     to: string,
-    name?: string
+    name?: string,
+    communities?: string[]
   ): Promise<void> {
     const params: EmailTemplateParams = {
       name: name || 'there',
       date: new Date().toLocaleDateString(),
       communityName: 'SOS Academy',
+      communities: communities ? communities.join(', ') : 'your selected communities',
     };
 
     await this.sendTemplatedEmail(

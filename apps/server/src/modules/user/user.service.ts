@@ -10,9 +10,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
+import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import * as bcrypt from 'bcrypt';
 import { EmailService } from '../email/email.service';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
@@ -212,5 +214,153 @@ export class UserService {
     user.status = UserStatus.REJECTED;
 
     return user.save();
+  }
+
+  /**
+   * Create or update user from subscription
+   * @param subscribeUserDto Subscription data
+   */
+  async createOrUpdateFromSubscription(subscribeUserDto: SubscribeUserDto): Promise<User> {
+    const { email, name, communities, githubHandle } = subscribeUserDto;
+
+    // Check if user already exists
+    let existingUser = await this.userModel.findOne({ email }).exec();
+    
+    if (existingUser) {
+      // Update existing user
+      existingUser.name = name || existingUser.name;
+      existingUser.communityIds = communities;
+      existingUser.source = 'subscription';
+      existingUser.status = UserStatus.PENDING;
+      
+      // Enrich with GitHub profile if handle provided
+      if (githubHandle) {
+        try {
+          const githubProfile = await this.fetchGitHubProfile(githubHandle);
+          if (githubProfile) {
+            existingUser.githubProfile = githubProfile;
+          }
+        } catch (error) {
+          console.error('Failed to fetch GitHub profile:', error);
+        }
+      }
+      
+      const savedUser = await existingUser.save();
+      
+      // Send confirmation email
+      try {
+        await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
+      } catch (error) {
+        console.error('Failed to send subscription confirmation email:', error);
+      }
+      
+      return savedUser;
+    } else {
+      // Create new user
+      const newUser = new this.userModel({
+        email,
+        name: name || '',
+        communityIds: communities,
+        role: UserRole.MEMBER,
+        status: UserStatus.PENDING,
+        source: 'subscription',
+      });
+
+      // Enrich with GitHub profile if handle provided
+      if (githubHandle) {
+        try {
+          const githubProfile = await this.fetchGitHubProfile(githubHandle);
+          if (githubProfile) {
+            newUser.githubProfile = githubProfile;
+          }
+        } catch (error) {
+          console.error('Failed to fetch GitHub profile:', error);
+        }
+      }
+
+      const savedUser = await newUser.save();
+
+      // Send confirmation email
+      try {
+        await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
+      } catch (error) {
+        console.error('Failed to send subscription confirmation email:', error);
+      }
+
+      return savedUser;
+    }
+  }
+
+  /**
+   * Create mentor application
+   * @param mentorApplicationDto Mentor application data
+   */
+  async createMentorApplication(mentorApplicationDto: MentorApplicationDto): Promise<User> {
+    const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
+
+    // Check if user already exists
+    const existingUser = await this.userModel.findOne({ email }).exec();
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    // Create mentor application
+    const newMentor = new this.userModel({
+      email,
+      name,
+      expertise,
+      motivation,
+      role: UserRole.MENTOR,
+      status: UserStatus.PENDING,
+      source: 'mentor-application',
+    });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newMentor.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
+
+    const savedMentor = await newMentor.save();
+
+    // Send confirmation email
+    try {
+      await this.emailService.sendMentorApplicationConfirmation(email, name);
+    } catch (error) {
+      console.error('Failed to send mentor application email:', error);
+    }
+
+    return savedMentor;
+  }
+
+  /**
+   * Fetch GitHub profile by handle
+   * @param handle GitHub username
+   */
+  private async fetchGitHubProfile(handle: string): Promise<{ login: string; avatarUrl: string; htmlUrl: string } | null> {
+    try {
+      const token = process.env.GITHUB_TOKEN;
+      const headers = token ? { Authorization: `token ${token}` } : {};
+      
+      const response = await axios.get(`https://api.github.com/users/${handle}`, {
+        headers,
+        timeout: 5000,
+      });
+
+      return {
+        login: response.data.login,
+        avatarUrl: response.data.avatar_url,
+        htmlUrl: response.data.html_url,
+      };
+    } catch (error) {
+      console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);
+      return null;
+    }
   }
 }

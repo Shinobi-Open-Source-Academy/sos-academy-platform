@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import CloseIcon from './icons/CloseIcon';
 import MenuIcon from './icons/MenuIcon';
+import SubscriptionModal from './SubscriptionModal';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState("");
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -23,17 +25,27 @@ export default function Navbar() {
         setIsScrolled(false);
       }
       
-      // Update active link based on scroll position
-      const sections = ["about", "communities", "featured-projects", "mentors"];
-      const scrollPosition = window.scrollY + 100;
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element && 
-            scrollPosition >= element.offsetTop && 
-            scrollPosition < element.offsetTop + element.offsetHeight) {
-          setActiveLink(section);
-          break;
+      // Update active link based on scroll position (only on home page)
+      if (window.location.pathname === '/') {
+        const sections = ["about", "communities", "featured-projects", "mentors"];
+        const scrollPosition = window.scrollY + 100;
+        
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element && 
+              scrollPosition >= element.offsetTop && 
+              scrollPosition < element.offsetTop + element.offsetHeight) {
+            setActiveLink(section);
+            break;
+          }
+        }
+      } else {
+        // For other pages, set active link based on current path
+        const currentPath = window.location.pathname;
+        if (currentPath === '/documentation') {
+          setActiveLink('documentation');
+        } else if (currentPath === '/blog') {
+          setActiveLink('blog');
         }
       }
     };
@@ -46,7 +58,9 @@ export default function Navbar() {
     { href: "/#about", label: "About" },
     { href: "/#communities", label: "Communities" },
     { href: "/#featured-projects", label: "Projects" },
-    { href: "/#mentors", label: "Mentors" }
+    { href: "/#mentors", label: "Mentors" },
+    { href: "/documentation", label: "Docs" },
+    { href: "/blog", label: "Blog" }
   ];
 
   return (
@@ -89,30 +103,20 @@ export default function Navbar() {
             key={link.href}
             href={link.href}
             className={`relative text-base px-1 py-1 ${
-              activeLink === link.href.split("#")[1]
+              activeLink === link.href.split("#")[1] || activeLink === link.href.split("/")[1]
               ? "text-white"
               : "text-gray-300 hover:text-transparent hover:bg-gradient-to-r hover:from-primary hover:to-gray-200 hover:bg-clip-text"
             } transition-colors duration-200`}
-            onClick={() => setActiveLink(link.href.split("#")[1])}
+            onClick={() => setActiveLink(link.href.split("#")[1] || link.href.split("/")[1])}
             >
               {link.label}
               <span 
               className={`absolute left-0 bottom-0 w-full h-0.5 bg-primary transform scale-x-0 origin-left transition-transform duration-300 ${
-                activeLink === link.href.split("#")[1] ? "scale-x-100" : ""
+                activeLink === link.href.split("#")[1] || activeLink === link.href.split("/")[1] ? "scale-x-100" : ""
               }`}
               />
               </Link>
           ))}
-        <Link 
-          href="/#join" 
-          onClick={() => setIsMenuOpen(false)}
-          className="relative overflow-hidden px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
-        >
-         <span className="relative z-10 flex items-center gap-1 sm:gap-2">
-           Join Us
-         </span>
-         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
-        </Link>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -137,27 +141,26 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className={`block text-base py-1 ${
-                activeLink === link.href.split("#")[1]
+                activeLink === link.href.split("#")[1] || activeLink === link.href.split("/")[1]
                   ? "text-white font-medium"
                   : "text-gray-300"
               } hover:text-white transition-colors`}
               onClick={() => {
-                setActiveLink(link.href.split("#")[1]);
+                setActiveLink(link.href.split("#")[1] || link.href.split("/")[1]);
                 setIsMenuOpen(false);
               }}
             >
               {link.label}
             </Link>
           ))}
-          <Link 
-            href="/#join" 
-            className="inline-block bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-medium transition-all transform hover:translate-y-[-2px]"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Join Us
-          </Link>
         </div>
       </div>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+      />
     </header>
   );
 }
