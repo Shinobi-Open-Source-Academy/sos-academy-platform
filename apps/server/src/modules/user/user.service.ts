@@ -137,7 +137,7 @@ export class UserService {
   async applyAsMentor(
     mentorApplicationDto: MentorApplicationDto
   ): Promise<User> {
-    const { email, password, name } = mentorApplicationDto;
+    const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
     // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
@@ -145,16 +145,28 @@ export class UserService {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Hash password
-    const hashedPassword = await this.hashPassword(password);
-
     // Create mentor application
     const newMentor = new this.userModel({
-      ...mentorApplicationDto,
-      password: hashedPassword,
+      email,
+      name,
+      expertise,
+      motivation,
       role: UserRole.MENTOR,
       status: UserStatus.APPLIED_MENTOR,
+      source: 'mentor-application',
     });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newMentor.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
 
     const savedMentor = await newMentor.save();
 
@@ -343,7 +355,23 @@ export class UserService {
    * Fetch GitHub profile by handle
    * @param handle GitHub username
    */
-  private async fetchGitHubProfile(handle: string): Promise<{ login: string; avatarUrl: string; htmlUrl: string } | null> {
+  private async fetchGitHubProfile(handle: string): Promise<{
+    login: string;
+    avatarUrl?: string;
+    htmlUrl?: string;
+    publicRepos?: number;
+    followers?: number;
+    following?: number;
+    createdAt?: Date;
+    lastUpdated: Date;
+    email?: string;
+    bio?: string;
+    location?: string;
+    company?: string;
+    blog?: string;
+    twitterUsername?: string;
+    githubId?: number;
+  } | null> {
     try {
       const token = process.env.GITHUB_TOKEN;
       const headers = token ? { Authorization: `token ${token}` } : {};
@@ -357,6 +385,18 @@ export class UserService {
         login: response.data.login,
         avatarUrl: response.data.avatar_url,
         htmlUrl: response.data.html_url,
+        publicRepos: response.data.public_repos,
+        followers: response.data.followers,
+        following: response.data.following,
+        createdAt: response.data.created_at ? new Date(response.data.created_at) : undefined,
+        lastUpdated: new Date(),
+        email: response.data.email,
+        bio: response.data.bio,
+        location: response.data.location,
+        company: response.data.company,
+        blog: response.data.blog,
+        twitterUsername: response.data.twitter_username,
+        githubId: response.data.id,
       };
     } catch (error) {
       console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);

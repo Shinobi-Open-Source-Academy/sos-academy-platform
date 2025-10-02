@@ -110,7 +110,7 @@ export default function Navbar() {
             />
             <div className="absolute -inset-1 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">SOSA</span>
+          <span className="text-xl font-bold text-white tracking-tight">SOS Academy</span>
         </Link>
 
         {/* Desktop Navigation */}
