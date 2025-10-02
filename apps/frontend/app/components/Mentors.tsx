@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import SectionHeading from "./ui/SectionHeading";
 import MentorCard from "./MentorCard";
-import { MENTORS } from "../config/mentors";
+import { MENTORS_LIST, MENTORS_DATA } from "../data/siteData";
 import MentorApplicationModal from "./MentorApplicationModal";
 
 export default function Mentors() {
@@ -39,8 +39,8 @@ export default function Mentors() {
     >
       <div className="container mx-auto px-4">
         <SectionHeading
-          title1="Expert Mentors"
-          description="Learn from industry professionals with years of experience in their fields. Our mentors are passionate about sharing their knowledge and helping you grow."
+          title1={MENTORS_DATA.heading.title}
+          description={MENTORS_DATA.heading.description}
           className="mb-16"
         />
 
@@ -52,7 +52,7 @@ export default function Mentors() {
             transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
           }}
         >
-          {MENTORS.map((mentor, index) => (
+          {MENTORS_LIST.map((mentor, index) => (
             <MentorCard key={index} {...mentor} />
           ))}
         </div>
@@ -70,7 +70,7 @@ export default function Mentors() {
             onClick={() => setIsMentorApplicationModalOpen(true)}
             className="relative overflow-hidden cursor-pointer px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
           >
-            <span className="relative z-10">Become a Mentor</span>
+            <span className="relative z-10">{MENTORS_DATA.cta.buttonText}</span>
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
           </button>
         </div>

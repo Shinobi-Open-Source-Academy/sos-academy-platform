@@ -1,4 +1,5 @@
 import { SOCIAL_LINKS } from "../../config/socialLinks";
+import { FOOTER_DATA } from "../../data/siteData";
 
 const CONTACT_ITEMS = [
   {
@@ -10,7 +11,7 @@ const CONTACT_ITEMS = [
         d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
       />
     ),
-    text: "info@shinobiopensource.academy",
+    text: FOOTER_DATA.contact.email,
   },
   {
     icon: (
@@ -21,7 +22,7 @@ const CONTACT_ITEMS = [
         d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
       />
     ),
-    text: "Join our Discord community for real-time discussions",
+    text: FOOTER_DATA.contact.discord,
   },
   {
     icon: (
@@ -32,7 +33,7 @@ const CONTACT_ITEMS = [
         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     ),
-    text: "Weekly community calls every Thursday at 7 PM UTC",
+    text: FOOTER_DATA.contact.schedule,
   },
 ];
 
