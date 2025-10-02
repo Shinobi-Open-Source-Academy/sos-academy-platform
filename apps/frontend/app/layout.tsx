@@ -29,7 +29,12 @@ export const metadata: Metadata = {
   title: "Shinobi Open-Source Academy",
   description: "Empowering the Next Generation of Open-Source Warriors",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/shinobiLogo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/shinobiLogo.png",
   },
 };
 

@@ -1,6 +1,7 @@
 import GithubIcon from "../components/icons/GithubIcon";
 import XIcon from "../components/icons/XIcon";
 import LinkedinIcon from "../components/icons/LinkedinIcon";
+import DiscordIcon from "../components/icons/DiscordIcon";
 
 export interface SocialLink {
   name: string;
@@ -16,12 +17,17 @@ export const SOCIAL_LINKS: SocialLink[] = [
   },
   {
     name: "X",
-    url: "#",
+    url: "https://x.com/SOSAcademy_",
     icon: XIcon,
   },
   {
     name: "LinkedIn",
-    url: "#",
+    url: "https://www.linkedin.com/company/shinobi-open-source-academy-sos-a/about/",
     icon: LinkedinIcon,
+  },
+  {
+    name: "Discord",
+    url: "https://discord.gg/9Wgx7bCh",
+    icon: DiscordIcon,
   },
 ];

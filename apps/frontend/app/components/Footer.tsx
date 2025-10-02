@@ -3,6 +3,7 @@
 import Newsletter from "./footer/Newsletter";
 import QuickLinks from "./footer/QuickLinks";
 import ContactInfo from "./footer/ContactInfo";
+import { FOOTER_DATA } from "../data/siteData";
 
 export default function Footer() {
   return (
@@ -21,8 +22,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800/40 mt-16 pt-8 text-center text-gray-400 text-sm">
           <p>
-            © {new Date().getFullYear()} Shinobi Open-Source Academy. All rights
-            reserved.
+            © {new Date().getFullYear()} {FOOTER_DATA.copyright}
           </p>
         </div>
       </div>

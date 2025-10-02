@@ -1,8 +1,6 @@
 import { IconProps } from './types';
 
-export default function DiscordIcon({
-  className = 'h-5 w-5 text-primary',
-}: IconProps) {
+export default function DiscordIcon({ className = 'h-6 w-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

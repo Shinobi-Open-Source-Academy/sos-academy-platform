@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import CodeBackground from "./CodeBackground";
-import { HERO_CONFIG } from "../constants/hero";
+import { HERO_DATA } from "../data/siteData";
 import { COMPANIES } from "../constants/companies";
 import HeroHeading from "./ui/HeroHeading";
 import HeroBanner from "./ui/HeroBanner";
@@ -10,10 +10,12 @@ import HeroButton from "./ui/HeroButton";
 import LogoAnimation from "./ui/LogoAnimation";
 import CompanyMarquee from "./ui/CompanyMarquee";
 import ArrowRightFillIcon from './icons/ArrowRightFillIcon';
+import SubscriptionModal from "./SubscriptionModal";
 
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const [dots, setDots] = useState<
     Array<{
@@ -29,7 +31,7 @@ export default function Hero() {
     // Small delay to trigger animations after component mounts
     setTimeout(() => {
       setIsLoaded(true);
-    }, HERO_CONFIG.LOAD_ANIMATION_DELAY);
+    }, HERO_DATA.loadAnimationDelay);
 
     // Generate random dots only on client-side to avoid hydration mismatch
     setDots(
@@ -81,9 +83,9 @@ export default function Hero() {
                 top: `${dot.top}%`,
                 left: `${dot.left}%`,
                 transform: `translate(${
-                  mousePosition.x * HERO_CONFIG.PARALLAX_MULTIPLIERS.DOTS - 10
+                  mousePosition.x * HERO_DATA.parallaxMultipliers.dots - 10
                 }px, ${
-                  mousePosition.y * HERO_CONFIG.PARALLAX_MULTIPLIERS.DOTS - 10
+                  mousePosition.y * HERO_DATA.parallaxMultipliers.dots - 10
                 }px)`,
                 transition: "transform 0.5s ease-out",
                 animationDuration: `${dot.duration}s`,
@@ -105,12 +107,12 @@ export default function Hero() {
         >
           {/* Banner component */}
           <HeroBanner
-            text={HERO_CONFIG.ACADEMY_BANNER_TEXT}
+            text={HERO_DATA.academyBannerText}
             style={{
               transform: `translate(${
-                mousePosition.x * HERO_CONFIG.PARALLAX_MULTIPLIERS.BANNER
+                mousePosition.x * HERO_DATA.parallaxMultipliers.banner
               }px, ${
-                mousePosition.y * HERO_CONFIG.PARALLAX_MULTIPLIERS.BANNER
+                mousePosition.y * HERO_DATA.parallaxMultipliers.banner
               }px)`,
               transition: "transform 0.3s ease-out",
             }}
@@ -118,17 +120,17 @@ export default function Hero() {
 
           {/* Heading component */}
           <HeroHeading
-            mainText={HERO_CONFIG.SHINOBI_TEXT}
-            secondaryText={HERO_CONFIG.TITLE_TEXT}
-            typingSpeed={HERO_CONFIG.TYPING_SPEED}
-            typingStartDelay={HERO_CONFIG.TYPING_START_DELAY}
-            typingRestartDelay={HERO_CONFIG.TYPING_RESTART_DELAY}
-            typingPauseDelay={HERO_CONFIG.TYPING_PAUSE_DELAY}
+            mainText={HERO_DATA.shinobiText}
+            secondaryText={HERO_DATA.titleText}
+            typingSpeed={HERO_DATA.typingSpeed}
+            typingStartDelay={HERO_DATA.typingStartDelay}
+            typingRestartDelay={HERO_DATA.typingRestartDelay}
+            typingPauseDelay={HERO_DATA.typingPauseDelay}
             style={{
               transform: `translate(${
-                mousePosition.x * HERO_CONFIG.PARALLAX_MULTIPLIERS.HEADING
+                mousePosition.x * HERO_DATA.parallaxMultipliers.heading
               }px, ${
-                mousePosition.y * HERO_CONFIG.PARALLAX_MULTIPLIERS.HEADING
+                mousePosition.y * HERO_DATA.parallaxMultipliers.heading
               }px)`,
               transition: "transform 0.5s ease-out",
             }}
@@ -139,15 +141,15 @@ export default function Hero() {
             className="font-sans text-lg sm:text-xl md:text-2xl text-gray-100 mb-4 sm:mb-6 font-light tracking-wide"
             style={{
               transform: `translate(${
-                mousePosition.x * HERO_CONFIG.PARALLAX_MULTIPLIERS.SUBTITLE
+                mousePosition.x * HERO_DATA.parallaxMultipliers.subtitle
               }px, ${
-                mousePosition.y * HERO_CONFIG.PARALLAX_MULTIPLIERS.SUBTITLE
+                mousePosition.y * HERO_DATA.parallaxMultipliers.subtitle
               }px)`,
               transition: "transform 0.7s ease-out",
               opacity: isLoaded ? 1 : 0,
             }}
           >
-            {HERO_CONFIG.SUBTITLE_TEXT}
+            {HERO_DATA.subtitleText}
           </p>
 
           {/* Description */}
@@ -155,15 +157,15 @@ export default function Hero() {
             className="font-body text-sm sm:text-base text-gray-300 mb-6 sm:mb-8 md:mb-10 leading-relaxed"
             style={{
               transform: `translate(${
-                mousePosition.x * HERO_CONFIG.PARALLAX_MULTIPLIERS.DESCRIPTION
+                mousePosition.x * HERO_DATA.parallaxMultipliers.description
               }px, ${
-                mousePosition.y * HERO_CONFIG.PARALLAX_MULTIPLIERS.DESCRIPTION
+                mousePosition.y * HERO_DATA.parallaxMultipliers.description
               }px)`,
               transition: "transform 0.9s ease-out",
               opacity: isLoaded ? 1 : 0,
             }}
           >
-            {HERO_CONFIG.DESCRIPTION_TEXT}
+            {HERO_DATA.descriptionText}
           </p>
 
           {/* Buttons */}
@@ -176,17 +178,27 @@ export default function Hero() {
                 "opacity 1s ease-out 0.2s, transform 1s ease-out 0.2s",
             }}
           >
-            <HeroButton
-              text={HERO_CONFIG.JOIN_BUTTON_TEXT}
-              href={HERO_CONFIG.JOIN_URL}
-              isPrimary
-              icon={<ArrowRightFillIcon />}
-            />
+            <button
+              onClick={() => setIsSubscriptionModalOpen(true)}
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            >
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                {HERO_DATA.joinButtonText}
+                <ArrowRightFillIcon />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
+            </button>
 
-            <HeroButton
-              text={HERO_CONFIG.LEARN_MORE_BUTTON_TEXT}
-              href={HERO_CONFIG.LEARN_MORE_URL}
-            />
+            <button
+              onClick={() => window.location.href = '/documentation'}
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+            >
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                {HERO_DATA.learnMoreButtonText}
+                <ArrowRightFillIcon />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
+            </button>
           </div>
         </div>
 
@@ -216,23 +228,29 @@ export default function Hero() {
           </div>
           <div className="relative flex justify-center my-4">
             <span className="bg-[#070a1d] px-4 sm:px-6 text-xs sm:text-sm uppercase tracking-wider font-medium text-gray-400">
-              {HERO_CONFIG.COMPANIES_TITLE}
+              {HERO_DATA.companiesTitle}
             </span>
           </div>
         </div>
 
         <p className="font-sans text-center text-base sm:text-lg font-medium text-gray-200 mb-6 sm:mb-8">
-          {HERO_CONFIG.COMPANIES_SUBTITLE}
+          {HERO_DATA.companiesSubtitle}
         </p>
 
         {/* Company marquee component */}
         <CompanyMarquee
           companies={COMPANIES}
-          speed={HERO_CONFIG.MARQUEE_SPEED}
-          pauseOnHover={HERO_CONFIG.MARQUEE_PAUSE_ON_HOVER}
-          direction={HERO_CONFIG.MARQUEE_DIRECTION}
+          speed={HERO_DATA.marqueeSpeed}
+          pauseOnHover={HERO_DATA.marqueePauseOnHover}
+          direction={HERO_DATA.marqueeDirection}
         />
       </div>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+      />
     </section>
   );
 }

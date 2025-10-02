@@ -72,3 +72,12 @@ export class Project {
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+
+// Add indexes for performance
+ProjectSchema.index({ community: 1, status: 1 });
+ProjectSchema.index({ owner: 1 });
+ProjectSchema.index({ rank: 1, status: 1 });
+ProjectSchema.index({ status: 1 });
+ProjectSchema.index({ technologies: 1 });
+ProjectSchema.index({ createdAt: -1 });
+ProjectSchema.index({ startDate: 1, endDate: 1 });

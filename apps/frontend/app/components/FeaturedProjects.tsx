@@ -4,9 +4,21 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import SectionHeading from "./ui/SectionHeading";
 import {
-  FEATURED_PROJECTS,
-  FeaturedProjectProps,
-} from "../constants/featured-projects";
+  FEATURED_PROJECTS_LIST,
+  FEATURED_PROJECTS_DATA,
+} from "../data/siteData";
+
+// Type for featured project props
+type FeaturedProjectProps = {
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  url: string;
+  githubStars: string;
+  contributors: string;
+  isInternal?: boolean;
+};
 
 const FeaturedProjectCard = ({
   title,
@@ -228,13 +240,13 @@ export default function FeaturedProjects() {
         </div>
 
         <SectionHeading
-          title1="Featured Open-Source Projects"
-          description="Explore these high-impact projects where our community members make contributions. Perfect for building your portfolio and gaining real-world experience."
+          title1={FEATURED_PROJECTS_DATA.heading.title}
+          description={FEATURED_PROJECTS_DATA.heading.description}
           className="mb-20"
         />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-          {FEATURED_PROJECTS.map((project, index) => (
+          {FEATURED_PROJECTS_LIST.map((project, index) => (
             <FeaturedProjectCard key={index} {...project} index={index} />
           ))}
         </div>
@@ -256,7 +268,8 @@ export default function FeaturedProjects() {
               project requirements, and make your first contributions.
             </p>
             <button
-              className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+              onClick={() => window.location.href = '/documentation'}
+              className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl cursor-pointer"
             >
              <span className="relative z-10">Get Started</span>
              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { FOOTER_DATA } from '../../data/siteData';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
@@ -60,10 +61,9 @@ export default function Newsletter() {
       </div>
 
       <div>
-        <h4 className="text-lg font-bold mb-4">Stay Updated</h4>
+        <h4 className="text-lg font-bold mb-4">{FOOTER_DATA.newsletter.title}</h4>
         <p className="text-gray-400 mb-4">
-          Subscribe to our newsletter to get the latest updates on our
-          communities, projects, and upcoming events.
+          {FOOTER_DATA.newsletter.description}
         </p>
         {success ? (
           <div className="bg-green-900/30 border border-green-700 text-green-300 px-4 py-3 rounded-lg mb-4">
@@ -78,7 +78,7 @@ export default function Newsletter() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email address"
+              placeholder={FOOTER_DATA.newsletter.placeholder}
               required
               className="px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary w-full"
               disabled={isLoading}
@@ -86,11 +86,11 @@ export default function Newsletter() {
          <button
            type="submit"
            disabled={isLoading}
-           className={`relative overflow-hidden whitespace-nowrap shrink-0 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group ${
+           className={`relative overflow-hidden whitespace-nowrap shrink-0 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group cursor-pointer ${
              isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl'
            }`}
           >
-            <span className="relative z-10">{isLoading ? 'Joining...' : 'Subscribe'}</span>
+            <span className="relative z-10">{isLoading ? 'Joining...' : FOOTER_DATA.newsletter.buttonText}</span>
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
         </button>
           </form>

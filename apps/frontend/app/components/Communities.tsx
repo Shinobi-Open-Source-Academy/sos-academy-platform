@@ -3,15 +3,14 @@
 import { useState, useRef, useEffect } from 'react';
 import SectionHeading from './ui/SectionHeading';
 import CommunityCard from './ui/CommunityCard';
-import ArrowRightIcon from './icons/ArrowRightIcon';
 import VideoIcon from './icons/VideoIcon';
-import { COMMUNITIES, COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import { COMMUNITIES_LIST, COMMUNITIES_DATA } from '@/app/data/siteData';
 import CountUp from 'react-countup';
 
 export default function Communities() {
   const [isInView, setIsInView] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { WEEKLY_CALLS, STATS } = COMMUNITIES_CONSTANTS;
+  const { weeklyCalls, stats } = COMMUNITIES_DATA;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -35,19 +34,19 @@ export default function Communities() {
     <section
       id="communities"
       ref={sectionRef}
-      className={`section py-20 ${COMMUNITIES_CONSTANTS.STYLE.SECTION_BG}`}
+      className={`section py-20 ${COMMUNITIES_DATA.style.sectionBg}`}
     >
       <div className="container mx-auto px-4">
         <SectionHeading
-          title1="Our Communities"
-          description="Join specialized sub-communities based on programming languages and domains, each led by experienced mentors who will guide your open-source journey."
+          title1={COMMUNITIES_DATA.heading.title}
+          description={COMMUNITIES_DATA.heading.description}
           className="mb-16"
           titleClassName="text-white"
           descriptionClassName="text-gray-300 text-lg"
         />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {COMMUNITIES.map((community, index) => (
+          {COMMUNITIES_LIST.map((community, index) => (
             <CommunityCard
               key={community.id}
               community={community}
@@ -64,7 +63,7 @@ export default function Communities() {
 
           <div className="absolute inset-0 opacity-5 overflow-hidden">
             <div className="text-[10px] text-white/80 font-mono whitespace-pre overflow-hidden p-8">
-              {WEEKLY_CALLS.CODE_SNIPPET}
+              {weeklyCalls.codeSnippet}
             </div>
           </div>
 
@@ -75,19 +74,12 @@ export default function Communities() {
                   <VideoIcon />
                 </div>
                 <h3 className="text-3xl font-bold mb-4 text-white bg-clip-text bg-gradient-to-r from-white to-gray-200">
-                  {WEEKLY_CALLS.TITLE}
+                  {weeklyCalls.title}
                 </h3>
                 <p className="text-gray-300 text-lg leading-relaxed">
-                  {WEEKLY_CALLS.DESCRIPTION}
+                  {weeklyCalls.description}
                 </p>
 
-               <button className="relative overflow-hidden mt-6 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl inline-flex items-center cursor-pointer">
-                <span className="relative z-10 flex items-center gap-2">
-                 Join Next Call
-                <ArrowRightIcon className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-                </span>
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
-               </button>
 
               </div>
 
@@ -98,7 +90,7 @@ export default function Communities() {
                   <div className="text-center mb-4">
                     <div className="text-5xl font-bold mb-2">
                       <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-                        {STATS.COMMUNITIES_COUNT}
+                        {stats.communitiesCount}
                       </span>
                     </div>
                     <p className="text-gray-300 font-medium uppercase tracking-wider text-sm">
@@ -111,11 +103,9 @@ export default function Communities() {
                       <div className="text-2xl font-bold text-white">
                         <CountUp
                           start={0}
-                          end={Number(STATS.MEMBERS_COUNT)}
+                          end={Number(stats.membersCount)}
                           duration={4}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                         +
                       </div>
@@ -127,11 +117,9 @@ export default function Communities() {
                       <div className="text-2xl font-bold text-white">
                         <CountUp
                           start={0}
-                          end={Number(STATS.MENTORS_COUNT)}
+                          end={Number(stats.mentorsCount)}
                           duration={4}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                       </div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider">
@@ -142,11 +130,9 @@ export default function Communities() {
                       <div className="text-2xl font-bold text-white">
                         <CountUp
                           start={0}
-                          end={Number(STATS.PROJECTS_COUNT)}
+                          end={Number(stats.projectsCount)}
                           duration={3}
                           separator=","
-                          enableScrollSpy={true}
-                          scrollSpyDelay={100}
                         />
                         +
                       </div>
