@@ -8,5 +8,6 @@ export interface MentorProps {
     github?: string;
     linkedin?: string;
     twitter?: string;
+    website?: string;
   };
 }

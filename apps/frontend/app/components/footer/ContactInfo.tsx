@@ -61,6 +61,8 @@ export default function ContactInfo() {
           <a
             key={social.name}
             href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-colors"
             aria-label={social.name}
           >

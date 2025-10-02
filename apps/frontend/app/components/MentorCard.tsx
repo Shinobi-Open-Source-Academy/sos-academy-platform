@@ -6,6 +6,7 @@ import { MentorProps } from "../types/mentor";
 import GithubIcon from "./icons/GithubIcon";
 import XIcon from "./icons/XIcon";
 import LinkedinIcon from "./icons/LinkedinIcon";
+import LinkIcon from "./icons/LinkIcon";
 
 export default function MentorCard({
   name,
@@ -110,6 +111,17 @@ export default function MentorCard({
               aria-label="LinkedIn Profile"
             >
               <LinkedinIcon />
+            </a>
+          )}
+          {social.website && (
+            <a
+              href={social.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-primary transition-colors duration-300"
+              aria-label="Personal Website"
+            >
+              <LinkIcon />
             </a>
           )}
         </div>

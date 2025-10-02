@@ -10,11 +10,11 @@ export default function Blog() {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [isMentorApplicationModalOpen, setIsMentorApplicationModalOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 overflow-x-hidden">
       <Navbar />
       <main className="pt-[var(--navbar-height)]">
-        <div className="container mx-auto px-4 py-16 pb-24">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="container mx-auto px-4 py-16 pb-24 max-w-full">
+          <div className="max-w-4xl mx-auto text-center w-full">
             {/* Header */}
             <div className="my-16">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-gray-800 dark:from-primary dark:to-gray-400 bg-clip-text text-transparent">
@@ -26,7 +26,7 @@ export default function Blog() {
             </div>
 
             {/* Coming Soon Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-12 mb-12">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-12 mb-12 w-full">
               <div className="max-w-2xl mx-auto">
                 {/* Blurred Background Effect */}
                 <div className="relative mb-8">
@@ -98,7 +98,7 @@ export default function Blog() {
                 </div>
 
                 {/* Stay Updated */}
-                <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="mt-12 p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg w-full">
                   <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                     Stay Updated
                   </h3>

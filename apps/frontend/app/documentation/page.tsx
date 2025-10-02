@@ -10,11 +10,11 @@ export default function Documentation() {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [isMentorApplicationModalOpen, setIsMentorApplicationModalOpen] = useState(false);
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 overflow-x-hidden">
       <Navbar />
       <main className="pt-[var(--navbar-height)]">
-        <div className="container mx-auto px-4 py-16 pb-24">
-          <div className="max-w-4xl mx-auto">
+        <div className="container mx-auto px-4 py-16 pb-24 max-w-full">
+          <div className="max-w-4xl mx-auto w-full">
             {/* Header */}
             <div className="text-center my-16">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-gray-800 dark:from-primary dark:to-gray-400 bg-clip-text text-transparent">
@@ -26,12 +26,12 @@ export default function Documentation() {
             </div>
 
             {/* Code of Conduct */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 mb-12">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-8 mb-12 w-full">
               <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
                 Code of Conduct
               </h2>
               
-              <div className="prose prose-lg dark:prose-invert max-w-none">
+              <div className="prose prose-lg dark:prose-invert max-w-none w-full overflow-hidden">
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   The Shinobi Open-Source Academy is committed to providing a welcoming and inspiring community for all. We pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
                 </p>
@@ -81,7 +81,7 @@ export default function Documentation() {
             </div>
 
             {/* Getting Started */}
-            <div className="bg-gradient-to-br from-primary/5 to-blue-500/5 rounded-xl border border-primary/20 p-8 mb-12">
+            <div className="bg-gradient-to-br from-primary/5 to-blue-500/5 rounded-xl border border-primary/20 p-4 sm:p-8 mb-12 w-full">
               <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
                 Getting Started
               </h2>
@@ -112,7 +112,7 @@ export default function Documentation() {
             </div>
 
             {/* Join CTA */}
-            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-8 my-12">
+            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 sm:p-8 my-12 w-full">
               <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                 Ready to Join Our Community?
               </h2>

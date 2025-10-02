@@ -27,8 +27,8 @@ export default function Navbar() {
       
       // Update active link based on scroll position (only on home page)
       if (window.location.pathname === '/') {
-        const sections = ["about", "communities", "featured-projects", "mentors"];
-        const scrollPosition = window.scrollY + 100;
+        const sections = ["about", "communities", "projects", "mentors"];
+        const scrollPosition = window.scrollY + 50;
         
         for (const section of sections) {
           const element = document.getElementById(section);
@@ -46,6 +46,8 @@ export default function Navbar() {
           setActiveLink('documentation');
         } else if (currentPath === '/blog') {
           setActiveLink('blog');
+        } else if (currentPath === '/privacy-policy') {
+          setActiveLink('privacy-policy');
         }
       }
     };
@@ -54,10 +56,24 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Set active link immediately on page load for non-home pages
+  useEffect(() => {
+    if (window.location.pathname !== '/') {
+      const currentPath = window.location.pathname;
+      if (currentPath === '/documentation') {
+        setActiveLink('documentation');
+      } else if (currentPath === '/blog') {
+        setActiveLink('blog');
+      } else if (currentPath === '/privacy-policy') {
+        setActiveLink('privacy-policy');
+      }
+    }
+  }, []);
+
   const links = [
     { href: "/#about", label: "About" },
     { href: "/#communities", label: "Communities" },
-    { href: "/#featured-projects", label: "Projects" },
+    { href: "/#projects", label: "Projects" },
     { href: "/#mentors", label: "Mentors" },
     { href: "/documentation", label: "Docs" },
     { href: "/blog", label: "Blog" }
@@ -90,6 +106,7 @@ export default function Navbar() {
               width={40}
               height={40}
               className="drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
+              style={{ width: "auto", height: "auto" }}
             />
             <div className="absolute -inset-1 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
@@ -132,10 +149,10 @@ export default function Navbar() {
       {/* Mobile Navigation */}
       <div 
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
+          isMenuOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-6 py-5 space-y-5 bg-gray-900/95 backdrop-blur-md border-t border-gray-800/60">
+        <div className="px-6 py-6 space-y-4 bg-gray-900/95 backdrop-blur-md border-t border-gray-800/60">
           {links.map((link) => (
             <Link
               key={link.href}

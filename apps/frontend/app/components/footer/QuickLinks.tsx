@@ -5,8 +5,8 @@ const QUICK_LINKS = [
   { href: "/#communities", label: "Our Communities" },
   { href: "/#projects", label: "Projects" },
   { href: "/#mentors", label: "Our Mentors" },
-  { href: "#", label: "Blog" },
-  { href: "#", label: "Privacy Policy" },
+  { href: "/blog", label: "Blog" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
 ];
 
 export default function QuickLinks() {

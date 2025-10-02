@@ -18,6 +18,7 @@ export const MENTORS: MentorProps[] = [
       github: "https://github.com/pacyL2K19",
       linkedin: "https://linkedin.com/in/pacifique-linjanja",
       twitter: "https://x.com/PacifiqueLinja1",
+      website: "https://paclinjanja.com",
     },
   },
   {
@@ -29,6 +30,7 @@ export const MENTORS: MentorProps[] = [
     social: {
       github: "https://github.com/mayawilliams",
       linkedin: "https://linkedin.com/in/mayawilliams",
+      website: "https://davidkathoh.com",
     },
   },
   {
