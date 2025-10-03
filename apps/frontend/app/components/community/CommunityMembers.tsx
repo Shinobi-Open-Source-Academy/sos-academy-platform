@@ -40,7 +40,7 @@ export default function CommunityMembers({ community }: CommunityMembersProps) {
             ) : (
               <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-8 text-center">
                 <p className="text-gray-300">No members have joined this community yet.</p>
-                <button className="mt-4 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300">
+                <button type="button" className="mt-4 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300">
                   Be the first to join
                 </button>
               </div>
@@ -64,6 +64,7 @@ function MemberCard({ member }: { member: CommunityMember }) {
       case 'chunin':
         return 'bg-green-600';
       case 'genin':
+        return 'bg-blue-600';
       default:
         return 'bg-blue-600';
     }
@@ -78,6 +79,7 @@ function MemberCard({ member }: { member: CommunityMember }) {
       case 'chunin':
         return 'Chunin';
       case 'genin':
+        return 'Genin';
       default:
         return 'Genin';
     }
@@ -85,9 +87,9 @@ function MemberCard({ member }: { member: CommunityMember }) {
 
   // Get badge based on contributions
   const getContributionBadge = (contributions: number) => {
-    if (contributions >= 100) return { label: 'Elite', color: 'bg-purple-600' };
-    if (contributions >= 50) return { label: 'Veteran', color: 'bg-red-600' };
-    if (contributions >= 20) return { label: 'Regular', color: 'bg-green-600' };
+    if (contributions >= 100) { return { label: 'Elite', color: 'bg-purple-600' }; }
+    if (contributions >= 50) { return { label: 'Veteran', color: 'bg-red-600' }; }
+    if (contributions >= 20) { return { label: 'Regular', color: 'bg-green-600' }; }
     return { label: 'Newcomer', color: 'bg-blue-600' };
   };
 

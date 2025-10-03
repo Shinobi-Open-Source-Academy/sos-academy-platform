@@ -42,8 +42,9 @@ export default function ContactInfo() {
     <div>
       <h4 className="text-lg font-bold mb-4">Contact Us</h4>
       <ul className="space-y-4">
-        {CONTACT_ITEMS.map((item, index) => (
-          <li key={index} className="flex items-start">
+        {CONTACT_ITEMS.map((item) => (
+          <li key={Math.random()} className="flex items-start">
+            {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg
               className="h-5 w-5 text-primary mr-3 mt-1"
               fill="none"

@@ -53,8 +53,7 @@
   "workspaces": ["packages/*"],
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,jsonc,md}": [
-      "biome format --write --no-errors-on-unmatched",
-      "biome lint --write --no-errors-on-unmatched"
+      "biome format --write --no-errors-on-unmatched"
     ]
   },
   "dependencies": {

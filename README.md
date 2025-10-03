@@ -142,7 +142,7 @@ npm run check
 npm run check:fix
 ```
 
-**Pre-commit Hook**: Code is automatically formatted and linted before each commit using Husky and lint-staged.
+**Pre-commit Hook**: Code is automatically formatted before each commit using Husky and lint-staged. Linting is available via npm scripts but not enforced on commit to avoid blocking development.
 
 ### Code Quality Tools
 

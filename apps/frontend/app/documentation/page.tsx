@@ -45,7 +45,7 @@ export default function Documentation() {
                 </p>
                 <ul className="list-disc pl-6 mb-6 text-gray-600 dark:text-gray-400 space-y-2">
                   {DOCUMENTATION_DATA.codeOfConduct.standards.items.map((item, index) => (
-                    <li key={index}>{item}</li>
+                    <li key={index + item}>{item}</li>
                   ))}
                 </ul>
 
@@ -58,7 +58,7 @@ export default function Documentation() {
                 <ul className="list-disc pl-6 mb-6 text-gray-600 dark:text-gray-400 space-y-2">
                   {DOCUMENTATION_DATA.codeOfConduct.unacceptableBehavior.items.map(
                     (item, index) => (
-                      <li key={index}>{item}</li>
+                      <li key={index + item}>{item}</li>
                     )
                   )}
                 </ul>
@@ -97,7 +97,7 @@ export default function Documentation() {
                   </h3>
                   <ol className="list-decimal pl-6 space-y-3 text-gray-600 dark:text-gray-400">
                     {DOCUMENTATION_DATA.gettingStarted.newMembers.steps.map((step, index) => (
-                      <li key={index}>{step}</li>
+                      <li key={index + step}>{step}</li>
                     ))}
                   </ol>
                 </div>
@@ -107,7 +107,7 @@ export default function Documentation() {
                   </h3>
                   <ol className="list-decimal pl-6 space-y-3 text-gray-600 dark:text-gray-400">
                     {DOCUMENTATION_DATA.gettingStarted.mentors.steps.map((step, index) => (
-                      <li key={index}>{step}</li>
+                      <li key={index + step}>{step}</li>
                     ))}
                   </ol>
                 </div>
@@ -124,6 +124,7 @@ export default function Documentation() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
+                  type="button"
                   onClick={() => setIsSubscriptionModalOpen(true)}
                   className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                 >
@@ -131,6 +132,7 @@ export default function Documentation() {
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsMentorApplicationModalOpen(true)}
                   className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                 >

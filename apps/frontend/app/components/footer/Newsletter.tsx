@@ -83,7 +83,7 @@ export default function Newsletter() {
               <span className="relative z-10">
                 {isLoading ? 'Joining...' : FOOTER_DATA.newsletter.buttonText}
               </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
             </button>
           </form>
         )}

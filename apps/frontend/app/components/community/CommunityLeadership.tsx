@@ -106,7 +106,7 @@ function KageCard({ kage }: KageProps) {
 
         <div className="flex flex-wrap gap-2 my-3">
           {kage.expertise.map((skill, index) => (
-            <span key={index} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
+            <span key={index + skill} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
               {skill}
             </span>
           ))}
@@ -165,7 +165,7 @@ function MentorCard({ mentor }: MentorProps) {
 
         <div className="flex flex-wrap gap-1 mt-1 mb-2">
           {mentor.expertise.slice(0, 3).map((skill, index) => (
-            <span key={index} className="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-xs">
+            <span key={index + skill} className="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-xs">
               {skill}
             </span>
           ))}

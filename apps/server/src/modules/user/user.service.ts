@@ -33,7 +33,7 @@ export class UserService {
     }
 
     // Hash password if provided
-    let hashedPassword;
+    let hashedPassword: string;
     if (password) {
       hashedPassword = await this.hashPassword(password);
     }
@@ -261,40 +261,39 @@ export class UserService {
       }
 
       return savedUser;
-    } else {
-      // Create new user
-      const newUser = new this.userModel({
-        email,
-        name: name || '',
-        communities: communities.map((id) => new Schema.Types.ObjectId(id)),
-        role: UserRole.MEMBER,
-        status: UserStatus.PENDING,
-        source: 'subscription',
-      });
-
-      // Enrich with GitHub profile if handle provided
-      if (githubHandle) {
-        try {
-          const githubProfile = await this.fetchGitHubProfile(githubHandle);
-          if (githubProfile) {
-            newUser.githubProfile = githubProfile;
-          }
-        } catch (error) {
-          console.error('Failed to fetch GitHub profile:', error);
-        }
-      }
-
-      const savedUser = await newUser.save();
-
-      // Send confirmation email
-      try {
-        await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
-      } catch (error) {
-        console.error('Failed to send subscription confirmation email:', error);
-      }
-
-      return savedUser;
     }
+    // Create new user
+    const newUser = new this.userModel({
+      email,
+      name: name || '',
+      communities: communities.map((id) => new Schema.Types.ObjectId(id)),
+      role: UserRole.MEMBER,
+      status: UserStatus.PENDING,
+      source: 'subscription',
+    });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newUser.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
+
+    const savedUser = await newUser.save();
+
+    // Send confirmation email
+    try {
+      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
+    } catch (error) {
+      console.error('Failed to send subscription confirmation email:', error);
+    }
+
+    return savedUser;
   }
 
   /**

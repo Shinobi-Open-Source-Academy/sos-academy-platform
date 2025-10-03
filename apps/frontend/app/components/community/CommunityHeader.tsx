@@ -26,7 +26,7 @@ export default function CommunityHeader({ community }: CommunityHeaderProps) {
             ''
           )}50 0%, transparent 70%)`,
         }}
-      ></div>
+      />
 
       {/* Code snippet background */}
       <div className="absolute inset-0 z-0 text-[10px] md:text-xs font-mono text-white whitespace-pre overflow-hidden p-4 opacity-5">
