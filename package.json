@@ -52,9 +52,7 @@
   },
   "workspaces": ["packages/*"],
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,jsonc,md}": [
-      "biome format --write --no-errors-on-unmatched"
-    ]
+    "*.{js,jsx,ts,tsx,json,jsonc,md}": ["biome format --write --no-errors-on-unmatched"]
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",

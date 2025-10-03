@@ -165,6 +165,13 @@ This project uses **Biome** for code formatting and linting instead of ESLint/Pr
 - The extension will show formatting issues and auto-fix on save
 - Pre-commit hooks ensure consistent formatting across the team
 
+**VS Code Setup:**
+- The project includes `.vscode/settings.json` with optimal Biome configuration
+- Auto-formatting and import organization on save is enabled
+- Recommended extensions are listed in `.vscode/extensions.json`
+- Debug configurations for both frontend and backend are available
+- Common development tasks can be run via VS Code's task runner
+
 ## 📋 API Endpoints
 
 ### User Management
