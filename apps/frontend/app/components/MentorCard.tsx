@@ -1,21 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Image from "next/image";
-import { MentorProps } from "../types/mentor";
-import GithubIcon from "./icons/GithubIcon";
-import XIcon from "./icons/XIcon";
-import LinkedinIcon from "./icons/LinkedinIcon";
-import LinkIcon from "./icons/LinkIcon";
+import Image from 'next/image';
+import { useState } from 'react';
+import type { MentorProps } from '../types/mentor';
+import GithubIcon from './icons/GithubIcon';
+import LinkIcon from './icons/LinkIcon';
+import LinkedinIcon from './icons/LinkedinIcon';
+import XIcon from './icons/XIcon';
 
-export default function MentorCard({
-  name,
-  role,
-  image,
-  bio,
-  expertise,
-  social,
-}: MentorProps) {
+export default function MentorCard({ name, role, image, bio, expertise, social }: MentorProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -24,11 +17,9 @@ export default function MentorCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        transform: isHovered ? "translateY(-6px)" : "translateY(0)",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        boxShadow: isHovered
-          ? "0 10px 30px rgba(0, 0, 0, 0.1)"
-          : "0 4px 6px rgba(0, 0, 0, 0.05)",
+        transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.1)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
       }}
     >
       <div className="relative h-80 w-full">
@@ -38,13 +29,13 @@ export default function MentorCard({
           fill
           className="object-cover"
           style={{
-            transform: isHovered ? "scale(1.05)" : "scale(1)",
-            transition: "transform 0.6s ease",
+            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+            transition: 'transform 0.6s ease',
           }}
         />
         <div
           className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6 transition-opacity duration-300 ${
-            isHovered ? "opacity-100" : "opacity-85"
+            isHovered ? 'opacity-100' : 'opacity-85'
           }`}
         >
           <div>
@@ -64,7 +55,7 @@ export default function MentorCard({
                 key={index}
                 className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs"
                 style={{
-                  transform: isHovered ? "translateY(0)" : "translateY(0)",
+                  transform: isHovered ? 'translateY(0)' : 'translateY(0)',
                   opacity: isHovered ? 1 : 0.9,
                   transition: `transform 0.3s ease ${
                     0.1 + index * 0.05

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useRef } from "react";
-import CodeBackground from "./CodeBackground";
-import { HERO_DATA } from "../data/siteData";
-import { COMPANIES } from "../constants/companies";
-import HeroHeading from "./ui/HeroHeading";
-import HeroBanner from "./ui/HeroBanner";
-import HeroButton from "./ui/HeroButton";
-import LogoAnimation from "./ui/LogoAnimation";
-import CompanyMarquee from "./ui/CompanyMarquee";
+import { useEffect, useRef, useState } from 'react';
+import { COMPANIES } from '../constants/companies';
+import { HERO_DATA } from '../data/siteData';
+import CodeBackground from './CodeBackground';
+import SubscriptionModal from './SubscriptionModal';
 import ArrowRightFillIcon from './icons/ArrowRightFillIcon';
-import SubscriptionModal from "./SubscriptionModal";
+import CompanyMarquee from './ui/CompanyMarquee';
+import HeroBanner from './ui/HeroBanner';
+import HeroButton from './ui/HeroButton';
+import HeroHeading from './ui/HeroHeading';
+import LogoAnimation from './ui/LogoAnimation';
 
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -55,8 +55,8 @@ export default function Hero() {
       setMousePosition({ x, y });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   return (
@@ -84,12 +84,10 @@ export default function Hero() {
                 left: `${dot.left}%`,
                 transform: `translate(${
                   mousePosition.x * HERO_DATA.parallaxMultipliers.dots - 10
-                }px, ${
-                  mousePosition.y * HERO_DATA.parallaxMultipliers.dots - 10
-                }px)`,
-                transition: "transform 0.5s ease-out",
+                }px, ${mousePosition.y * HERO_DATA.parallaxMultipliers.dots - 10}px)`,
+                transition: 'transform 0.5s ease-out',
                 animationDuration: `${dot.duration}s`,
-                animation: "float infinite ease-in-out",
+                animation: 'float infinite ease-in-out',
               }}
             ></div>
           ))}
@@ -101,20 +99,18 @@ export default function Hero() {
           className="w-full max-w-xl md:col-span-3"
           style={{
             opacity: isLoaded ? 1 : 0,
-            transform: `translateY(${isLoaded ? "0" : "30px"})`,
-            transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+            transform: `translateY(${isLoaded ? '0' : '30px'})`,
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
           }}
         >
           {/* Banner component */}
           <HeroBanner
             text={HERO_DATA.academyBannerText}
             style={{
-              transform: `translate(${
-                mousePosition.x * HERO_DATA.parallaxMultipliers.banner
-              }px, ${
+              transform: `translate(${mousePosition.x * HERO_DATA.parallaxMultipliers.banner}px, ${
                 mousePosition.y * HERO_DATA.parallaxMultipliers.banner
               }px)`,
-              transition: "transform 0.3s ease-out",
+              transition: 'transform 0.3s ease-out',
             }}
           />
 
@@ -127,12 +123,10 @@ export default function Hero() {
             typingRestartDelay={HERO_DATA.typingRestartDelay}
             typingPauseDelay={HERO_DATA.typingPauseDelay}
             style={{
-              transform: `translate(${
-                mousePosition.x * HERO_DATA.parallaxMultipliers.heading
-              }px, ${
+              transform: `translate(${mousePosition.x * HERO_DATA.parallaxMultipliers.heading}px, ${
                 mousePosition.y * HERO_DATA.parallaxMultipliers.heading
               }px)`,
-              transition: "transform 0.5s ease-out",
+              transition: 'transform 0.5s ease-out',
             }}
           />
 
@@ -142,10 +136,8 @@ export default function Hero() {
             style={{
               transform: `translate(${
                 mousePosition.x * HERO_DATA.parallaxMultipliers.subtitle
-              }px, ${
-                mousePosition.y * HERO_DATA.parallaxMultipliers.subtitle
-              }px)`,
-              transition: "transform 0.7s ease-out",
+              }px, ${mousePosition.y * HERO_DATA.parallaxMultipliers.subtitle}px)`,
+              transition: 'transform 0.7s ease-out',
               opacity: isLoaded ? 1 : 0,
             }}
           >
@@ -158,10 +150,8 @@ export default function Hero() {
             style={{
               transform: `translate(${
                 mousePosition.x * HERO_DATA.parallaxMultipliers.description
-              }px, ${
-                mousePosition.y * HERO_DATA.parallaxMultipliers.description
-              }px)`,
-              transition: "transform 0.9s ease-out",
+              }px, ${mousePosition.y * HERO_DATA.parallaxMultipliers.description}px)`,
+              transition: 'transform 0.9s ease-out',
               opacity: isLoaded ? 1 : 0,
             }}
           >
@@ -173,9 +163,8 @@ export default function Hero() {
             className="flex flex-wrap gap-3 sm:gap-4 mb-2"
             style={{
               opacity: isLoaded ? 1 : 0,
-              transform: `translateY(${isLoaded ? "0" : "20px"})`,
-              transition:
-                "opacity 1s ease-out 0.2s, transform 1s ease-out 0.2s",
+              transform: `translateY(${isLoaded ? '0' : '20px'})`,
+              transition: 'opacity 1s ease-out 0.2s, transform 1s ease-out 0.2s',
             }}
           >
             <button
@@ -190,7 +179,7 @@ export default function Hero() {
             </button>
 
             <button
-              onClick={() => window.location.href = '/documentation'}
+              onClick={() => (window.location.href = '/documentation')}
               className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
             >
               <span className="relative z-10 flex items-center gap-1 sm:gap-2">
@@ -218,7 +207,7 @@ export default function Hero() {
         className="container relative z-10 mx-auto px-4 sm:px-5 mt-16 sm:mt-20 md:mt-24"
         style={{
           opacity: isLoaded ? 1 : 0,
-          transition: "opacity 1.2s ease-out 0.5s",
+          transition: 'opacity 1.2s ease-out 0.5s',
         }}
       >
         {/* Subtle separator line */}

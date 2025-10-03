@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import SectionHeading from './ui/SectionHeading';
-import CommunityCard from './ui/CommunityCard';
-import VideoIcon from './icons/VideoIcon';
-import { COMMUNITIES_LIST, COMMUNITIES_DATA } from '@/app/data/siteData';
+import { COMMUNITIES_DATA, COMMUNITIES_LIST } from '@/app/data/siteData';
+import { useEffect, useRef, useState } from 'react';
 import CountUp from 'react-countup';
+import VideoIcon from './icons/VideoIcon';
+import CommunityCard from './ui/CommunityCard';
+import SectionHeading from './ui/SectionHeading';
 
 export default function Communities() {
   const [isInView, setIsInView] = useState(false);
@@ -76,11 +76,7 @@ export default function Communities() {
                 <h3 className="text-3xl font-bold mb-4 text-white bg-clip-text bg-gradient-to-r from-white to-gray-200">
                   {weeklyCalls.title}
                 </h3>
-                <p className="text-gray-300 text-lg leading-relaxed">
-                  {weeklyCalls.description}
-                </p>
-
-
+                <p className="text-gray-300 text-lg leading-relaxed">{weeklyCalls.description}</p>
               </div>
 
               <div className="relative md:w-1/3 w-full rounded-xl overflow-hidden">
@@ -109,9 +105,7 @@ export default function Communities() {
                         />
                         +
                       </div>
-                      <p className="text-xs text-gray-400 uppercase tracking-wider">
-                        Members
-                      </p>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider">Members</p>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white">
@@ -122,9 +116,7 @@ export default function Communities() {
                           separator=","
                         />
                       </div>
-                      <p className="text-xs text-gray-400 uppercase tracking-wider">
-                        Mentors
-                      </p>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider">Mentors</p>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-white">
@@ -136,18 +128,14 @@ export default function Communities() {
                         />
                         +
                       </div>
-                      
-                      <p className="text-xs text-gray-400 uppercase tracking-wider">
-                        Projects
-                      </p>
+
+                      <p className="text-xs text-gray-400 uppercase tracking-wider">Projects</p>
                     </div>
                   </div>
 
                   <div className="mt-6 flex items-center justify-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                    <p className="text-sm text-gray-300">
-                      Next call: Thursday at 7PM UTC
-                    </p>
+                    <p className="text-sm text-gray-300">Next call: Thursday at 7PM UTC</p>
                   </div>
                 </div>
               </div>

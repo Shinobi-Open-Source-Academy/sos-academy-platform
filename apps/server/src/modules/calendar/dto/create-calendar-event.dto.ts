@@ -1,4 +1,7 @@
+import { CalendarEventType } from '@sos-academy/shared';
+import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDate,
   IsEnum,
   IsMongoId,
@@ -6,10 +9,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
-  IsBoolean,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { CalendarEventType } from '@sos-academy/shared';
 
 export class CreateCalendarEventDto {
   @IsNotEmpty()

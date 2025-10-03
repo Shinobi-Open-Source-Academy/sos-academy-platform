@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailService } from './email.service';
 
 @Module({
@@ -27,10 +27,7 @@ import { EmailService } from './email.service';
             },
           },
           defaults: {
-            from: `"SOS Academy" <${configService.get(
-              'EMAIL_FROM',
-              'no-reply@sos-academy.org'
-            )}>`,
+            from: `"SOS Academy" <${configService.get('EMAIL_FROM', 'no-reply@sos-academy.org')}>`,
           },
           template: {
             dir: templatesDir,

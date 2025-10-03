@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import CloseIcon from "../icons/CloseIcon";
+import { useEffect, useRef } from 'react';
+import CloseIcon from '../icons/CloseIcon';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface ModalProps {
   className?: string;
 }
 
-export default function Modal({ isOpen, onClose, title, children, className = "" }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, className = '' }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
@@ -19,26 +19,26 @@ export default function Modal({ isOpen, onClose, title, children, className = ""
     if (isOpen) {
       // Store the currently focused element
       previousActiveElement.current = document.activeElement as HTMLElement;
-      
+
       // Focus the modal
       modalRef.current?.focus();
-      
+
       // Prevent body scroll
       document.body.style.overflow = 'hidden';
-      
+
       // Handle escape key
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           onClose();
         }
       };
-      
+
       document.addEventListener('keydown', handleEscape);
-      
+
       return () => {
         document.removeEventListener('keydown', handleEscape);
         document.body.style.overflow = 'unset';
-        
+
         // Restore focus to the previously focused element
         if (previousActiveElement.current) {
           previousActiveElement.current.focus();
@@ -52,12 +52,12 @@ export default function Modal({ isOpen, onClose, title, children, className = ""
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Modal */}
       <div
         ref={modalRef}
@@ -80,13 +80,10 @@ export default function Modal({ isOpen, onClose, title, children, className = ""
             <CloseIcon />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );
 }
-

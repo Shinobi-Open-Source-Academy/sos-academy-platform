@@ -33,9 +33,7 @@ async function bootstrap() {
   // Configure Swagger
   const config = new DocumentBuilder()
     .setTitle('SOS Academy Platform API')
-    .setDescription(
-      'API documentation for the Shinobi Open-Source Academy Platform'
-    )
+    .setDescription('API documentation for the Shinobi Open-Source Academy Platform')
     .setVersion('1.0')
     .addTag('users', 'User management endpoints')
     .addTag('communities', 'Community management endpoints')
@@ -62,12 +60,8 @@ async function bootstrap() {
   });
 
   await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port} (${envConfig.nodeEnv})`
-  );
-  Logger.log(
-    `📚 Swagger documentation available at: http://localhost:${port}/api/docs`
-  );
+  Logger.log(`🚀 Application is running on: http://localhost:${port} (${envConfig.nodeEnv})`);
+  Logger.log(`📚 Swagger documentation available at: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

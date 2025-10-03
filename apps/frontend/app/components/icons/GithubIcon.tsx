@@ -1,4 +1,4 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
 export default function GithubIcon({ className = 'h-6 w-6' }: IconProps) {
   return (

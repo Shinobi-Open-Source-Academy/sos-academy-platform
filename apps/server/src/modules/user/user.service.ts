@@ -1,20 +1,16 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { MentorApplicationDto } from './dto/mentor-application.dto';
-import { MemberInvitationDto } from './dto/member-invitation.dto';
-import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import * as bcrypt from 'bcrypt';
-import { EmailService } from '../email/email.service';
 import axios from 'axios';
+import * as bcrypt from 'bcrypt';
+import { Model, Schema } from 'mongoose';
+import { EmailService } from '../email/email.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { MemberInvitationDto } from './dto/member-invitation.dto';
+import { MentorApplicationDto } from './dto/mentor-application.dto';
+import { SubscribeUserDto } from './dto/subscribe-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -134,9 +130,7 @@ export class UserService {
    * Apply as a mentor with full application
    * @param mentorApplicationDto Mentor application data
    */
-  async applyAsMentor(
-    mentorApplicationDto: MentorApplicationDto
-  ): Promise<User> {
+  async applyAsMentor(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
     // Check if user already exists
@@ -236,15 +230,15 @@ export class UserService {
     const { email, name, communities, githubHandle } = subscribeUserDto;
 
     // Check if user already exists
-    let existingUser = await this.userModel.findOne({ email }).exec();
-    
+    const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
       // Update existing user
       existingUser.name = name || existingUser.name;
-      existingUser.communityIds = communities;
+      existingUser.communities = communities.map((id) => new Schema.Types.ObjectId(id));
       existingUser.source = 'subscription';
       existingUser.status = UserStatus.PENDING;
-      
+
       // Enrich with GitHub profile if handle provided
       if (githubHandle) {
         try {
@@ -256,23 +250,23 @@ export class UserService {
           console.error('Failed to fetch GitHub profile:', error);
         }
       }
-      
+
       const savedUser = await existingUser.save();
-      
+
       // Send confirmation email
       try {
         await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
       } catch (error) {
         console.error('Failed to send subscription confirmation email:', error);
       }
-      
+
       return savedUser;
     } else {
       // Create new user
       const newUser = new this.userModel({
         email,
         name: name || '',
-        communityIds: communities,
+        communities: communities.map((id) => new Schema.Types.ObjectId(id)),
         role: UserRole.MEMBER,
         status: UserStatus.PENDING,
         source: 'subscription',
@@ -375,7 +369,7 @@ export class UserService {
     try {
       const token = process.env.GITHUB_TOKEN;
       const headers = token ? { Authorization: `token ${token}` } : {};
-      
+
       const response = await axios.get(`https://api.github.com/users/${handle}`, {
         headers,
         timeout: 5000,

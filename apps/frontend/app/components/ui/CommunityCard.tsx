@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { Community } from "@/app/constants/communities";
-import { COMMUNITIES_CONSTANTS } from "@/app/constants/communities";
-import Link from "next/link";
+import type { Community } from '@/app/constants/communities';
+import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 interface CommunityCardProps {
   community: Community;
@@ -11,11 +11,7 @@ interface CommunityCardProps {
   isInView: boolean;
 }
 
-export default function CommunityCard({
-  community,
-  index,
-  isInView,
-}: CommunityCardProps) {
+export default function CommunityCard({ community, index, isInView }: CommunityCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const codeRef = useRef<HTMLDivElement>(null);
   const { ANIMATION, STYLE } = COMMUNITIES_CONSTANTS;
@@ -25,22 +21,22 @@ export default function CommunityCard({
     if (codeRef.current && isInView) {
       const codeElement = codeRef.current;
       const totalHeight = codeElement.scrollHeight;
-      
+
       // Only animate if there's enough content to scroll
       if (totalHeight > codeElement.clientHeight) {
         const scrollAnimation = codeElement.animate(
           [
-            { transform: "translateY(0)" },
+            { transform: 'translateY(0)' },
             { transform: `translateY(-${totalHeight - codeElement.clientHeight}px)` },
           ],
           {
             duration: ANIMATION.CODE_SCROLL_DURATION * 1000,
-            iterations: Infinity,
-            direction: "alternate",
-            easing: "ease-in-out",
+            iterations: Number.POSITIVE_INFINITY,
+            direction: 'alternate',
+            easing: 'ease-in-out',
           }
         );
-        
+
         // Pause animation when not hovered
         if (!isHovered) {
           scrollAnimation.playbackRate = 0.3;
@@ -65,12 +61,12 @@ export default function CommunityCard({
         opacity: isInView ? 1 : 0,
         transform: isInView
           ? isHovered
-            ? "translateY(-10px)"
-            : "translateY(0)"
-          : "translateY(20px)",
+            ? 'translateY(-10px)'
+            : 'translateY(0)'
+          : 'translateY(20px)',
         transition: `opacity ${ANIMATION.CARD_ANIMATION_DURATION}s ease-out ${animationDelay}, transform 0.4s ease-out`,
         borderTop: `3px solid`,
-        borderColor: community.color.replace("bg-", ""),
+        borderColor: community.color.replace('bg-', ''),
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -88,7 +84,7 @@ export default function CommunityCard({
       </div>
 
       {/* Hover effect overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-0"
         style={{
           opacity: isHovered ? 0.9 : 0.5,
@@ -99,19 +95,19 @@ export default function CommunityCard({
       {/* Card content */}
       <div className="relative z-10 p-6">
         <div className="flex items-center mb-4">
-          <div 
+          <div
             className={`w-10 h-10 mr-3 flex items-center justify-center rounded-full transition-all duration-300 font-bold text-white`}
-            style={{ 
-              backgroundColor: community.color.replace("bg-", ""),
-              boxShadow: isHovered ? `0 0 15px ${community.color.replace("bg-", "")}` : 'none',
+            style={{
+              backgroundColor: community.color.replace('bg-', ''),
+              boxShadow: isHovered ? `0 0 15px ${community.color.replace('bg-', '')}` : 'none',
               transform: isHovered ? 'scale(1.1)' : 'scale(1)',
             }}
           >
             {community.icon}
           </div>
-          
+
           <div>
-            <h3 
+            <h3
               className={`text-xl font-bold text-white transition-all duration-300`}
               style={{
                 transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
@@ -119,15 +115,11 @@ export default function CommunityCard({
             >
               {community.name}
             </h3>
-            <p className="text-sm text-gray-400">
-              {community.language}
-            </p>
+            <p className="text-sm text-gray-400">{community.language}</p>
           </div>
         </div>
-        
-        <p className={`${STYLE.TEXT_COLOR} transition-all duration-300`}>
-          {community.description}
-        </p>
+
+        <p className={`${STYLE.TEXT_COLOR} transition-all duration-300`}>{community.description}</p>
 
         {/* Learn more button - appears on hover */}
         <Link
@@ -153,7 +145,7 @@ export default function CommunityCard({
           </svg>
         </Link>
       </div>
-      
+
       {/* Particle effects (only shown when hovered) */}
       {isHovered && (
         <>
@@ -176,4 +168,4 @@ export default function CommunityCard({
       )}
     </div>
   );
-} 
+}

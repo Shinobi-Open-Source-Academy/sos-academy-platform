@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 
 :root {
   --primary: #304ffe; /* updated deep blue */
@@ -16,13 +16,13 @@
   --navbar-height: 72px; /* Add navbar height for proper spacing */
 
   /* Font variables */
-  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-body: var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo,
-    Monaco, Consolas, monospace;
-  --font-montserrat: 'Montserrat';
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body: var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Arial, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  --font-montserrat: "Montserrat";
 
   /* Typography scale */
   --heading-1: 3.5rem;

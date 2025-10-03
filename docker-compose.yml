@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: sos-academy-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: sos-academy
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - sos-academy-network
+
+  # Backend API Server
+  backend:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: sos-academy-backend
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-4200}
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-1d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Email Configuration
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.sendgrid.net}
+      EMAIL_USER: ${EMAIL_USER:-apikey}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_FROM: ${EMAIL_FROM:-no-reply@sos-academy.org}
+      # GitHub API (Optional)
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    depends_on:
+      - mongodb
+    networks:
+      - sos-academy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4200/api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Next.js Application
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: sos-academy-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${FRONTEND_PORT:-3000}
+      BASE_SERVER_URL: ${BASE_SERVER_URL:-http://localhost:4200}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4200/api}
+    depends_on:
+      - backend
+    networks:
+      - sos-academy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  sos-academy-network:
+    driver: bridge

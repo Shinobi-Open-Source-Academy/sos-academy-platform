@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
 import { ProjectRank, ProjectStatus } from '@sos-academy/shared';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type ProjectDocument = Project & Document;
 

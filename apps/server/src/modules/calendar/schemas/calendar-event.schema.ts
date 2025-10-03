@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
 import { CalendarEventType } from '@sos-academy/shared';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type CalendarEventDocument = CalendarEvent & Document;
 

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
 import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -25,7 +25,6 @@ export class User {
 
   @Prop({
     required: true,
-    unique: true,
     lowercase: true,
     trim: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
@@ -90,9 +89,7 @@ export class User {
     required: false,
     type: [String],
     validate: {
-      validator: function (skills: string[]) {
-        return skills.length <= 20;
-      },
+      validator: (skills: string[]) => skills.length <= 20,
       message: 'Maximum 20 skills allowed',
     },
   })
@@ -103,9 +100,7 @@ export class User {
     required: false,
     type: [String],
     validate: {
-      validator: function (interests: string[]) {
-        return interests.length <= 15;
-      },
+      validator: (interests: string[]) => interests.length <= 15,
       message: 'Maximum 15 interests allowed',
     },
   })

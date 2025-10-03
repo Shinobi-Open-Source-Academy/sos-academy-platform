@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { COMMUNITIES_CONSTANTS } from "@/app/constants/communities";
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer";
+import Footer from '@/app/components/Footer';
+import Navbar from '@/app/components/Navbar';
+import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import Link from 'next/link';
 
 export default function CommunityNotFound() {
   return (
@@ -10,12 +10,9 @@ export default function CommunityNotFound() {
 
       <div className="min-h-[80vh] flex items-center justify-center px-6">
         <div className="max-w-xl text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Community Not Found
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Community Not Found</h1>
           <p className="text-gray-300 mb-8">
-            The community you&apos;re looking for doesn&apos;t exist or may have
-            been moved.
+            The community you&apos;re looking for doesn&apos;t exist or may have been moved.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

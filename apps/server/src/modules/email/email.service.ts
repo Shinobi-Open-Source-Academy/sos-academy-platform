@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
-import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import { join } from 'path';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable, Logger } from '@nestjs/common';
+import * as handlebars from 'handlebars';
 
 export interface EmailTemplateParams {
   [key: string]: any;
@@ -110,9 +110,7 @@ export class EmailService {
     } catch (error) {
       // If there's an error with the template file, fall back to inline template
       if (error.message && error.message.includes('ENOENT')) {
-        this.logger.warn(
-          `Template file not found for ${template}, using fallback template.`
-        );
+        this.logger.warn(`Template file not found for ${template}, using fallback template.`);
         await this.sendInlineTemplateEmail(
           to,
           subject,
@@ -157,10 +155,7 @@ export class EmailService {
    * @param to User's email address
    * @param name User's name
    */
-  async sendMentorApplicationConfirmation(
-    to: string,
-    name: string
-  ): Promise<void> {
+  async sendMentorApplicationConfirmation(to: string, name: string): Promise<void> {
     const params: EmailTemplateParams = {
       name,
       date: new Date().toLocaleDateString(),

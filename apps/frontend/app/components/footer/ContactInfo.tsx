@@ -1,5 +1,5 @@
-import { SOCIAL_LINKS } from "../../config/socialLinks";
-import { FOOTER_DATA } from "../../data/siteData";
+import { SOCIAL_LINKS } from '../../config/socialLinks';
+import { FOOTER_DATA } from '../../data/siteData';
 
 const CONTACT_ITEMS = [
   {
@@ -73,4 +73,4 @@ export default function ContactInfo() {
       </div>
     </div>
   );
-} 
+}

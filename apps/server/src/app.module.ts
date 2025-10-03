@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { databaseConfig } from './common/config/database.config';
 import { envConfig } from './common/config/env.config';
 
+import { CalendarModule } from './modules/calendar/calendar.module';
+import { CommunityModule } from './modules/community/community.module';
+import { ProjectModule } from './modules/project/project.module';
 // Import modules
 import { UserModule } from './modules/user/user.module';
-import { ProjectModule } from './modules/project/project.module';
-import { CommunityModule } from './modules/community/community.module';
-import { CalendarModule } from './modules/calendar/calendar.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
     UserModule,
     ProjectModule,
     CommunityModule,
-    CalendarModule
+    CalendarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

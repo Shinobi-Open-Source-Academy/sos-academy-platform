@@ -9,4 +9,4 @@ export enum UserStatus {
   INVITED = 'INVITED',
   REJECTED = 'REJECTED',
   PENDING_REVIEW = 'PENDING_REVIEW',
-} 
+}

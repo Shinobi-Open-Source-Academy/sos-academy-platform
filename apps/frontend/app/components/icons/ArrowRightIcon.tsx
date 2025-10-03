@@ -1,4 +1,4 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
 export default function ArrowRightIcon({ className = 'h-5 w-5' }: IconProps) {
   return (

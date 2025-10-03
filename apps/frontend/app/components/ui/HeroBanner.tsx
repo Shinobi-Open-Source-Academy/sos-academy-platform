@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import type React from 'react';
 
 interface HeroBannerProps {
   text: string;
@@ -8,7 +8,7 @@ interface HeroBannerProps {
   style?: React.CSSProperties;
 }
 
-export default function HeroBanner({ text, className = "", style = {} }: HeroBannerProps) {
+export default function HeroBanner({ text, className = '', style = {} }: HeroBannerProps) {
   return (
     <div
       className={`inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full bg-primary/10 mb-4 sm:mb-6 relative overflow-hidden ${className}`}
@@ -22,4 +22,4 @@ export default function HeroBanner({ text, className = "", style = {} }: HeroBan
       </span>
     </div>
   );
-} 
+}

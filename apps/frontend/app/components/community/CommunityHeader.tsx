@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { CommunityDetails } from "@/app/types/community";
+import type { CommunityDetails } from '@/app/types/community';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface CommunityHeaderProps {
   community: CommunityDetails;
@@ -22,8 +22,8 @@ export default function CommunityHeader({ community }: CommunityHeaderProps) {
         className="absolute inset-0 z-0 opacity-20"
         style={{
           background: `radial-gradient(circle at 50% 50%, ${community.color.replace(
-            "bg-",
-            ""
+            'bg-',
+            ''
           )}50 0%, transparent 70%)`,
         }}
       ></div>
@@ -57,22 +57,28 @@ export default function CommunityHeader({ community }: CommunityHeaderProps) {
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
           {/* Community icon */}
           <div
-            className={`w-16 h-16 flex items-center justify-center rounded-full text-2xl font-bold text-white shadow-lg transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-            style={{ backgroundColor: community.color.replace("bg-", "") }}
+            className={`w-16 h-16 flex items-center justify-center rounded-full text-2xl font-bold text-white shadow-lg transition-opacity duration-500 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ backgroundColor: community.color.replace('bg-', '') }}
           >
             {community.icon}
           </div>
 
           <div>
             <h1
-              className={`text-3xl md:text-4xl font-bold text-white mb-2 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+              className={`text-3xl md:text-4xl font-bold text-white mb-2 transition-all duration-500 ${
+                isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+              }`}
               style={{ transitionDelay: '100ms' }}
             >
               {community.name}
             </h1>
 
             <p
-              className={`text-gray-300 md:text-lg transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+              className={`text-gray-300 md:text-lg transition-all duration-500 ${
+                isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+              }`}
               style={{ transitionDelay: '200ms' }}
             >
               {community.description}
@@ -83,27 +89,29 @@ export default function CommunityHeader({ community }: CommunityHeaderProps) {
         {/* Community stats */}
         <div className="grid grid-cols-3 gap-4 mt-8 max-w-lg">
           <div
-            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
             style={{ transitionDelay: '300ms' }}
           >
-            <div className="text-2xl font-bold text-white">
-              {community.stats.memberCount}
-            </div>
+            <div className="text-2xl font-bold text-white">{community.stats.memberCount}</div>
             <div className="text-sm text-gray-400">Members</div>
           </div>
 
           <div
-            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
             style={{ transitionDelay: '400ms' }}
           >
-            <div className="text-2xl font-bold text-white">
-              {community.stats.projectCount}
-            </div>
+            <div className="text-2xl font-bold text-white">{community.stats.projectCount}</div>
             <div className="text-sm text-gray-400">Projects</div>
           </div>
 
           <div
-            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`text-center p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 transition-all duration-500 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
             style={{ transitionDelay: '500ms' }}
           >
             <div className="text-2xl font-bold text-white">

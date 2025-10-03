@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import SubscriptionModal from "../components/SubscriptionModal";
-import MentorApplicationModal from "../components/MentorApplicationModal";
+import { useState } from 'react';
+import Footer from '../components/Footer';
+import MentorApplicationModal from '../components/MentorApplicationModal';
+import Navbar from '../components/Navbar';
+import SubscriptionModal from '../components/SubscriptionModal';
 
 export default function Blog() {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
@@ -37,7 +37,8 @@ export default function Blog() {
                       Coming Soon
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                      We&apos;re working hard to bring you amazing content about open-source development, community insights, and success stories from our members.
+                      We&apos;re working hard to bring you amazing content about open-source
+                      development, community insights, and success stories from our members.
                     </p>
                   </div>
                 </div>
@@ -52,22 +53,34 @@ export default function Blog() {
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Technical Tutorials</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Step-by-step guides for contributing to open-source projects</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Technical Tutorials
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Step-by-step guides for contributing to open-source projects
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Community Stories</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Success stories and experiences from our community members</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Community Stories
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Success stories and experiences from our community members
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Best Practices</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Tips and tricks for effective open-source collaboration</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Best Practices
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Tips and tricks for effective open-source collaboration
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -75,22 +88,34 @@ export default function Blog() {
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Project Spotlights</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Deep dives into interesting open-source projects</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Project Spotlights
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Deep dives into interesting open-source projects
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Industry Insights</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Trends and analysis in the open-source ecosystem</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Industry Insights
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Trends and analysis in the open-source ecosystem
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Mentor Interviews</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Conversations with our expert mentors</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Mentor Interviews
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Conversations with our expert mentors
+                          </p>
                         </div>
                       </div>
                     </div>

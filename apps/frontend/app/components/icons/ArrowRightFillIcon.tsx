@@ -1,4 +1,4 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
 export default function ArrowRightFillIcon({
   className = 'h-4 w-4 transform transition-transform group-hover:translate-x-1',

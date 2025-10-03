@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { CommunityDetails } from "@/app/types/community";
-import GithubIcon from "../icons/GithubIcon";
-import XIcon from "../icons/XIcon";
-import LinkedinIcon from "../icons/LinkedinIcon";
+import type { CommunityDetails } from '@/app/types/community';
+import Image from 'next/image';
+import GithubIcon from '../icons/GithubIcon';
+import LinkedinIcon from '../icons/LinkedinIcon';
+import XIcon from '../icons/XIcon';
 
 interface CommunityLeadershipProps {
   community: CommunityDetails;
@@ -33,17 +33,13 @@ interface MentorProps {
   mentor: Person;
 }
 
-export default function CommunityLeadership({
-  community,
-}: CommunityLeadershipProps) {
+export default function CommunityLeadership({ community }: CommunityLeadershipProps) {
   const { kage, mentors } = community;
 
   return (
     <section className="py-10">
       <div className="container mx-auto px-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-          Leadership
-        </h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">Leadership</h2>
 
         {/* Kage (Community Leader) */}
         {kage && (
@@ -97,12 +93,7 @@ function KageCard({ kage }: KageProps) {
   return (
     <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
       <div className="relative h-32 w-32 md:h-40 md:w-40 flex-shrink-0">
-        <Image
-          src={kage.image}
-          alt={kage.name}
-          fill
-          className="object-cover rounded-lg"
-        />
+        <Image src={kage.image} alt={kage.name} fill className="object-cover rounded-lg" />
         <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm font-bold text-white">
           K
         </div>
@@ -115,10 +106,7 @@ function KageCard({ kage }: KageProps) {
 
         <div className="flex flex-wrap gap-2 my-3">
           {kage.expertise.map((skill, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs"
-            >
+            <span key={index} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
               {skill}
             </span>
           ))}
@@ -169,12 +157,7 @@ function MentorCard({ mentor }: MentorProps) {
   return (
     <div className="flex gap-4 items-center">
       <div className="relative h-16 w-16 flex-shrink-0">
-        <Image
-          src={mentor.image}
-          alt={mentor.name}
-          fill
-          className="object-cover rounded-full"
-        />
+        <Image src={mentor.image} alt={mentor.name} fill className="object-cover rounded-full" />
       </div>
       <div className="flex-1">
         <h4 className="text-lg font-bold text-white">{mentor.name}</h4>
@@ -182,10 +165,7 @@ function MentorCard({ mentor }: MentorProps) {
 
         <div className="flex flex-wrap gap-1 mt-1 mb-2">
           {mentor.expertise.slice(0, 3).map((skill, index) => (
-            <span
-              key={index}
-              className="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-xs"
-            >
+            <span key={index} className="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-xs">
               {skill}
             </span>
           ))}

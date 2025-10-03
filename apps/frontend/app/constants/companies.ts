@@ -5,35 +5,35 @@ export type Company = {
 
 export const COMPANIES: Company[] = [
   {
-    name: "Cal.com",
-    url: "https://cal.com/",
+    name: 'Cal.com',
+    url: 'https://cal.com/',
   },
   {
-    name: "Firefox",
-    url: "https://www.mozilla.org/firefox/",
+    name: 'Firefox',
+    url: 'https://www.mozilla.org/firefox/',
   },
   {
-    name: "Sourcegraph",
-    url: "https://sourcegraph.com/",
+    name: 'Sourcegraph',
+    url: 'https://sourcegraph.com/',
   },
   {
-    name: "DRATA",
-    url: "https://drata.com/",
+    name: 'DRATA',
+    url: 'https://drata.com/',
   },
   {
-    name: "UnionBank",
-    url: "https://www.unionbankph.com/",
+    name: 'UnionBank',
+    url: 'https://www.unionbankph.com/',
   },
   {
-    name: "Twenty",
-    url: "https://twenty.com/",
+    name: 'Twenty',
+    url: 'https://twenty.com/',
   },
   {
-    name: "Weaviate",
-    url: "https://weaviate.io/",
+    name: 'Weaviate',
+    url: 'https://weaviate.io/',
   },
   {
-    name: "TRUST Wallet",
-    url: "https://trustwallet.com/",
+    name: 'TRUST Wallet',
+    url: 'https://trustwallet.com/',
   },
 ];

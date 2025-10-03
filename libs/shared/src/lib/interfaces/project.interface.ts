@@ -1,4 +1,4 @@
-import { ProjectRank, ProjectStatus } from '../enums';
+import type { ProjectRank, ProjectStatus } from '../enums';
 
 export interface IProject {
   id?: string;

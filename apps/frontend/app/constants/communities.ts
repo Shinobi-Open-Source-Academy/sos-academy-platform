@@ -1,11 +1,11 @@
 export const COMMUNITIES_CONSTANTS = {
   HEADING: {
-    TITLE: "Our Communities",
+    TITLE: 'Our Communities',
     DESCRIPTION:
-      "Join specialized sub-communities based on programming languages and domains, each led by experienced mentors who will guide your open-source journey.",
+      'Join specialized sub-communities based on programming languages and domains, each led by experienced mentors who will guide your open-source journey.',
   },
   WEEKLY_CALLS: {
-    TITLE: "Weekly Community Calls",
+    TITLE: 'Weekly Community Calls',
     DESCRIPTION:
       "Each community hosts weekly calls where members discuss their projects, share progress, and get guidance from mentors. It's a great way to stay connected and learn from peers.",
     CODE_SNIPPET: `function communityCall() {
@@ -36,26 +36,26 @@ export const COMMUNITIES_CONSTANTS = {
   });
   
   return meeting;
-}`
+}`,
   },
   STATS: {
-    COMMUNITIES_COUNT: "5",
-    MEMBERS_COUNT: "30",
-    MENTORS_COUNT: "10",
-    PROJECTS_COUNT: "50",
+    COMMUNITIES_COUNT: '5',
+    MEMBERS_COUNT: '30',
+    MENTORS_COUNT: '10',
+    PROJECTS_COUNT: '50',
   },
   ANIMATION: {
     STAGGER_DELAY: 0.15, // seconds between each card animation
     CARD_ANIMATION_DURATION: 0.7, // seconds
-    HOVER_TRANSITION_DURATION: "0.4s",
+    HOVER_TRANSITION_DURATION: '0.4s',
     CODE_SCROLL_DURATION: 40, // seconds
   },
   STYLE: {
-    SECTION_BG: "bg-[#070a1d]",
-    STATS_BG: "bg-[#0c1228]",
-    CARD_BG: "bg-[#14182f] bg-opacity-70",
-    TITLE_COLOR: "text-white",
-    TEXT_COLOR: "text-gray-300",
+    SECTION_BG: 'bg-[#070a1d]',
+    STATS_BG: 'bg-[#0c1228]',
+    CARD_BG: 'bg-[#14182f] bg-opacity-70',
+    TITLE_COLOR: 'text-white',
+    TEXT_COLOR: 'text-gray-300',
   },
 };
 
@@ -71,13 +71,13 @@ export type Community = {
 
 export const COMMUNITIES: Community[] = [
   {
-    id: "suna",
-    name: "Suna Community",
-    language: "JavaScript",
-    icon: "JS",
-    color: "bg-yellow-500",
+    id: 'suna',
+    name: 'Suna Community',
+    language: 'JavaScript',
+    icon: 'JS',
+    color: 'bg-yellow-500',
     description:
-      "Master modern JavaScript and its frameworks while contributing to web-focused open-source projects.",
+      'Master modern JavaScript and its frameworks while contributing to web-focused open-source projects.',
     codeSnippet: `
 // Modern JavaScript with async/await
 import { fetchRepositories } from './api';
@@ -116,13 +116,13 @@ project.fetchIssues().then(issues => {
 `,
   },
   {
-    id: "konoha",
-    name: "Konoha Community",
-    language: "Python",
-    icon: "PY",
-    color: "bg-green-500",
+    id: 'konoha',
+    name: 'Konoha Community',
+    language: 'Python',
+    icon: 'PY',
+    color: 'bg-green-500',
     description:
-      "Dive into Python development and contribute to data science, automation, and web backend projects.",
+      'Dive into Python development and contribute to data science, automation, and web backend projects.',
     codeSnippet: `
 # Python data analysis workflow
 import pandas as pd
@@ -173,13 +173,13 @@ project.train_model("is_contributor")
 `,
   },
   {
-    id: "kiri",
-    name: "Kiri Community",
-    language: "Go",
-    icon: "GO",
-    color: "bg-blue-500",
+    id: 'kiri',
+    name: 'Kiri Community',
+    language: 'Go',
+    icon: 'GO',
+    color: 'bg-blue-500',
     description:
-      "Build high-performance, concurrent systems and microservices with Go language expertise.",
+      'Build high-performance, concurrent systems and microservices with Go language expertise.',
     codeSnippet: `
 package main
 
@@ -271,13 +271,13 @@ func main() {
 `,
   },
   {
-    id: "iwa",
-    name: "Iwa Community",
-    language: "Java",
-    icon: "JV",
-    color: "bg-red-500",
+    id: 'iwa',
+    name: 'Iwa Community',
+    language: 'Java',
+    icon: 'JV',
+    color: 'bg-red-500',
     description:
-      "Focus on enterprise-grade applications, Android development, and Java-based open-source projects.",
+      'Focus on enterprise-grade applications, Android development, and Java-based open-source projects.',
     codeSnippet: `
 package org.shinobi.opensource;
 
@@ -335,13 +335,13 @@ public class ContributionTracker {
 `,
   },
   {
-    id: "taki",
-    name: "Taki Community",
-    language: "Ruby",
-    icon: "RB",
-    color: "bg-pink-500",
+    id: 'taki',
+    name: 'Taki Community',
+    language: 'Ruby',
+    icon: 'RB',
+    color: 'bg-pink-500',
     description:
-      "Contribute to elegant, readable codebases and web applications using Ruby and Rails.",
+      'Contribute to elegant, readable codebases and web applications using Ruby and Rails.',
     codeSnippet: `
 # Ruby on Rails contribution workflow
 require 'octokit'

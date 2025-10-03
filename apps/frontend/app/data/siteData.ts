@@ -485,14 +485,7 @@ export const MENTORS_LIST = [
     role: 'Senior Backend Engineer',
     image: '/images/mentor3.jpeg',
     bio: "Over 7 years experience in backend development, with a focus on building scalable and maintainable systems. Passionate about mentoring the next generation of engineers. Author of 'Scalable Software Development with NestJS'",
-    expertise: [
-      'JS',
-      'TS',
-      'Rust',
-      'Microservices',
-      'System Design',
-      'Software Architecture',
-    ],
+    expertise: ['JS', 'TS', 'Rust', 'Microservices', 'System Design', 'Software Architecture'],
     social: {
       github: 'https://github.com/pacyL2K19',
       linkedin: 'https://linkedin.com/in/pacifique-linjanja',
@@ -838,8 +831,7 @@ export const DOCUMENTATION_DATA = {
 
 export const BLOG_DATA = {
   title: 'Blog',
-  subtitle:
-    'Stay updated with the latest insights, tutorials, and stories from our community.',
+  subtitle: 'Stay updated with the latest insights, tutorials, and stories from our community.',
   comingSoon: {
     title: 'Coming Soon',
     description:
@@ -858,8 +850,7 @@ export const BLOG_DATA = {
   },
   cta: {
     title: 'Stay Updated',
-    description:
-      'Join our community to be the first to know when we publish new content.',
+    description: 'Join our community to be the first to know when we publish new content.',
     joinButtonText: 'Join Us',
     mentorButtonText: 'Apply as Mentor',
   },
@@ -873,8 +864,7 @@ export const PRIVACY_POLICY_DATA = {
   sections: {
     informationWeCollect: {
       title: 'Information We Collect',
-      description:
-        'We collect information you provide directly to us, such as when you:',
+      description: 'We collect information you provide directly to us, such as when you:',
       items: [
         'Subscribe to our community',
         'Apply to become a mentor',
@@ -915,8 +905,7 @@ export const PRIVACY_POLICY_DATA = {
     },
     contactUs: {
       title: 'Contact Us',
-      description:
-        'If you have any questions about this Privacy Policy, please contact us at',
+      description: 'If you have any questions about this Privacy Policy, please contact us at',
       email: 'info@shinobiopensource.academy',
     },
     note: 'This privacy policy may be updated from time to time. We will notify you of any changes by posting the new policy on this page.',

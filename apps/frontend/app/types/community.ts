@@ -1,4 +1,4 @@
-import { MentorProps } from "./mentor";
+import type { MentorProps } from './mentor';
 
 export interface CommunityMember {
   id: string;
@@ -6,7 +6,7 @@ export interface CommunityMember {
   avatar: string;
   role: string;
   joinedDate: string;
-  level: "genin" | "chunin" | "jonin" | "kage";
+  level: 'genin' | 'chunin' | 'jonin' | 'kage';
   contributions: number;
 }
 
@@ -17,10 +17,10 @@ export interface CommunityProject {
   technologies: string[];
   repoUrl: string;
   demoUrl?: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   maintainers: string[];
   contributors: string[];
-  status: "active" | "completed" | "planned";
+  status: 'active' | 'completed' | 'planned';
   startDate: string;
   completionDate?: string;
 }
@@ -44,13 +44,7 @@ export interface CommunityDetails {
   resourceLinks: {
     title: string;
     url: string;
-    type:
-      | "documentation"
-      | "tutorial"
-      | "video"
-      | "github"
-      | "discord"
-      | "other";
+    type: 'documentation' | 'tutorial' | 'video' | 'github' | 'discord' | 'other';
   }[];
   stats: {
     memberCount: number;

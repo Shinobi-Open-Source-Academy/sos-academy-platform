@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Modal from "./ui/Modal";
+import { useState } from 'react';
+import Modal from './ui/Modal';
 
 interface MentorApplicationModalProps {
   isOpen: boolean;
@@ -23,13 +23,13 @@ interface FormErrors {
 
 export default function MentorApplicationModal({ isOpen, onClose }: MentorApplicationModalProps) {
   const [formData, setFormData] = useState<FormData>({
-    email: "",
-    name: "",
-    expertise: "",
-    githubHandle: "",
-    motivation: ""
+    email: '',
+    name: '',
+    expertise: '',
+    githubHandle: '',
+    motivation: '',
   });
-  
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -39,14 +39,14 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
     // Email validation
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     }
 
     setErrors(newErrors);
@@ -55,11 +55,11 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/users/mentor-application', {
         method: 'POST',
@@ -79,26 +79,26 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
         setIsSuccess(true);
         // Reset form after 3 seconds and close modal
         setTimeout(() => {
-          setFormData({ email: "", name: "", expertise: "", githubHandle: "", motivation: "" });
+          setFormData({ email: '', name: '', expertise: '', githubHandle: '', motivation: '' });
           setIsSuccess(false);
           onClose();
         }, 3000);
       } else {
         const errorData = await response.json();
-        setErrors({ email: errorData.message || "Something went wrong. Please try again." });
+        setErrors({ email: errorData.message || 'Something went wrong. Please try again.' });
       }
     } catch (error) {
-      setErrors({ email: "Network error. Please check your connection and try again." });
+      setErrors({ email: 'Network error. Please check your connection and try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -107,15 +107,27 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
       <Modal isOpen={isOpen} onClose={onClose} title="Application Submitted!">
         <div className="text-center py-4">
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-8 h-8 text-blue-600 dark:text-blue-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             Thank You for Your Interest!
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            Your mentor application has been submitted successfully. Our team will review your application and get back to you within 3-5 business days. You'll receive a confirmation email shortly.
+            Your mentor application has been submitted successfully. Our team will review your
+            application and get back to you within 3-5 business days. You'll receive a confirmation
+            email shortly.
           </p>
         </div>
       </Modal>
@@ -136,8 +148,8 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
             onChange={(e) => handleInputChange('email', e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
               errors.email
-                ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                : "border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary"
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
             } bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
             placeholder="your.email@example.com"
             disabled={isSubmitting}
@@ -158,8 +170,8 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
             onChange={(e) => handleInputChange('name', e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
               errors.name
-                ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                : "border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary"
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
             } bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
             placeholder="John Doe"
             disabled={isSubmitting}
@@ -230,13 +242,24 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
             {isSubmitting ? (
               <>
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
                 Submitting...
               </>
             ) : (
-              "Submit Application"
+              'Submit Application'
             )}
           </button>
         </div>
@@ -251,4 +274,3 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
     </Modal>
   );
 }
-

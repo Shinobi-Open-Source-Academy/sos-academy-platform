@@ -1,31 +1,25 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  Put,
+  ClassSerializerInterceptor,
+  Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  Put,
   UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { MentorApplicationDto } from './dto/mentor-application.dto';
-import { MemberInvitationDto } from './dto/member-invitation.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityJoinDto } from './dto/community-join.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { MemberInvitationDto } from './dto/member-invitation.dto';
+import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UserService } from './user.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -49,9 +43,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'List of all users', type: [UserResponseDto] })
   async findAll() {
     const users = await this.userService.findAll();
-    return users.map(
-      (user) => new UserResponseDto(JSON.parse(JSON.stringify(user)))
-    );
+    return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
   }
 
   @Get(':id')
@@ -89,12 +81,16 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Join community with email' })
   @ApiBody({ type: CommunityJoinDto })
-  @ApiResponse({ status: 201, description: 'User joined community successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'User joined community successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
   async joinCommunity(@Body() communityJoinDto: CommunityJoinDto) {
     const user = await this.userService.joinCommunity(
       communityJoinDto.email,
-      communityJoinDto.name,
+      communityJoinDto.name
     );
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
@@ -114,7 +110,11 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Submit mentor application' })
   @ApiBody({ type: MentorApplicationDto })
-  @ApiResponse({ status: 201, description: 'Mentor application submitted successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Mentor application submitted successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
   async mentorApplication(@Body() mentorApplicationDto: MentorApplicationDto) {
     const mentor = await this.userService.createMentorApplication(mentorApplicationDto);
@@ -125,7 +125,11 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Apply as mentor (alternative endpoint)' })
   @ApiBody({ type: MentorApplicationDto })
-  @ApiResponse({ status: 201, description: 'Mentor application submitted successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Mentor application submitted successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
   async applyAsMentor(@Body() mentorApplicationDto: MentorApplicationDto) {
     const mentor = await this.userService.applyAsMentor(mentorApplicationDto);

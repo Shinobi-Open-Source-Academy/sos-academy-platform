@@ -1,3 +1,5 @@
+import { ProjectRank } from '@sos-academy/shared';
+import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
@@ -7,8 +9,6 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ProjectRank } from '@sos-academy/shared';
 
 export class CreateProjectDto {
   @IsNotEmpty()

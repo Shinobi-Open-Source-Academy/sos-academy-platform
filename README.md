@@ -25,11 +25,13 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - MongoDB (local or cloud)
 - SendGrid account (for emails)
 
 ### Environment Setup
+
 Create a `.env` file in the root directory:
 
 ```env
@@ -59,6 +61,8 @@ GITHUB_TOKEN=your_github_token_here_optional
 
 ### Development
 
+#### Option 1: Local Development
+
 ```sh
 # Install dependencies
 npm install
@@ -73,9 +77,27 @@ npx nx serve server
 npx nx serve frontend
 ```
 
+#### Option 2: Docker (Recommended for Production)
+
+```sh
+# Copy environment template
+cp env.example .env
+
+# Edit .env with your MongoDB URI and other settings
+nano .env
+
+# Build and start all services
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up --build -d
+```
+
 The application will be available at:
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:4200
+- API Documentation: http://localhost:4200/api/docs
 
 ### Build for Production
 
@@ -85,21 +107,82 @@ npx nx build frontend
 npx nx build server
 ```
 
+### Docker Commands
+
+```sh
+# Start services
+docker-compose up
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs
+
+# Rebuild services
+docker-compose up --build
+```
+
+### Code Formatting
+
+```sh
+# Format all code
+npm run format
+
+# Check formatting without fixing
+npm run format:check
+
+# Lint and fix issues
+npm run lint:fix
+
+# Check everything (format + lint)
+npm run check
+
+# Fix everything (format + lint)
+npm run check:fix
+```
+
+**Pre-commit Hook**: Code is automatically formatted and linted before each commit using Husky and lint-staged.
+
+### Code Quality Tools
+
+This project uses **Biome** for code formatting and linting instead of ESLint/Prettier for better performance and consistency. All ESLint configurations have been removed to avoid conflicts.
+
+**Key Features:**
+- ⚡ **Fast**: Biome is 10-100x faster than ESLint/Prettier
+- 🎯 **All-in-one**: Combines formatting and linting in a single tool
+- 🔧 **Zero config**: Works out of the box with sensible defaults
+- 🚀 **Pre-commit hooks**: Automatically formats code before commits
+
+**Configuration:**
+- **Formatter**: 2-space indentation, single quotes, semicolons
+- **Linter**: Enforces code quality rules and best practices
+- **Import organization**: Automatically sorts and organizes imports
+- **File exclusions**: Ignores build artifacts, dependencies, and generated files
+
+**IDE Integration:**
+- Install the Biome extension for your editor (VS Code, WebStorm, etc.)
+- The extension will show formatting issues and auto-fix on save
+- Pre-commit hooks ensure consistent formatting across the team
+
 ## 📋 API Endpoints
 
 ### User Management
+
 - `POST /api/users/subscribe` - Subscribe to communities
 - `POST /api/users/mentor-application` - Apply as mentor
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
 
 ### Subscription Flow
+
 1. User fills subscription form with email, name, communities, and optional GitHub handle
 2. Backend creates/updates user record with `status: 'pending'`
 3. GitHub profile is enriched if handle provided
 4. Confirmation email sent with community details and Monday meeting cadence
 
 ### Mentor Application Flow
+
 1. User fills mentor application form
 2. Backend creates user record with `source: 'mentor-application'` and `status: 'pending'`
 3. GitHub profile is enriched if handle provided
@@ -110,6 +193,7 @@ npx nx build server
 While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
 
 To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
+
 ```sh
 npx nx add @nx/react
 ```
@@ -165,12 +249,13 @@ Nx Console is an editor extension that enriches your developer experience. It le
 
 Learn more:
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/npm-workspaces-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
+- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/npm-workspaces-tutorial?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 And join the Nx community:
+
 - [Discord](https://go.nx.dev/community)
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)

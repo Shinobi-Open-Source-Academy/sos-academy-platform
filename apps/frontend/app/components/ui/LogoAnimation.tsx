@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Image from "next/image";
+import Image from 'next/image';
 
 interface LogoAnimationProps {
   src: string;
@@ -18,21 +18,21 @@ export default function LogoAnimation({
   alt,
   width = 320,
   height = 320,
-  className = "",
+  className = '',
   style = {},
   mousePosition = { x: 0, y: 0 },
-  isLoaded = true
+  isLoaded = true,
 }: LogoAnimationProps) {
   return (
     <div
       className="relative"
       style={{
         opacity: isLoaded ? 1 : 0,
-        transform: `translateY(${isLoaded ? "0" : "30px"}) translate(${
+        transform: `translateY(${isLoaded ? '0' : '30px'}) translate(${
           mousePosition.x * 10
         }px, ${mousePosition.y * 10}px)`,
-        transition: "opacity 1s ease-out, transform 1s ease-out",
-        ...style
+        transition: 'opacity 1s ease-out, transform 1s ease-out',
+        ...style,
       }}
     >
       {/* Pulsing light behind the logo */}
@@ -43,8 +43,8 @@ export default function LogoAnimation({
       <div
         className="absolute -z-10 w-64 h-64 border border-[#304FFE]/20 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow"
         style={{
-          animationDirection: "reverse",
-          animationDuration: "25s",
+          animationDirection: 'reverse',
+          animationDuration: '25s',
         }}
       ></div>
 
@@ -55,12 +55,10 @@ export default function LogoAnimation({
         height={height}
         className={`filter drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] transform transition-all duration-700 hover:scale-105 animate-float ${className}`}
         style={{
-          filter: `drop-shadow(0 0 8px rgba(48,79,254,${
-            0.3 + mousePosition.x * 0.3
-          }))`,
+          filter: `drop-shadow(0 0 8px rgba(48,79,254,${0.3 + mousePosition.x * 0.3}))`,
         }}
         priority
       />
     </div>
   );
-} 
+}
