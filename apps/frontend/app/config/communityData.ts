@@ -9,8 +9,8 @@ export const COMMUNITY_DETAILS: CommunityDetails[] = [
     slug: 'suna',
     description:
       'Master modern JavaScript and its frameworks while contributing to web-focused open-source projects.',
-    longDescription: `The Suna Community is focused on JavaScript and its ecosystem, including modern frameworks like React, Vue, Angular, and Node.js. 
-    
+    longDescription: `The Suna Community is focused on JavaScript and its ecosystem, including modern frameworks like React, Vue, Angular, and Node.js.
+
 We work on a variety of web-focused open-source projects, from frontend applications to backend services, helping members grow their skills while making meaningful contributions to the JavaScript ecosystem.
 
 Our mentors are experienced JavaScript developers who guide newcomers through setting up their environment, understanding codebases, making their first contributions, and eventually becoming project maintainers themselves.`,
@@ -130,7 +130,7 @@ class OpenSourceProject {
     description:
       'Dive into Python development and contribute to data science, automation, and web backend projects.',
     longDescription: `The Konoha Community is centered around Python and its extensive ecosystem, covering everything from data science and machine learning to web development with frameworks like Django and FastAPI.
-    
+
 We focus on building tools and libraries that make Python development more accessible and efficient, while also contributing to existing open-source Python projects.
 
 Our community is perfect for those interested in data analysis, automation, AI/ML, and backend web development.`,

@@ -6,7 +6,7 @@ import CommunityLeadership from '@/app/components/community/CommunityLeadership'
 import CommunityMembers from '@/app/components/community/CommunityMembers';
 import CommunityProjects from '@/app/components/community/CommunityProjects';
 import { getAllCommunitySlugs, getCommunityBySlug } from '@/app/config/communityData';
-import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import { COMMUNITIES_DATA } from '@/app/data/siteData';
 import { notFound } from 'next/navigation';
 
 // Generate static paths for all community pages
@@ -53,31 +53,31 @@ export default async function CommunityPage({
   }
 
   return (
-    <main className={COMMUNITIES_CONSTANTS.STYLE.SECTION_BG}>
+    <main className={COMMUNITIES_DATA.style.sectionBg}>
       <Navbar />
 
       <CommunityHeader community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityAbout community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityLeadership community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityProjects community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityMembers community={community} />

@@ -1,11 +1,11 @@
 import Footer from '@/app/components/Footer';
 import Navbar from '@/app/components/Navbar';
-import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import { COMMUNITIES_DATA } from '@/app/data/siteData';
 import Link from 'next/link';
 
 export default function CommunityNotFound() {
   return (
-    <main className={COMMUNITIES_CONSTANTS.STYLE.SECTION_BG}>
+    <main className={COMMUNITIES_DATA.style.sectionBg}>
       <Navbar />
 
       <div className="min-h-[80vh] flex items-center justify-center px-6">

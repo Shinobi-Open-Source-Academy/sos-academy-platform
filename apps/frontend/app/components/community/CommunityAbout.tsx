@@ -25,11 +25,11 @@ export default function CommunityAbout({ community }: CommunityAboutProps) {
             <p className="text-gray-300 whitespace-pre-line">{community.longDescription}</p>
           </div>
 
-          {/* Meeting Information */}
+          {/* Meeting Information - Blurred for now */}
           {(community.meetingDay || community.meetingTime) && (
-            <div className="mt-8 border-t border-gray-700/60 pt-6">
+            <div className="mt-8 border-t border-gray-700/60 pt-6 relative">
               <h3 className="text-xl font-bold text-white mb-4">Weekly Meetings</h3>
-              <div className="bg-black/30 rounded-lg p-4 flex flex-col md:flex-row gap-4 items-start md:items-center">
+              <div className="bg-black/30 rounded-lg p-4 flex flex-col md:flex-row gap-4 items-start md:items-center blur-sm select-none pointer-events-none">
                 <div className="flex items-center">
                   <CalendarIcon />
                   <span className="text-gray-200">{community.meetingDay || 'TBA'}</span>
@@ -53,6 +53,11 @@ export default function CommunityAbout({ community }: CommunityAboutProps) {
                     </a>
                   </div>
                 )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-gray-900/80 backdrop-blur-sm px-6 py-3 rounded-lg border border-gray-700">
+                  <p className="text-gray-300 font-medium">Coming Soon</p>
+                </div>
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { COMMUNITIES } from '../constants/communities';
+import { COMMUNITIES_LIST } from '../data/siteData';
 import Modal from './ui/Modal';
 import MultiSelect from './ui/MultiSelect';
 
@@ -185,7 +185,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
         <MultiSelect
           label="Communities"
           placeholder="Select communities you're interested in..."
-          options={COMMUNITIES}
+          options={COMMUNITIES_LIST}
           selectedValues={formData.communities}
           onChange={(values) => handleInputChange('communities', values)}
           required

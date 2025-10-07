@@ -1,7 +1,16 @@
 'use client';
 
-import type { Community } from '@/app/constants/communities';
-import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
+import { COMMUNITIES_DATA } from '@/app/data/siteData';
+
+type Community = {
+  id: string;
+  name: string;
+  language: string;
+  icon: string;
+  color: string;
+  description: string;
+  codeSnippet: string;
+};
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import CommunityJoinModal from '../CommunityJoinModal';
@@ -15,8 +24,14 @@ interface CommunityCardProps {
 export default function CommunityCard({ community, index, isInView }: CommunityCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const codeRef = useRef<HTMLDivElement>(null);
-  const { ANIMATION, STYLE } = COMMUNITIES_CONSTANTS;
+  const { animation: ANIMATION, style: STYLE } = COMMUNITIES_DATA;
+
+  // Prevent hydration mismatch by only showing particles on client side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Setup the code scrolling animation
   useEffect(() => {
@@ -32,7 +47,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
             { transform: `translateY(-${totalHeight - codeElement.clientHeight}px)` },
           ],
           {
-            duration: ANIMATION.CODE_SCROLL_DURATION * 1000,
+            duration: ANIMATION.codeScrollDuration * 1000,
             iterations: Number.POSITIVE_INFINITY,
             direction: 'alternate',
             easing: 'ease-in-out',
@@ -51,14 +66,14 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
         };
       }
     }
-  }, [isInView, isHovered, ANIMATION.CODE_SCROLL_DURATION]);
+  }, [isInView, isHovered, ANIMATION.codeScrollDuration]);
 
   // Calculate the staggered animation delay based on index
-  const animationDelay = `${index * ANIMATION.STAGGER_DELAY}s`;
+  const animationDelay = `${index * ANIMATION.staggerDelay}s`;
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg shadow-lg ${STYLE.CARD_BG} backdrop-blur-sm transition-all duration-500`}
+      className={`relative overflow-hidden rounded-lg shadow-lg ${STYLE.cardBg} backdrop-blur-sm transition-all duration-500`}
       style={{
         opacity: isInView ? 1 : 0,
         transform: isInView
@@ -66,7 +81,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
             ? 'translateY(-10px)'
             : 'translateY(0)'
           : 'translateY(20px)',
-        transition: `opacity ${ANIMATION.CARD_ANIMATION_DURATION}s ease-out ${animationDelay}, transform 0.4s ease-out`,
+        transition: `opacity ${ANIMATION.cardAnimationDuration}s ease-out ${animationDelay}, transform 0.4s ease-out`,
         borderTop: '3px solid',
         borderColor: community.color.replace('bg-', ''),
       }}
@@ -78,7 +93,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
         ref={codeRef}
         className="absolute inset-0 text-[10px] font-mono opacity-10 text-white whitespace-pre overflow-hidden p-4 z-0"
         style={{
-          transition: `opacity ${ANIMATION.HOVER_TRANSITION_DURATION} ease-out`,
+          transition: `opacity ${ANIMATION.hoverTransitionDuration} ease-out`,
           opacity: isHovered ? 0.15 : 0.05,
         }}
       >
@@ -90,7 +105,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
         className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-0"
         style={{
           opacity: isHovered ? 0.9 : 0.5,
-          transition: `opacity ${ANIMATION.HOVER_TRANSITION_DURATION} ease-out`,
+          transition: `opacity ${ANIMATION.hoverTransitionDuration} ease-out`,
         }}
       />
 
@@ -123,49 +138,57 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
           </div>
         </div>
 
-        <p className={`${STYLE.TEXT_COLOR} transition-all duration-300`}>{community.description}</p>
-
-        {/* Action buttons - appear on hover */}
-        <div
-          className="mt-4 flex gap-3 opacity-0 transition-all duration-300"
+        <p className={`${STYLE.textColor} transition-all duration-300`}>{community.description}</p>
+        {/* Learn more button - appears on hover */}
+        <Link
+          href={`/communities/${community.id}`}
+          className="mt-4 text-primary py-1 px-0 group flex items-center text-sm font-medium opacity-0 transition-all duration-300"
           style={{
             opacity: isHovered ? 1 : 0,
             transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setShowJoinModal(true)}
-            className="flex-1 bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+          Learn more
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
           >
-            Join Community
-          </button>
-          <Link
-            href={`/communities/${community.id}`}
-            className="flex-1 text-primary border border-primary hover:bg-primary hover:text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-center"
-          >
-            Learn More
-          </Link>
-        </div>
+            <title>Learn more</title>
+            <path
+              fillRule="evenodd"
+              d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </Link>
       </div>
 
-      {/* Particle effects (only shown when hovered) */}
-      {isHovered &&
-        [...Array(3)].map((_) => (
-          <div
-            key={`particle-${Math.random()}`}
-            className="absolute rounded-full bg-white/30"
-            style={{
-              width: `${Math.random() * 4 + 2}px`,
-              height: `${Math.random() * 4 + 2}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${Math.random() * 3 + 2}s infinite ease-in-out ${
-                Math.random() * 1
-              }s`,
-            }}
-          />
-        ))}
+      {/* Particle effects (only shown when hovered and mounted on client) */}
+      {isMounted &&
+        isHovered &&
+        [...Array(3)].map((_, i) => {
+          const size = Math.random() * 4 + 2;
+          const topPos = Math.random() * 100;
+          const leftPos = Math.random() * 100;
+          const duration = Math.random() * 3 + 2;
+          const delay = Math.random() * 1;
+
+          return (
+            <div
+              key={`particle-${community.id}-${i}`}
+              className="absolute rounded-full bg-white/30"
+              style={{
+                width: `${size}px`,
+                height: `${size}px`,
+                top: `${topPos}%`,
+                left: `${leftPos}%`,
+                animation: `float ${duration}s infinite ease-in-out ${delay}s`,
+              }}
+            />
+          );
+        })}
 
       {/* Community Join Modal */}
       <CommunityJoinModal

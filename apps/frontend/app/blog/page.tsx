@@ -30,7 +30,7 @@ export default function Blog() {
               <div className="max-w-2xl mx-auto">
                 {/* Blurred Background Effect */}
                 <div className="relative mb-8">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-xl" />
                   <div className="relative bg-gradient-to-r from-primary/10 via-blue-500/10 to-purple-500/10 rounded-lg p-8 border border-primary/20">
                     <div className="text-6xl mb-4 opacity-30">📝</div>
                     <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
@@ -51,7 +51,7 @@ export default function Blog() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Technical Tutorials
@@ -62,7 +62,7 @@ export default function Blog() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Community Stories
@@ -73,7 +73,7 @@ export default function Blog() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Best Practices
@@ -86,7 +86,7 @@ export default function Blog() {
                     </div>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Project Spotlights
@@ -97,7 +97,7 @@ export default function Blog() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Industry Insights
@@ -108,7 +108,7 @@ export default function Blog() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
                             Mentor Interviews
@@ -132,6 +132,7 @@ export default function Blog() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
+                      type="button"
                       onClick={() => setIsSubscriptionModalOpen(true)}
                       className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                     >
@@ -139,6 +140,7 @@ export default function Blog() {
                       <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => setIsMentorApplicationModalOpen(true)}
                       className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                     >
