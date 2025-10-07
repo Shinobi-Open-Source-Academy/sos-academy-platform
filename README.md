@@ -67,7 +67,13 @@ SENDGRID_API_KEY=your_sendgrid_api_key_here
 # Server Configuration
 NODE_ENV=development
 PORT=4200
+HOST=0.0.0.0
 LOG_LEVEL=info
+
+# Public Application URL (optional - auto-detected if not set)
+# Production: https://api.yourdomain.com
+# Local: leave empty (auto-detects as http://localhost:4200)
+APP_URL=
 
 # JWT Configuration
 JWT_EXPIRATION=1d
@@ -175,6 +181,32 @@ The application will be available at:
 npx nx build frontend
 npx nx build server
 ```
+
+### Deployment Configuration
+
+When deploying to production or remote environments, configure the following environment variables:
+
+**Backend:**
+```env
+NODE_ENV=production
+HOST=0.0.0.0
+APP_URL=https://api.yourdomain.com
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/sos-academy
+SENDGRID_API_KEY=your_production_sendgrid_key
+JWT_SECRET=your_secure_production_secret
+CORS_ORIGIN=https://yourdomain.com
+```
+
+**Frontend:**
+```env
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api
+```
+
+**Important Notes:**
+- `HOST=0.0.0.0` allows the server to accept connections from any IP (required in containerized/cloud environments)
+- `APP_URL` should be your public-facing URL (used in logs and responses)
+- If `APP_URL` is not set, the system will auto-detect using `HOST` and `PORT`
+- Always use HTTPS URLs in production for security
 
 ### Docker Commands
 

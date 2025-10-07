@@ -69,9 +69,17 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(port);
-  Logger.log(`🚀 Application is running on: http://localhost:${port} (${envConfig.nodeEnv})`);
-  Logger.log(`📚 Swagger documentation available at: http://localhost:${port}/api/docs`);
+  await app.listen(port, envConfig.host);
+
+  // Determine the base URL (use APP_URL if set, otherwise construct from host/port)
+  const baseUrl =
+    envConfig.appUrl ||
+    (envConfig.host === '0.0.0.0'
+      ? `http://localhost:${port}`
+      : `http://${envConfig.host}:${port}`);
+
+  Logger.log(`🚀 Application is running on: ${baseUrl} (${envConfig.nodeEnv})`);
+  Logger.log(`📚 Swagger documentation available at: ${baseUrl}/api/docs`);
 
   // Auto-seed database if empty
   await autoSeedDatabase(app);
@@ -84,19 +92,19 @@ async function autoSeedDatabase(app): Promise<void> {
     const seederService = app.get(SeederService);
 
     // Check if database needs seeding
-    logger.log('🔍 Checking database seeding status...');
+    logger.log('Checking database seeding status...');
     const status = await seederService.getDatabaseStatus();
 
     if (status.totalCommunities === 0) {
-      logger.log('📦 Database is empty. Seeding communities...');
+      logger.log('Database is empty. Seeding communities...');
       await seederService.seedCommunities();
-      logger.log('✅ Database seeded successfully');
+      logger.log('Database seeded successfully');
     } else {
-      logger.log(`✓ Database already seeded (${status.totalCommunities} communities found)`);
+      logger.log(`Database already seeded (${status.totalCommunities} communities found)`);
     }
   } catch (error) {
-    logger.error('❌ Auto-seeding failed:', error);
-    logger.warn('⚠️  Application will continue without seeding');
+    logger.error('Auto-seeding failed:', error);
+    logger.warn('Application will continue without seeding');
   }
 }
 

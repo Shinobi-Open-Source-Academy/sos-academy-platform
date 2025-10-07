@@ -8,6 +8,8 @@ const getEnvValue = (key: string, defaultValue: string) => {
 export const envConfig = {
   port: Number.parseInt(getEnvValue('PORT', '4200'), 10),
   nodeEnv: getEnvValue('NODE_ENV', 'development'),
+  host: getEnvValue('HOST', '0.0.0.0'),
+  appUrl: getEnvValue('APP_URL', ''), // e.g., https://api.yourdomain.com or left empty for auto-detection
   mongodb: {
     uri: getEnvValue('MONGODB_URI', 'mongodb://localhost:27017/sos-academy'),
   },

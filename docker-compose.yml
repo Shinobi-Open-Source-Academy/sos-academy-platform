@@ -27,6 +27,8 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-4200}
+      HOST: ${HOST:-0.0.0.0}
+      APP_URL: ${APP_URL:-}
       MONGODB_URI: ${MONGODB_URI}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1d}
