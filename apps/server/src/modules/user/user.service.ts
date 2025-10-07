@@ -109,25 +109,33 @@ export class UserService {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Look up community ObjectIds by slug or name
+    // Look up community ObjectIds by slug or name with SIMPLE case-insensitive matching
     let communityObjectIds: mongoose.Types.ObjectId[] = [];
     if (communities && communities.length > 0) {
-      const foundCommunities = await this.communityModel
-        .find({
-          $or: [{ slug: { $in: communities } }, { name: { $in: communities } }],
-        })
-        .select('_id name slug')
-        .exec();
+      // Get all communities first
+      const allCommunities = await this.communityModel.find({}).select('_id name slug').exec();
+
+      // Simple case-insensitive matching
+      const foundCommunities = allCommunities.filter((community) => {
+        return communities.some((inputCommunity) => {
+          const inputLower = inputCommunity.toLowerCase();
+          const nameLower = community.name.toLowerCase();
+          const slugLower = community.slug.toLowerCase();
+          return nameLower === inputLower || slugLower === inputLower;
+        });
+      });
 
       communityObjectIds = foundCommunities.map(
         (community) => community._id as mongoose.Types.ObjectId
       );
 
       // Log any communities that weren't found
-      const foundIdentifiers = foundCommunities.flatMap((c) => [c.name, c.slug]);
-      const notFound = communities.filter((identifier) => !foundIdentifiers.includes(identifier));
+      const foundNames = foundCommunities.map((c) => c.name.toLowerCase());
+      const notFound = communities.filter(
+        (identifier) => !foundNames.includes(identifier.toLowerCase())
+      );
       if (notFound.length > 0) {
-        console.warn(`Communities not found: ${notFound.join(', ')}`);
+        console.warn(`❌ Communities not found: ${notFound.join(', ')}`);
       }
     }
 

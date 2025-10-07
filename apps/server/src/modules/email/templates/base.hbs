@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mentor Application - Shinobi Open-Source Academy</title>
+  <title>{{title}}</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -14,44 +13,44 @@
       padding: 0;
       background-color: #f5f5f5;
     }
-
+    
     .container {
       max-width: 600px;
       margin: 0 auto;
       background-color: #ffffff;
     }
-
+    
     .header {
       background-color: #304ffe;
       padding: 30px 20px;
       text-align: center;
     }
-
+    
     .logo {
       max-width: 120px;
       height: auto;
       margin-bottom: 10px;
     }
-
+    
     .logo-container {
       background-color: #ffffff;
       padding: 20px;
       border-radius: 12px;
       display: inline-block;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-
+    
     .content {
       padding: 40px 30px;
     }
-
+    
     .greeting {
       font-size: 18px;
       font-weight: 600;
       color: #304ffe;
       margin-bottom: 20px;
     }
-
+    
     .main-heading {
       font-size: 24px;
       font-weight: 700;
@@ -59,7 +58,7 @@
       margin-bottom: 20px;
       line-height: 1.3;
     }
-
+    
     .info-box {
       background-color: #f7f9fc;
       border: 1px solid #e9ecef;
@@ -67,7 +66,7 @@
       padding: 25px;
       margin: 25px 0;
     }
-
+    
     .info-row {
       display: flex;
       justify-content: space-between;
@@ -76,19 +75,19 @@
       padding-bottom: 12px;
       border-bottom: 1px solid #e9ecef;
     }
-
+    
     .info-row:last-child {
       border-bottom: none;
       margin-bottom: 0;
     }
-
+    
     .info-label {
       font-weight: 500;
       color: #9e9e9e;
       font-size: 14px;
       margin-right: 15px;
     }
-
+    
     .info-value {
       font-weight: 600;
       color: #171717;
@@ -96,7 +95,13 @@
       text-align: right;
       flex: 1;
     }
-
+    
+    .communities-list {
+      font-weight: 600;
+      color: #304ffe;
+      text-transform: capitalize;
+    }
+    
     .timeline-box {
       background-color: rgba(48, 79, 254, 0.1);
       border: 1px solid rgba(48, 79, 254, 0.2);
@@ -104,31 +109,31 @@
       padding: 25px;
       margin: 25px 0;
     }
-
+    
     .timeline-title {
       font-weight: 600;
       color: #304ffe;
       margin-bottom: 15px;
       font-size: 16px;
     }
-
+    
     .timeline-list {
       margin: 0;
       padding-left: 20px;
     }
-
+    
     .timeline-list li {
       margin-bottom: 10px;
       color: #171717;
       font-size: 14px;
       line-height: 1.5;
     }
-
+    
     .cta-section {
       text-align: center;
       margin: 35px 0;
     }
-
+    
     .cta-button {
       display: inline-block;
       background-color: #304ffe;
@@ -141,29 +146,29 @@
       transition: background-color 0.2s ease;
       box-shadow: 0 4px 12px rgba(48, 79, 254, 0.3);
     }
-
+    
     .cta-button:hover {
       background-color: #0d1b60;
       box-shadow: 0 6px 16px rgba(48, 79, 254, 0.4);
     }
-
+    
     .footer {
       background-color: #f7f9fc;
       padding: 25px 30px;
       text-align: center;
       border-top: 1px solid #e9ecef;
     }
-
+    
     .footer-text {
       font-size: 12px;
       color: #9e9e9e;
       margin-bottom: 10px;
     }
-
+    
     .social-links {
       margin-top: 15px;
     }
-
+    
     .social-links a {
       color: #304ffe;
       text-decoration: none;
@@ -171,20 +176,19 @@
       font-size: 12px;
       font-weight: 500;
     }
-
+    
     .contact-info {
       margin-top: 25px;
       font-size: 14px;
       color: #9e9e9e;
     }
-
+    
     .contact-info a {
       color: #304ffe;
       text-decoration: none;
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <div class="header">
@@ -192,74 +196,26 @@
         <img src="cid:logo" alt="Shinobi Open-Source Academy" class="logo">
       </div>
     </div>
-
+    
     <div class="content">
-      <div class="greeting">Dear {{name}},</div>
-
-      <div class="main-heading">Thank you for applying to <strong>Shinobi Open-Source Academy</strong></div>
-
-      <p>Thank you for applying to become a mentor at Shinobi Open-Source Academy. We've received your application and
-        are reviewing your qualifications and experience.</p>
-
-      <p>Mentors play a crucial role in our community by guiding developers through their learning journey, sharing
-        practical knowledge, and helping them build real-world projects. Your expertise and willingness to help others
-        grow is what makes our community strong.</p>
-
-      <div class="info-box">
-        <div class="info-row">
-          <div class="info-label">Applicant</div>
-          <div class="info-value">{{name}}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Application Date</div>
-          <div class="info-value">{{date}}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Review Period</div>
-          <div class="info-value">{{applicationReviewPeriod}}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Status</div>
-          <div class="info-value">Under Review</div>
-        </div>
-      </div>
-
-      <div class="timeline-box">
-        <div class="timeline-title">What happens next</div>
-        <ol class="timeline-list">
-          <li>Manual application review by our team</li>
-          <li>If selected, we'll contact you directly</li>
-          <li>Final confirmation and onboarding process</li>
-          <li>Getting started with your first mentoring sessions</li>
-        </ol>
-      </div>
-
-      <p><strong>Mentor responsibilities include:</strong></p>
-      <ul>
-        <li>Conducting regular mentoring sessions with community members</li>
-        <li>Providing technical guidance and code reviews</li>
-        <li>Sharing industry best practices and real-world experience</li>
-        <li>Helping mentees set and achieve their learning goals</li>
-        <li>Participating in community discussions and knowledge sharing</li>
-      </ul>
-
-      <p>While you wait for our review, feel free to explore our documentation and familiarize yourself with our
-        community guidelines and mentoring framework.</p>
-
+      <div class="greeting">{{greeting}}</div>
+      
+      <div class="main-heading">{{mainHeading}}</div>
+      
+      {{{content}}}
+      
       <div class="cta-section">
-        <a href="https://shinobi-open-source.academy/documentation" class="cta-button">View Mentor Resources</a>
+        <a href="{{ctaUrl}}" class="cta-button">{{ctaText}}</a>
       </div>
-
+      
       <div class="contact-info">
-        <p>Questions about your application? Contact us at <a
-            href="mailto:mentors@shinobi-open-source.academy">mentors@shinobi-open-source.academy</a></p>
+        <p>{{contactText}} <a href="mailto:{{contactEmail}}">{{contactEmail}}</a></p>
       </div>
     </div>
-
+    
     <div class="footer">
       <div class="footer-text">© {{currentYear}} Shinobi Open-Source Academy. All rights reserved.</div>
-      <div class="footer-text">You're receiving this email because you applied to be a mentor at Shinobi Open-Source
-        Academy.</div>
+      <div class="footer-text">{{footerText}}</div>
       <div class="social-links">
         <a href="https://twitter.com/shinobiopensource">Twitter</a>
         <a href="https://github.com/shinobi-open-source">GitHub</a>
@@ -268,5 +224,4 @@
     </div>
   </div>
 </body>
-
 </html>

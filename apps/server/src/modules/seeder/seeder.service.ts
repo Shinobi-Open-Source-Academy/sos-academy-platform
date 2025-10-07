@@ -23,10 +23,10 @@ export interface DatabaseStatus {
 export class SeederService {
   private readonly logger = new Logger(SeederService.name);
 
-  // Seed data - matching frontend COMMUNITIES_LIST structure
+  // Seed data - clean language names with Naruto-inspired slugs
   private readonly COMMUNITIES_DATA = [
     {
-      name: 'Suna Community',
+      name: 'JavaScript',
       slug: 'suna',
       description:
         'Master modern JavaScript and its frameworks while contributing to web-focused open-source projects.',
@@ -34,7 +34,7 @@ export class SeederService {
       isActive: true,
     },
     {
-      name: 'Konoha Community',
+      name: 'Python',
       slug: 'konoha',
       description:
         'Dive into Python development and contribute to data science, automation, and web backend projects.',
@@ -42,7 +42,7 @@ export class SeederService {
       isActive: true,
     },
     {
-      name: 'Kiri Community',
+      name: 'Go',
       slug: 'kiri',
       description:
         'Build high-performance, concurrent systems and microservices with Go language expertise.',
@@ -50,7 +50,7 @@ export class SeederService {
       isActive: true,
     },
     {
-      name: 'Iwa Community',
+      name: 'Java',
       slug: 'iwa',
       description:
         'Focus on enterprise-grade applications, Android development, and Java-based open-source projects.',
@@ -58,7 +58,7 @@ export class SeederService {
       isActive: true,
     },
     {
-      name: 'Taki Community',
+      name: 'Ruby',
       slug: 'taki',
       description:
         'Contribute to elegant, readable codebases and web applications using Ruby and Rails.',
@@ -66,7 +66,7 @@ export class SeederService {
       isActive: true,
     },
     {
-      name: 'Rust Community',
+      name: 'Rust',
       slug: 'rust',
       description:
         'Build memory-safe, high-performance systems and contribute to cutting-edge Rust projects.',

@@ -67,6 +67,7 @@
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^10.0.2",
     "@nestjs/swagger": "^7.4.2",
+    "@sendgrid/mail": "^8.1.6",
     "axios": "^1.6.0",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",

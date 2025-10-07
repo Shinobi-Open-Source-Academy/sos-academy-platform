@@ -75,5 +75,8 @@
     "**/.next/**": true,
     "**/coverage/**": true,
     "**/.nx/**": true
+  },
+  "[handlebars]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
   }
 }
