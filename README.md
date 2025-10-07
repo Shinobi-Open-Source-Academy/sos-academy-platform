@@ -9,9 +9,11 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 - **User Subscription**: Join communities with email and community selection
 - **Mentor Applications**: Apply to become a mentor with streamlined process
 - **Community Management**: 5 specialized communities (JavaScript, Python, Go, Java, Ruby)
-- **Email Notifications**: Automated confirmation emails with Monday meeting cadence
+- **Email Notifications**: Professional email templates with SendGrid integration
 - **GitHub Integration**: Automatic profile enrichment from GitHub handles
+- **Database Seeders**: Smart seeding system to populate communities
 - **Beautiful UI**: Modern, responsive design with modal-based forms
+- **API Documentation**: Full Swagger/OpenAPI documentation
 
 ## 🏗️ Architecture
 
@@ -30,31 +32,78 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 
 ### Environment Setup
 
-Create a `.env` file in the root directory:
+#### Quick Setup
+
+```sh
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your actual values (MongoDB URI, SendGrid API key, etc.)
+nano .env
+```
+
+#### Backend Configuration
+
+Create a `.env` file in the root directory (or copy from `.env.example`):
 
 ```env
-# Server Configuration
-PORT=4200
-NODE_ENV=development
+# =============================================================================
+# REQUIRED ENVIRONMENT VARIABLES
+# =============================================================================
 
-# MongoDB Connection
+# MongoDB Connection String (Required)
 MONGODB_URI=mongodb://localhost:27017/sos-academy
 
-# JWT Authentication
-JWT_SECRET=your_jwt_secret_key_here_change_in_production
+# JWT Secret (Required - change this in production!)
+JWT_SECRET=your_secure_jwt_secret_key_here
+
+# SendGrid API Key (Required for email functionality)
+SENDGRID_API_KEY=your_sendgrid_api_key_here
+
+# =============================================================================
+# OPTIONAL ENVIRONMENT VARIABLES (with defaults)
+# =============================================================================
+
+# Server Configuration
+NODE_ENV=development
+PORT=4200
+LOG_LEVEL=info
+
+# JWT Configuration
 JWT_EXPIRATION=1d
 
-# Cors Configuration
+# CORS Configuration
 CORS_ORIGIN=http://localhost:3000
 
-# Email Configuration (SendGrid)
+# Email Configuration
 EMAIL_HOST=smtp.sendgrid.net
 EMAIL_USER=apikey
-EMAIL_PASSWORD=your_sendgrid_api_key_here
-EMAIL_FROM=no-reply@sos-academy.org
+EMAIL_FROM=no-reply@shinobi-open-source.academy
 
-# GitHub API (Optional - for higher rate limits)
-GITHUB_TOKEN=your_github_token_here_optional
+# GitHub API (Optional - for GitHub profile fetching)
+GITHUB_TOKEN=your_github_token_here
+
+# =============================================================================
+# FRONTEND CONFIGURATION
+# =============================================================================
+
+# Frontend Port
+FRONTEND_PORT=3000
+
+# Backend API URL (used by frontend to make API calls)
+NEXT_PUBLIC_API_URL=http://localhost:4200/api
+
+# Base Server URL (internal backend URL)
+BASE_SERVER_URL=http://localhost:4200
+```
+
+#### Frontend Configuration
+
+Create `apps/frontend/.env.local`:
+
+```env
+# API URL for backend communication
+NEXT_PUBLIC_API_URL=http://localhost:4200/api
 ```
 
 ### Development
@@ -63,25 +112,36 @@ GITHUB_TOKEN=your_github_token_here_optional
 
 ```sh
 # Install dependencies
-npm install
+pnpm install
 
 # Start MongoDB (if running locally)
 mongod
 
-# Start the backend server
+# Start the backend server (auto-seeds database if empty)
 npx nx serve server
 
 # Start the frontend (in another terminal)
-npx nx dev frontend
+npx nx serve frontend
+```
+
+**Note**: The backend automatically checks and seeds the database on startup if it's empty. You can also manually seed using:
+```sh
+npx nx run server:seed
 ```
 
 #### Option 2: Docker (Recommended for Production)
 
+**Prerequisites for Docker:**
+- Docker and Docker Compose installed
+- `.env` file with required variables (especially `SENDGRID_API_KEY`, `JWT_SECRET`, `MONGODB_URI`)
+
 ```sh
 # Copy environment template
-cp env.example .env
+cp .env.example .env
 
-# Edit .env with your MongoDB URI and other settings
+# Edit .env with your actual values
+# IMPORTANT: Update MONGODB_URI to use Docker service name
+# MONGODB_URI=mongodb://mongodb:27017/sos-academy
 nano .env
 
 # Build and start all services
@@ -89,7 +149,18 @@ docker-compose up --build
 
 # Or run in detached mode
 docker-compose up --build -d
+
+# View logs
+docker-compose logs -f
 ```
+
+**Important Docker Configuration:**
+- The `MONGODB_URI` should use the Docker service name: `mongodb://mongodb:27017/sos-academy`
+- Frontend will be accessible at: http://localhost:3000
+- Backend API at: http://localhost:4200
+- API Documentation at: http://localhost:4200/api/docs
+- MongoDB will persist data in a Docker volume
+- **Database auto-seeds on first startup** - no manual seeding required!
 
 The application will be available at:
 
@@ -111,14 +182,35 @@ npx nx build server
 # Start services
 docker-compose up
 
+# Start in detached mode
+docker-compose up -d
+
 # Stop services
 docker-compose down
 
 # View logs
-docker-compose logs
+docker-compose logs -f
 
 # Rebuild services
 docker-compose up --build
+
+# Seed database (after services are running)
+docker-compose exec backend node seed-docker.js seed
+
+# Clear database
+docker-compose exec backend node seed-docker.js clear
+
+# Reset database (clear + seed)
+docker-compose exec backend node seed-docker.js reset
+
+# Check seeding status
+docker-compose exec backend node seed-docker.js status
+
+# Access backend shell
+docker-compose exec backend sh
+
+# Access MongoDB shell
+docker-compose exec mongodb mongosh sos-academy
 ```
 
 ### Code Formatting
@@ -172,12 +264,27 @@ This project uses **Biome** for code formatting and linting instead of ESLint/Pr
 
 ## 📋 API Endpoints
 
+Full API documentation is available at: http://localhost:4200/api/docs (Swagger UI)
+
 ### User Management
 
-- `POST /api/users/subscribe` - Subscribe to communities
+- `POST /api/users/subscribe` - Subscribe to newsletter
+- `POST /api/users/join/community` - Join communities
 - `POST /api/users/mentor-application` - Apply as mentor
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
+
+### Communities
+
+- `GET /api/communities` - Get all communities
+- `GET /api/communities/:id` - Get community by ID
+
+### Database Seeding (Development)
+
+- `POST /api/seeder/seed` - Seed communities
+- `POST /api/seeder/clear` - Clear all communities
+- `POST /api/seeder/reset` - Reset database (clear + seed)
+- `GET /api/seeder/status` - Check seeding status
 
 ### Subscription Flow
 
@@ -192,6 +299,184 @@ This project uses **Biome** for code formatting and linting instead of ESLint/Pr
 2. Backend creates user record with `source: 'mentor-application'` and `status: 'pending'`
 3. GitHub profile is enriched if handle provided
 4. Confirmation email sent with manual review timeline (3-5 business days)
+
+## 🌱 Database Seeders
+
+The platform includes a **smart auto-seeding system** that automatically populates the database with communities.
+
+### Automatic Seeding
+
+**Both Local & Docker**: The database automatically checks and seeds itself when the application starts up if it's empty. No manual intervention needed!
+
+**How it works:**
+1. Application starts and listens on the configured port
+2. Auto-seed system checks database status
+3. If database is empty (0 communities), it seeds automatically
+4. If database has communities, it skips seeding
+5. Application continues running normally
+
+**Startup logs you'll see:**
+```
+🚀 Application is running on: http://localhost:4200
+🔍 Checking database seeding status...
+📦 Database is empty. Seeding communities...
+✅ Database seeded successfully
+```
+
+Or if already seeded:
+```
+🚀 Application is running on: http://localhost:4200
+🔍 Checking database seeding status...
+✓ Database already seeded (5 communities found)
+```
+
+### Manual Seeder Commands
+
+```sh
+# Seed communities (idempotent - won't create duplicates)
+npx nx run server:seed
+
+# Clear all communities
+npx nx run server:seed:clear
+
+# Reset (clear + seed)
+npx nx run server:seed:reset
+
+# Check seeding status
+npx nx run server:seed:status
+```
+
+### Docker Manual Seeding (if needed)
+
+```sh
+# Seed communities
+docker-compose exec backend node seed-docker.js seed
+
+# Check status
+docker-compose exec backend node seed-docker.js status
+```
+
+### Seeder Endpoints (via API)
+
+- `POST /api/seeder/seed` - Seed communities
+- `POST /api/seeder/clear` - Clear all communities
+- `POST /api/seeder/reset` - Reset database (clear + seed)
+- `GET /api/seeder/status` - Check seeding status
+
+**Note**: The seeder is idempotent and will skip existing communities to prevent duplicates.
+
+### Technical Implementation
+
+The auto-seeding system is implemented directly in the `main.ts` application bootstrap:
+- Runs **after** the application successfully starts (post `app.listen()`)
+- Uses the `SeederService` to check database status
+- Non-blocking and fail-safe - app continues even if seeding fails
+- Logs are clearly visible in the console for debugging
+- Works identically in local development, Docker, and production environments
+
+The same seeding logic is also accessible via CLI commands for manual control when needed.
+
+## 🐛 Troubleshooting
+
+### Database Seeding Issues
+
+**Problem**: Auto-seeding doesn't run
+```
+Application starts but no seeding logs appear
+```
+**Solution**: Check if the database already has communities:
+```sh
+# Check via API
+curl http://localhost:4200/api/seeder/status
+
+# Or check MongoDB directly
+docker-compose exec mongodb mongosh sos-academy --eval "db.communities.countDocuments()"
+```
+
+**Problem**: Seeding fails with MongoDB connection error
+```
+❌ Auto-seeding failed: MongooseServerSelectionError
+```
+**Solution**: Ensure MongoDB is running and the connection string is correct:
+- Local: `MONGODB_URI=mongodb://localhost:27017/sos-academy`
+- Docker: `MONGODB_URI=mongodb://mongodb:27017/sos-academy`
+
+**Problem**: Want to re-seed the database
+```
+Database is already seeded, but I want fresh data
+```
+**Solution**: Clear and re-seed:
+```sh
+# Local
+npx nx run server:seed:reset
+
+# Docker
+docker-compose exec backend node seed-docker.js reset
+```
+
+### Docker Issues
+
+**Problem**: Backend can't connect to MongoDB
+```
+MongooseError: The `uri` parameter to `openUri()` must be a string
+```
+**Solution**: Make sure your `.env` file has the correct `MONGODB_URI`:
+- For Docker: `MONGODB_URI=mongodb://mongodb:27017/sos-academy`
+- For local: `MONGODB_URI=mongodb://localhost:27017/sos-academy`
+
+**Problem**: Email sending fails in Docker
+```
+Error: SENDGRID_API_KEY environment variable is required
+```
+**Solution**: Add `SENDGRID_API_KEY` to your `.env` file with a valid SendGrid API key.
+
+**Problem**: Frontend shows "Connection refused" errors
+```
+Error: connect ECONNREFUSED ::1:4200
+```
+**Solution**: Make sure the `NEXT_PUBLIC_API_URL` in `.env` points to the correct backend URL:
+- For Docker: `http://localhost:4200/api` (NOT `http://backend:4200/api`)
+- The frontend runs in the browser, so it needs the external URL
+
+**Problem**: pnpm-lock.yaml is out of date
+```
+ERR_PNPM_LOCKFILE_CONFIG_MISMATCH
+```
+**Solution**: Update the lockfile:
+```sh
+pnpm install
+```
+
+### Local Development Issues
+
+**Problem**: Port already in use
+```
+Error: listen EADDRINUSE: address already in use :::4200
+```
+**Solution**: Kill the process using the port:
+```sh
+# Find the process
+lsof -i :4200
+
+# Kill it
+kill -9 <PID>
+```
+
+**Problem**: MongoDB connection timeout
+```
+MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017
+```
+**Solution**: Make sure MongoDB is running:
+```sh
+# macOS (Homebrew)
+brew services start mongodb-community
+
+# Linux
+sudo systemctl start mongod
+
+# Or run manually
+mongod --dbpath /path/to/data/db
+```
 
 ## Add new projects
 

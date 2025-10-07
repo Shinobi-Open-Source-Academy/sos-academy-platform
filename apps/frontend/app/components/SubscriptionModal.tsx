@@ -63,7 +63,8 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/users/subscribe', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
+      const response = await fetch(`${apiUrl}/users/join/community`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,6 +148,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
             Email Address <span className="text-red-500">*</span>
           </label>
           <input
+            id="email"
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
@@ -172,6 +174,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
             Full Name (Optional)
           </label>
           <input
+            id="name"
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -201,6 +204,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
             GitHub Handle (Optional)
           </label>
           <input
+            id="githubHandle"
             type="text"
             value={formData.githubHandle}
             onChange={(e) => handleInputChange('githubHandle', e.target.value)}

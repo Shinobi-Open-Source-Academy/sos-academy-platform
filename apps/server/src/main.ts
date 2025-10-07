@@ -72,6 +72,32 @@ async function bootstrap() {
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port} (${envConfig.nodeEnv})`);
   Logger.log(`📚 Swagger documentation available at: http://localhost:${port}/api/docs`);
+
+  // Auto-seed database if empty
+  await autoSeedDatabase(app);
+}
+
+async function autoSeedDatabase(app): Promise<void> {
+  const logger = new Logger('AutoSeed');
+
+  try {
+    const seederService = app.get(SeederService);
+
+    // Check if database needs seeding
+    logger.log('🔍 Checking database seeding status...');
+    const status = await seederService.getDatabaseStatus();
+
+    if (status.totalCommunities === 0) {
+      logger.log('📦 Database is empty. Seeding communities...');
+      await seederService.seedCommunities();
+      logger.log('✅ Database seeded successfully');
+    } else {
+      logger.log(`✓ Database already seeded (${status.totalCommunities} communities found)`);
+    }
+  } catch (error) {
+    logger.error('❌ Auto-seeding failed:', error);
+    logger.warn('⚠️  Application will continue without seeding');
+  }
 }
 
 async function runSeederCommand(command: string): Promise<void> {
@@ -93,7 +119,6 @@ async function runSeederCommand(command: string): Promise<void> {
       case 'status':
         await seederService.getDatabaseStatus();
         break;
-      case 'seed':
       default:
         await seederService.seedCommunities();
         break;

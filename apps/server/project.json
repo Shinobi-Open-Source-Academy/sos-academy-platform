@@ -39,6 +39,30 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register apps/server/src/seed.ts seed"
+      }
+    },
+    "seed:clear": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register apps/server/src/seed.ts clear"
+      }
+    },
+    "seed:reset": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register apps/server/src/seed.ts reset"
+      }
+    },
+    "seed:status": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register apps/server/src/seed.ts status"
+      }
     }
   }
 }

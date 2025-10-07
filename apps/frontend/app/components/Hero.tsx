@@ -46,7 +46,9 @@ export default function Hero() {
 
     // Subtle parallax effect on mouse move
     const handleMouseMove = (e: MouseEvent) => {
-      if (!heroRef.current) return;
+      if (!heroRef.current) {
+        return;
+      }
 
       const rect = heroRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
@@ -68,14 +70,14 @@ export default function Hero() {
       <CodeBackground />
 
       {/* Gradient overlay for better text visibility */}
-      <div className="absolute inset-0 bg-gradient-radial from-[#0a1135]/80 to-transparent z-0"></div>
+      <div className="absolute inset-0 bg-gradient-radial from-[#0a1135]/80 to-transparent z-0" />
 
       {/* Subtle moving dots background - only rendered on client side */}
       {isLoaded && (
         <div className="absolute inset-0 z-0 opacity-20">
-          {dots.map((dot, i) => (
+          {dots.map((dot) => (
             <div
-              key={i}
+              key={Math.random()}
               className="absolute rounded-full bg-primary/30"
               style={{
                 width: `${dot.width}px`,
@@ -89,7 +91,7 @@ export default function Hero() {
                 animationDuration: `${dot.duration}s`,
                 animation: 'float infinite ease-in-out',
               }}
-            ></div>
+            />
           ))}
         </div>
       )}
@@ -168,8 +170,9 @@ export default function Hero() {
             }}
           >
             <button
+              type="button"
               onClick={() => setIsSubscriptionModalOpen(true)}
-              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-1 sm:gap-2">
                 {HERO_DATA.joinButtonText}
@@ -179,8 +182,10 @@ export default function Hero() {
             </button>
 
             <button
+              type="button"
+              // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
               onClick={() => (window.location.href = '/documentation')}
-              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
+              className="relative overflow-hidden px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-sans font-semibold text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-1 sm:gap-2">
                 {HERO_DATA.learnMoreButtonText}
@@ -213,7 +218,7 @@ export default function Hero() {
         {/* Subtle separator line */}
         <div className="relative max-w-3xl mt-36 mx-auto mb-6 sm:mb-10">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700/30"></div>
+            <div className="w-full border-t border-gray-700/30" />
           </div>
           <div className="relative flex justify-center my-4">
             <span className="bg-[#070a1d] px-4 sm:px-6 text-xs sm:text-sm uppercase tracking-wider font-medium text-gray-400">

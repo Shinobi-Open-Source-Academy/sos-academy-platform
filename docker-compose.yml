@@ -35,8 +35,8 @@ services:
       # Email Configuration
       EMAIL_HOST: ${EMAIL_HOST:-smtp.sendgrid.net}
       EMAIL_USER: ${EMAIL_USER:-apikey}
-      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-      EMAIL_FROM: ${EMAIL_FROM:-no-reply@sos-academy.org}
+      EMAIL_FROM: ${EMAIL_FROM:-no-reply@shinobi-open-source.academy}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
       # GitHub API (Optional)
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     depends_on:

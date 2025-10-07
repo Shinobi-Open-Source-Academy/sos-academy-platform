@@ -35,8 +35,16 @@ COPY --from=builder --chown=nestjs:nodejs /app/dist/apps/server ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
 
-# Copy email templates
-COPY --from=builder --chown=nestjs:nodejs /app/apps/server/src/modules/email/templates ./templates
+# Copy email templates and assets to the correct location
+COPY --from=builder --chown=nestjs:nodejs /app/apps/server/src/modules/email/templates ./apps/server/src/modules/email/templates
+
+# Copy Docker seeder scripts
+COPY --from=builder --chown=nestjs:nodejs /app/apps/server/seed-docker.js ./seed-docker.js
+COPY --from=builder --chown=nestjs:nodejs /app/apps/server/auto-seed-docker.js ./auto-seed-docker.js
+COPY --from=builder --chown=nestjs:nodejs /app/apps/server/docker-start.sh ./docker-start.sh
+
+# Make startup script executable
+RUN chmod +x ./docker-start.sh
 
 USER nestjs
 
@@ -44,5 +52,5 @@ EXPOSE 4200
 
 ENV PORT=4200
 
-# Start the application
-CMD ["node", "dist/main.js"]
+# Start the application with auto-seeding
+CMD ["sh", "./docker-start.sh"]
