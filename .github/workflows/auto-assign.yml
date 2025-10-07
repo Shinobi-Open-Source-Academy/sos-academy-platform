@@ -1,0 +1,92 @@
+name: Auto Assign
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  add-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Label new issues
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = [];
+
+            // Auto-label based on title keywords
+            const title = issue.title.toLowerCase();
+
+            if (title.includes('[bug]') || title.includes('bug:') || title.includes('fix:')) {
+              labels.push('bug');
+            }
+            if (title.includes('[feature]') || title.includes('feat:')) {
+              labels.push('enhancement');
+            }
+            if (title.includes('[docs]') || title.includes('docs:')) {
+              labels.push('documentation');
+            }
+
+            // Add needs-triage if not already added by template
+            if (!issue.labels.some(l => l.name === 'needs-triage')) {
+              labels.push('needs-triage');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
+
+      - name: Label new PRs
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = [];
+
+            // Auto-label based on PR title
+            const title = pr.title.toLowerCase();
+
+            if (title.startsWith('feat:') || title.startsWith('feature:')) {
+              labels.push('enhancement');
+            } else if (title.startsWith('fix:') || title.startsWith('bugfix:')) {
+              labels.push('bug');
+            } else if (title.startsWith('docs:')) {
+              labels.push('documentation');
+            } else if (title.startsWith('chore:')) {
+              labels.push('chore');
+            } else if (title.startsWith('refactor:')) {
+              labels.push('refactor');
+            } else if (title.startsWith('test:')) {
+              labels.push('testing');
+            } else if (title.startsWith('perf:')) {
+              labels.push('performance');
+            }
+
+            // Check if it's a draft PR
+            if (pr.draft) {
+              labels.push('work-in-progress');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labels
+              });
+            }

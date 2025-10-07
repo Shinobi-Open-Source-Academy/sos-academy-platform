@@ -1,0 +1,66 @@
+name: Mark Stale Issues and PRs
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Issue settings
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          stale-issue-label: 'stale'
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had recent activity.
+            It will be closed in 14 days if no further activity occurs.
+
+            If this issue is still relevant, please:
+            - Comment to keep it open
+            - Remove the 'stale' label
+            - Provide updates on the issue
+
+            Thank you for your contributions! 🙏
+          close-issue-message: |
+            This issue has been automatically closed due to inactivity.
+            If you believe this issue is still relevant, please reopen it with updated information.
+
+            Thank you for your understanding! 🙏
+
+          # PR settings
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: 'stale'
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had recent activity.
+            It will be closed in 14 days if no further activity occurs.
+
+            If this PR is still being worked on, please:
+            - Push new commits
+            - Comment to keep it open
+            - Remove the 'stale' label
+
+            Thank you for your contributions! 🙏
+          close-pr-message: |
+            This pull request has been automatically closed due to inactivity.
+            If you'd like to continue working on this, please reopen it or create a new PR.
+
+            Thank you for your understanding! 🙏
+
+          # Exemptions
+          exempt-issue-labels: 'pinned,security,on-hold,blocked'
+          exempt-pr-labels: 'pinned,security,on-hold,blocked,work-in-progress'
+          exempt-draft-pr: true
+
+          # Operation limits
+          operations-per-run: 100

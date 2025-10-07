@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test --passWithNoTests
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: ".github/release.yml"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update CHANGELOG.md
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          DATE=$(date +%Y-%m-%d)
+
+          # Create temporary changelog entry
+          cat << EOF > /tmp/changelog_entry.md
+          ## [$VERSION] - $DATE
+
+          ${{ steps.changelog.outputs.changelog }}
+
+          EOF
+
+          # Insert new entry after the [Unreleased] section
+          sed -i "/## \[Unreleased\]/r /tmp/changelog_entry.md" CHANGELOG.md
+
+          # Update the comparison links at the bottom
+          echo "" >> CHANGELOG.md
+          echo "[${VERSION}]: https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/releases/tag/v${VERSION}" >> CHANGELOG.md
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: update CHANGELOG for v${{ steps.get_version.outputs.VERSION }}"
+          file_pattern: CHANGELOG.md
+          branch: main

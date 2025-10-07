@@ -1,0 +1,68 @@
+# Automatically label PRs based on changed files
+
+# Frontend related changes
+'area: frontend':
+  - 'apps/frontend/**/*'
+
+# Backend related changes
+'area: backend':
+  - 'apps/server/**/*'
+
+# Documentation changes
+'documentation':
+  - '**/*.md'
+  - 'docs/**/*'
+
+# Configuration changes
+'config':
+  - '**/*.json'
+  - '**/*.yml'
+  - '**/*.yaml'
+  - '**/*.config.js'
+  - '**/*.config.ts'
+  - '.github/**/*'
+
+# Testing changes
+'testing':
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/specs/**/*'
+  - 'jest.config.*'
+
+# Dependencies
+'dependencies':
+  - 'package.json'
+  - 'pnpm-lock.yaml'
+  - '**/package.json'
+
+# DevOps and Infrastructure
+'devops':
+  - 'docker-compose.yml'
+  - '**/Dockerfile'
+  - '.github/workflows/**/*'
+  - '.dockerignore'
+
+# Database and Seeders
+'database':
+  - '**/seeders/**/*'
+  - '**/seed*.ts'
+  - '**/seed*.js'
+
+# UI/Styling
+'ui/ux':
+  - '**/*.css'
+  - '**/*.scss'
+  - '**/tailwind.config.*'
+  - '**/postcss.config.*'
+
+# TypeScript/Types
+'typescript':
+  - '**/*.ts'
+  - '**/*.tsx'
+  - '**/tsconfig*.json'
+
+# Shared/Library
+'shared':
+  - 'libs/**/*'

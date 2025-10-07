@@ -1,0 +1,86 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+*.dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# Git
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.gitkeep text eol=lf
+
+# Documentation
+*.txt text eol=lf
+*.pdf binary
+*.doc binary
+*.docx binary
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+*.webp binary
+*.avif binary
+
+# Archives
+*.zip binary
+*.gz binary
+*.tar binary
+*.rar binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Executables
+*.exe binary
+*.out binary
+*.app binary
+
+# Lock files (binary to avoid conflicts)
+pnpm-lock.yaml binary
+package-lock.json binary
+yarn.lock binary
+
+# Environment files
+.env* text eol=lf
+*.example text eol=lf
+
+# Linguist overrides for language statistics
+*.hbs linguist-language=Handlebars
+*.css linguist-detectable=true
+*.scss linguist-detectable=true
+
+# Mark generated files
+dist/** linguist-generated=true
+build/** linguist-generated=true
+coverage/** linguist-generated=true
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
