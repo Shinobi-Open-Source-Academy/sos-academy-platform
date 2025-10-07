@@ -6,4 +6,4 @@
   "typings": "./src/index.d.ts",
   "dependencies": {},
   "peerDependencies": {}
-} 
+}

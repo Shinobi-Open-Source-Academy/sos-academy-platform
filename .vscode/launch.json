@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/server/src/main.ts",
+      "cwd": "${workspaceFolder}/apps/server",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Frontend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/frontend/node_modules/.bin/next",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}/apps/frontend",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

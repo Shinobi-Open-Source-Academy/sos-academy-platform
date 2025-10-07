@@ -1,14 +1,14 @@
 'use client';
 
-import { CommunityDetails } from '@/app/types/community';
+import type { CommunityDetails } from '@/app/types/community';
 import CalendarIcon from '../icons/CalendarIcon';
 import ClockIcon from '../icons/ClockIcon';
-import VideoIcon from '../icons/VideoIcon';
+import DiscordIcon from '../icons/DiscordIcon';
 import DocumentIcon from '../icons/DocumentIcon';
-import PlayCircleIcon from '../icons/PlayCircleIcon';
 import GithubIcon from '../icons/GithubIcon';
 import LinkIcon from '../icons/LinkIcon';
-import DiscordIcon from '../icons/DiscordIcon';
+import PlayCircleIcon from '../icons/PlayCircleIcon';
+import VideoIcon from '../icons/VideoIcon';
 
 interface CommunityAboutProps {
   community: CommunityDetails;
@@ -18,36 +18,26 @@ export default function CommunityAbout({ community }: CommunityAboutProps) {
   return (
     <section className="py-10">
       <div className="container mx-auto px-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-          About This Community
-        </h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">About This Community</h2>
 
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-6 md:p-8">
           <div className="prose prose-invert max-w-none">
-            <p className="text-gray-300 whitespace-pre-line">
-              {community.longDescription}
-            </p>
+            <p className="text-gray-300 whitespace-pre-line">{community.longDescription}</p>
           </div>
 
-          {/* Meeting Information */}
+          {/* Meeting Information - Blurred for now */}
           {(community.meetingDay || community.meetingTime) && (
-            <div className="mt-8 border-t border-gray-700/60 pt-6">
-              <h3 className="text-xl font-bold text-white mb-4">
-                Weekly Meetings
-              </h3>
-              <div className="bg-black/30 rounded-lg p-4 flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div className="mt-8 border-t border-gray-700/60 pt-6 relative">
+              <h3 className="text-xl font-bold text-white mb-4">Weekly Meetings</h3>
+              <div className="bg-black/30 rounded-lg p-4 flex flex-col md:flex-row gap-4 items-start md:items-center blur-sm select-none pointer-events-none">
                 <div className="flex items-center">
                   <CalendarIcon />
-                  <span className="text-gray-200">
-                    {community.meetingDay || 'TBA'}
-                  </span>
+                  <span className="text-gray-200">{community.meetingDay || 'TBA'}</span>
                 </div>
 
                 <div className="flex items-center">
                   <ClockIcon />
-                  <span className="text-gray-200">
-                    {community.meetingTime || 'TBA'}
-                  </span>
+                  <span className="text-gray-200">{community.meetingTime || 'TBA'}</span>
                 </div>
 
                 {community.meetingLink && (
@@ -63,6 +53,11 @@ export default function CommunityAbout({ community }: CommunityAboutProps) {
                     </a>
                   </div>
                 )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-gray-900/80 backdrop-blur-sm px-6 py-3 rounded-lg border border-gray-700">
+                  <p className="text-gray-300 font-medium">Coming Soon</p>
+                </div>
               </div>
             </div>
           )}

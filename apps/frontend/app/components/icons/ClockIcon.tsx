@@ -1,8 +1,6 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
-export default function ClockIcon({
-  className = 'h-5 w-5 text-primary mr-2',
-}: IconProps) {
+export default function ClockIcon({ className = 'h-5 w-5 text-primary mr-2' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

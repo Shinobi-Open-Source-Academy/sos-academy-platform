@@ -1,4 +1,4 @@
-import { CalendarEventType } from '../enums';
+import type { CalendarEventType } from '../enums';
 
 export interface ICalendarEvent {
   id?: string;

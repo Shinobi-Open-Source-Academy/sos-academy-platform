@@ -1,69 +1,244 @@
-<html lang='en'>
-  <head>
-    <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Welcome to SOS Academy!</title>
-    <style>
-      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333;
-      max-width: 600px; margin: 0 auto; padding: 20px; } .header { text-align:
-      center; margin-bottom: 30px; } .logo { max-width: 150px; margin-bottom:
-      20px; } h1 { color: #2c3e50; margin-bottom: 20px; } .content {
-      background-color: #f8f9fa; padding: 30px; border-radius: 5px;
-      margin-bottom: 30px; } .footer { font-size: 12px; text-align: center;
-      color: #6c757d; margin-top: 30px; padding-top: 20px; border-top: 1px solid
-      #e9ecef; } .button { display: inline-block; background-color: #007bff;
-      color: white; text-decoration: none; padding: 10px 20px; border-radius:
-      5px; margin: 20px 0; } .social-links { margin-top: 20px; } .social-links a
-      { margin: 0 10px; text-decoration: none; color: #007bff; }
-    </style>
-  </head>
-  <body>
-    <div class='header'>
-      <img
-        src='https://sos-academy.org/logo.png'
-        alt='SOS Academy Logo'
-        class='logo'
-      />
-      <h1>Welcome to SOS Academy!</h1>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class='content'>
-      <p>Hello {{name}},</p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Shinobi Open-Source Academy</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #171717;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
 
-      <p>Thank you for joining the Shinobi Open-Source Academy! We're thrilled to have you with us.</p>
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
 
-      <p>Your subscription has been successfully received. You've selected the following communities: {{communities}}.</p>
+    .header {
+      background-color: #304ffe;
+      padding: 30px 20px;
+      text-align: center;
+    }
 
-      <p>At SOS Academy, we're committed to fostering a collaborative
-        environment where developers can learn, grow, and build impactful
-        projects together. We look forward to having you as part of our journey.</p>
+    .logo {
+      max-width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
 
-      <p><strong>Important:</strong> You'll receive community-related meetings and general all-hands meeting invitations every Monday, so please stay up to date with your email notifications.</p>
+    .logo-container {
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
 
-      <p>In the meantime, feel free to explore our resources and learning
-        materials:</p>
+    .content {
+      padding: 40px 30px;
+    }
 
-      <p><a href='https://sos-academy.org/resources' class='button'>Explore
-          Resources</a></p>
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      color: #304ffe;
+      margin-bottom: 20px;
+    }
 
-      <p>If you have any questions, please don't hesitate to reach out to our
-        support team at
-        <a
-          href='mailto:support@sos-academy.org'
-        >support@sos-academy.org</a>.</p>
+    .main-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
 
-      <p>Best regards,<br />
-        The SOS Academy Team</p>
-    </div>
+    .info-box {
+      background-color: #f7f9fc;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 25px 0;
+    }
 
-    <div class='footer'>
-      <p>© 2023 SOS Academy. All rights reserved.</p>
-      <p>You're receiving this email because you registered at SOS Academy.</p>
-      <div class='social-links'>
-        <a href='https://twitter.com/sosacademy'>Twitter</a>
-        <a href='https://github.com/sos-academy'>GitHub</a>
-        <a href='https://linkedin.com/company/sos-academy'>LinkedIn</a>
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: #9e9e9e;
+      font-size: 14px;
+      margin-right: 15px;
+    }
+
+    .info-value {
+      font-weight: 600;
+      color: #171717;
+      font-size: 14px;
+      text-align: right;
+      flex: 1;
+    }
+
+    .communities-list {
+      font-weight: 600;
+      color: #304ffe;
+      text-transform: capitalize;
+    }
+
+    .cta-section {
+      text-align: center;
+      margin: 35px 0;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background-color: #304ffe !important;
+      color: #ffffff !important;
+      text-decoration: none !important;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background-color 0.2s ease;
+      box-shadow: 0 4px 12px rgba(48, 79, 254, 0.3);
+      border: none;
+    }
+
+    .cta-button:hover {
+      background-color: #0d1b60 !important;
+      box-shadow: 0 6px 16px rgba(48, 79, 254, 0.4);
+    }
+
+    .footer {
+      background-color: #f7f9fc;
+      padding: 25px 30px;
+      text-align: center;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: #9e9e9e;
+      margin-bottom: 10px;
+    }
+
+    .social-links {
+      margin-top: 15px;
+    }
+
+    .social-links a {
+      color: #304ffe;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .contact-info {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #9e9e9e;
+    }
+
+    .contact-info a {
+      color: #304ffe;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="cid:logo" alt="Shinobi Open-Source Academy" class="logo">
       </div>
     </div>
-  </body>
+
+    <div class="content">
+      <div class="greeting">Hi {{name}},</div>
+
+      <div class="main-heading">Welcome to <strong>Shinobi Open-Source Academy</strong></div>
+
+      <p>Thank you for joining our community. Your registration has been successfully processed and you're now part of
+        our developer community.</p>
+
+      <div class="info-box">
+        <div class="info-row">
+          <div class="info-label">Member</div>
+          <div class="info-value">{{name}}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Communities</div>
+          <div class="info-value">
+            <span class="communities-list">{{communities}}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Registration Date</div>
+          <div class="info-value">{{date}}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Status</div>
+          <div class="info-value">Active</div>
+        </div>
+      </div>
+
+      <p>At Shinobi Open-Source Academy, we focus on practical learning through real-world projects and peer
+        collaboration. Our communities provide structured learning paths, mentorship opportunities, and hands-on
+        experience with modern development practices.</p>
+
+      <p><strong>What to expect:</strong></p>
+      <ul>
+        <li>Weekly community meetings and technical discussions</li>
+        <li>Project collaboration opportunities with other developers</li>
+        <li>Access to learning resources and documentation</li>
+        <li>Mentorship from experienced developers in your chosen communities</li>
+        <li>Networking opportunities with like-minded professionals</li>
+      </ul>
+
+      <p><strong>Important:</strong> You'll receive community meeting invitations and general updates every Monday.
+        Please ensure your email notifications are enabled to stay informed about upcoming events and opportunities.</p>
+
+      <div class="cta-section">
+        <a href="https://shinobi-open-source.academy/documentation" class="cta-button">View Documentation</a>
+      </div>
+
+      <div class="contact-info">
+        <p>Questions? Contact us at <a
+            href="mailto:support@shinobi-open-source.academy">support@shinobi-open-source.academy</a></p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-text">© {{currentYear}} Shinobi Open-Source Academy. All rights reserved.</div>
+      <div class="footer-text">You're receiving this email because you registered at Shinobi Open-Source Academy.</div>
+      <div class="social-links">
+        <a href="https://github.com/Shinobi-Open-Source-Academy-SOS-Academy">GitHub</a>
+        <a href="https://x.com/SOSAcademy_">X (Twitter)</a>
+        <a href="https://www.linkedin.com/company/shinobi-open-source-academy-sos-a/about/">LinkedIn</a>
+        <a href="https://discord.gg/9Wgx7bCh">Discord</a>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>

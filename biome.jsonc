@@ -1,0 +1,102 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "semicolons": "always"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error"
+      },
+      "style": {
+        "useConst": "error",
+        "useBlockStatements": "error"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off",
+        "noUselessConstructor": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noArrayIndexKey": "error",
+        "noThenProperty": "off"
+      }
+    }
+  },
+  "files": {
+    "ignore": [
+      ".nx/**",
+      "dist/**",
+      "node_modules/**",
+      ".next/**",
+      "coverage/**",
+      "*.min.js",
+      "*.min.css",
+      "pnpm-lock.yaml",
+      "package-lock.json",
+      "yarn.lock"
+    ],
+    "maxSize": 1048576
+  },
+  "overrides": [
+    {
+      "include": ["**/*.spec.ts", "**/*.test.ts", "**/__tests__/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": [".github/workflows/**/*.yml", ".github/workflows/**/*.yaml"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "include": ["**/migrations/**/*.ts"],
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "include": ["apps/**/src/**/*.ts", "dev-apps/**/src/**/*.ts", "packages/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useImportType": "off"
+          }
+        }
+      }
+    }
+  ],
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  }
+}

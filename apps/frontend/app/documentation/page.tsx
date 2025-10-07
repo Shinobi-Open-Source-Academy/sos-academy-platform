@@ -1,16 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import SubscriptionModal from '../components/SubscriptionModal';
 import MentorApplicationModal from '../components/MentorApplicationModal';
+import Navbar from '../components/Navbar';
+import SubscriptionModal from '../components/SubscriptionModal';
 import { DOCUMENTATION_DATA } from '../data/siteData';
 
 export default function Documentation() {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
-  const [isMentorApplicationModalOpen, setIsMentorApplicationModalOpen] =
-    useState(false);
+  const [isMentorApplicationModalOpen, setIsMentorApplicationModalOpen] = useState(false);
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 overflow-x-hidden">
       <Navbar />
@@ -45,26 +44,21 @@ export default function Documentation() {
                   {DOCUMENTATION_DATA.codeOfConduct.standards.description}
                 </p>
                 <ul className="list-disc pl-6 mb-6 text-gray-600 dark:text-gray-400 space-y-2">
-                  {DOCUMENTATION_DATA.codeOfConduct.standards.items.map(
-                    (item, index) => (
-                      <li key={index}>{item}</li>
-                    )
-                  )}
+                  {DOCUMENTATION_DATA.codeOfConduct.standards.items.map((item, index) => (
+                    <li key={index + item}>{item}</li>
+                  ))}
                 </ul>
 
                 <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
                   {DOCUMENTATION_DATA.codeOfConduct.unacceptableBehavior.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {
-                    DOCUMENTATION_DATA.codeOfConduct.unacceptableBehavior
-                      .description
-                  }
+                  {DOCUMENTATION_DATA.codeOfConduct.unacceptableBehavior.description}
                 </p>
                 <ul className="list-disc pl-6 mb-6 text-gray-600 dark:text-gray-400 space-y-2">
                   {DOCUMENTATION_DATA.codeOfConduct.unacceptableBehavior.items.map(
                     (item, index) => (
-                      <li key={index}>{item}</li>
+                      <li key={index + item}>{item}</li>
                     )
                   )}
                 </ul>
@@ -73,10 +67,7 @@ export default function Documentation() {
                   {DOCUMENTATION_DATA.codeOfConduct.responsibilities.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {
-                    DOCUMENTATION_DATA.codeOfConduct.responsibilities
-                      .description
-                  }
+                  {DOCUMENTATION_DATA.codeOfConduct.responsibilities.description}
                 </p>
 
                 <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
@@ -88,8 +79,7 @@ export default function Documentation() {
 
                 <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
                   <p className="text-primary font-medium">
-                    <strong>Remember:</strong>{' '}
-                    {DOCUMENTATION_DATA.codeOfConduct.reminder}
+                    <strong>Remember:</strong> {DOCUMENTATION_DATA.codeOfConduct.reminder}
                   </p>
                 </div>
               </div>
@@ -106,11 +96,9 @@ export default function Documentation() {
                     {DOCUMENTATION_DATA.gettingStarted.newMembers.title}
                   </h3>
                   <ol className="list-decimal pl-6 space-y-3 text-gray-600 dark:text-gray-400">
-                    {DOCUMENTATION_DATA.gettingStarted.newMembers.steps.map(
-                      (step, index) => (
-                        <li key={index}>{step}</li>
-                      )
-                    )}
+                    {DOCUMENTATION_DATA.gettingStarted.newMembers.steps.map((step, index) => (
+                      <li key={index + step}>{step}</li>
+                    ))}
                   </ol>
                 </div>
                 <div>
@@ -118,11 +106,9 @@ export default function Documentation() {
                     {DOCUMENTATION_DATA.gettingStarted.mentors.title}
                   </h3>
                   <ol className="list-decimal pl-6 space-y-3 text-gray-600 dark:text-gray-400">
-                    {DOCUMENTATION_DATA.gettingStarted.mentors.steps.map(
-                      (step, index) => (
-                        <li key={index}>{step}</li>
-                      )
-                    )}
+                    {DOCUMENTATION_DATA.gettingStarted.mentors.steps.map((step, index) => (
+                      <li key={index + step}>{step}</li>
+                    ))}
                   </ol>
                 </div>
               </div>
@@ -138,21 +124,19 @@ export default function Documentation() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
+                  type="button"
                   onClick={() => setIsSubscriptionModalOpen(true)}
                   className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                 >
-                  <span className="relative z-10">
-                    {DOCUMENTATION_DATA.cta.joinButtonText}
-                  </span>
+                  <span className="relative z-10">{DOCUMENTATION_DATA.cta.joinButtonText}</span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsMentorApplicationModalOpen(true)}
                   className="relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                 >
-                  <span className="relative z-10">
-                    {DOCUMENTATION_DATA.cta.mentorButtonText}
-                  </span>
+                  <span className="relative z-10">{DOCUMENTATION_DATA.cta.mentorButtonText}</span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
                 </button>
               </div>

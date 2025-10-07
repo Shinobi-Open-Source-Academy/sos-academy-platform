@@ -1,16 +1,13 @@
-"use client";
+'use client';
 
-import Newsletter from "./footer/Newsletter";
-import QuickLinks from "./footer/QuickLinks";
-import ContactInfo from "./footer/ContactInfo";
-import { FOOTER_DATA } from "../data/siteData";
+import { FOOTER_DATA } from '../data/siteData';
+import ContactInfo from './footer/ContactInfo';
+import Newsletter from './footer/Newsletter';
+import QuickLinks from './footer/QuickLinks';
 
 export default function Footer() {
   return (
-    <footer
-      id="join"
-      className="bg-gray-950 text-white py-16 border-t border-gray-800/30"
-    >
+    <footer id="join" className="bg-gray-950 text-white py-16 border-t border-gray-800/30">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-16">
           <Newsletter />

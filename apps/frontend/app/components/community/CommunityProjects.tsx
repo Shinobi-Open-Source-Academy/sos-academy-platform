@@ -1,29 +1,25 @@
-"use client";
+'use client';
 
-import { CommunityDetails, CommunityProject } from "@/app/types/community";
+import type { CommunityDetails, CommunityProject } from '@/app/types/community';
 
 interface CommunityProjectsProps {
   community: CommunityDetails;
 }
 
-export default function CommunityProjects({
-  community,
-}: CommunityProjectsProps) {
+export default function CommunityProjects({ community }: CommunityProjectsProps) {
   const { projects } = community;
 
   // Helper to group projects by status
   const groupedProjects = {
-    active: projects.filter((project) => project.status === "active"),
-    planned: projects.filter((project) => project.status === "planned"),
-    completed: projects.filter((project) => project.status === "completed"),
+    active: projects.filter((project) => project.status === 'active'),
+    planned: projects.filter((project) => project.status === 'planned'),
+    completed: projects.filter((project) => project.status === 'completed'),
   };
 
   return (
     <section className="py-10">
       <div className="container mx-auto px-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-          Projects
-        </h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">Projects</h2>
 
         {/* Show blur overlay with coming soon message */}
         <div className="relative">
@@ -44,7 +40,7 @@ export default function CommunityProjects({
                 {groupedProjects.active.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold text-gray-200 mb-4 flex items-center">
-                      <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                      <span className="w-3 h-3 bg-green-500 rounded-full mr-2" />
                       Active Projects
                     </h3>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -59,7 +55,7 @@ export default function CommunityProjects({
                 {groupedProjects.planned.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold text-gray-200 mb-4 flex items-center">
-                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2" />
                       Planned Projects
                     </h3>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -74,7 +70,7 @@ export default function CommunityProjects({
                 {groupedProjects.completed.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold text-gray-200 mb-4 flex items-center">
-                      <span className="w-3 h-3 bg-gray-500 rounded-full mr-2"></span>
+                      <span className="w-3 h-3 bg-gray-500 rounded-full mr-2" />
                       Completed Projects
                     </h3>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -87,10 +83,11 @@ export default function CommunityProjects({
               </div>
             ) : (
               <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-8 text-center">
-                <p className="text-gray-300">
-                  No projects have been added to this community yet.
-                </p>
-                <button className="mt-4 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300">
+                <p className="text-gray-300">No projects have been added to this community yet.</p>
+                <button
+                  type="button"
+                  className="mt-4 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300"
+                >
                   Propose a project
                 </button>
               </div>
@@ -107,23 +104,24 @@ function ProjectCard({ project }: { project: CommunityProject }) {
   // Get difficulty badge color
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "advanced":
-        return "bg-red-600";
-      case "intermediate":
-        return "bg-yellow-600";
-      case "beginner":
+      case 'advanced':
+        return 'bg-red-600';
+      case 'intermediate':
+        return 'bg-yellow-600';
+      case 'beginner':
+        return 'bg-green-600';
       default:
-        return "bg-green-600";
+        return 'bg-green-600';
     }
   };
 
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -134,11 +132,8 @@ function ProjectCard({ project }: { project: CommunityProject }) {
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <h4 className="text-lg font-bold text-white">{project.name}</h4>
-          <div
-            className={`${difficultyColor} px-2 py-1 rounded text-xs text-white font-medium`}
-          >
-            {project.difficulty.charAt(0).toUpperCase() +
-              project.difficulty.slice(1)}
+          <div className={`${difficultyColor} px-2 py-1 rounded text-xs text-white font-medium`}>
+            {project.difficulty.charAt(0).toUpperCase() + project.difficulty.slice(1)}
           </div>
         </div>
 
@@ -147,7 +142,7 @@ function ProjectCard({ project }: { project: CommunityProject }) {
         <div className="flex flex-wrap gap-1 mb-4">
           {project.technologies.map((tech, index) => (
             <span
-              key={index}
+              key={index + tech}
               className="px-2 py-0.5 bg-gray-700 text-gray-300 rounded text-xs"
             >
               {tech}
@@ -157,9 +152,7 @@ function ProjectCard({ project }: { project: CommunityProject }) {
 
         <div className="text-gray-400 text-xs flex items-center gap-4">
           <span>Started: {formatDate(project.startDate)}</span>
-          {project.completionDate && (
-            <span>Completed: {formatDate(project.completionDate)}</span>
-          )}
+          {project.completionDate && <span>Completed: {formatDate(project.completionDate)}</span>}
         </div>
       </div>
 
@@ -167,7 +160,7 @@ function ProjectCard({ project }: { project: CommunityProject }) {
         <div>
           <span className="text-gray-400 text-xs">
             {project.contributors.length} contributor
-            {project.contributors.length !== 1 ? "s" : ""}
+            {project.contributors.length !== 1 ? 's' : ''}
           </span>
         </div>
         <div className="flex space-x-2">

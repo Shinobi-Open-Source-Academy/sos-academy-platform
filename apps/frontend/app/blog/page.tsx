@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import SubscriptionModal from "../components/SubscriptionModal";
-import MentorApplicationModal from "../components/MentorApplicationModal";
+import { useState } from 'react';
+import Footer from '../components/Footer';
+import MentorApplicationModal from '../components/MentorApplicationModal';
+import Navbar from '../components/Navbar';
+import SubscriptionModal from '../components/SubscriptionModal';
 
 export default function Blog() {
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
@@ -30,14 +30,15 @@ export default function Blog() {
               <div className="max-w-2xl mx-auto">
                 {/* Blurred Background Effect */}
                 <div className="relative mb-8">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-xl" />
                   <div className="relative bg-gradient-to-r from-primary/10 via-blue-500/10 to-purple-500/10 rounded-lg p-8 border border-primary/20">
                     <div className="text-6xl mb-4 opacity-30">📝</div>
                     <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
                       Coming Soon
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                      We&apos;re working hard to bring you amazing content about open-source development, community insights, and success stories from our members.
+                      We&apos;re working hard to bring you amazing content about open-source
+                      development, community insights, and success stories from our members.
                     </p>
                   </div>
                 </div>
@@ -50,47 +51,71 @@ export default function Blog() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Technical Tutorials</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Step-by-step guides for contributing to open-source projects</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Technical Tutorials
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Step-by-step guides for contributing to open-source projects
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Community Stories</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Success stories and experiences from our community members</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Community Stories
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Success stories and experiences from our community members
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Best Practices</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Tips and tricks for effective open-source collaboration</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Best Practices
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Tips and tricks for effective open-source collaboration
+                          </p>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Project Spotlights</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Deep dives into interesting open-source projects</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Project Spotlights
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Deep dives into interesting open-source projects
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Industry Insights</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Trends and analysis in the open-source ecosystem</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Industry Insights
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Trends and analysis in the open-source ecosystem
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">Mentor Interviews</h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Conversations with our expert mentors</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            Mentor Interviews
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Conversations with our expert mentors
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -107,6 +132,7 @@ export default function Blog() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
+                      type="button"
                       onClick={() => setIsSubscriptionModalOpen(true)}
                       className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                     >
@@ -114,6 +140,7 @@ export default function Blog() {
                       <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => setIsMentorApplicationModalOpen(true)}
                       className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl"
                     >

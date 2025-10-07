@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
-import SectionHeading from "./ui/SectionHeading";
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import SectionHeading from './ui/SectionHeading';
 
 interface ProjectProps {
   title: string;
@@ -56,14 +56,11 @@ const ProjectCard = ({
         opacity: isVisible ? 1 : 0,
         transform: isVisible
           ? isHovered
-            ? "translateY(-8px)"
-            : "translateY(0)"
-          : "translateY(30px)",
-        transition:
-          "transform 0.3s ease, opacity 0.6s ease, box-shadow 0.3s ease",
-        boxShadow: isHovered
-          ? "0 10px 30px rgba(0, 0, 0, 0.1)"
-          : "0 2px 10px rgba(0, 0, 0, 0.05)",
+            ? 'translateY(-8px)'
+            : 'translateY(0)'
+          : 'translateY(30px)',
+        transition: 'transform 0.3s ease, opacity 0.6s ease, box-shadow 0.3s ease',
+        boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.1)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
       }}
     >
       <div className="absolute top-0 right-0 mt-4 mr-4 z-10">
@@ -79,19 +76,19 @@ const ProjectCard = ({
           fill
           className="object-cover transition-transform duration-500"
           style={{
-            transform: isHovered ? "scale(1.08)" : "scale(1)",
+            transform: isHovered ? 'scale(1.08)' : 'scale(1)',
           }}
         />
       </div>
       <div className="p-6">
         <h3
           className="text-xl font-bold mb-2 transition-colors duration-300 flex items-center"
-          style={{ color: isHovered ? "var(--primary)" : "inherit" }}
+          style={{ color: isHovered ? 'var(--primary)' : 'inherit' }}
         >
           {title}
           <div
             className={`ml-2 h-1 w-0 bg-primary rounded-full transition-all duration-300 ${
-              isHovered ? "w-12" : ""
+              isHovered ? 'w-12' : ''
             }`}
           ></div>
         </h3>
@@ -112,14 +109,14 @@ const ProjectCard = ({
           rel="noopener noreferrer"
           className="text-primary font-medium hover:text-primary/80 transition-colors duration-300 flex items-center"
           style={{
-            transform: isHovered ? "translateX(8px)" : "translateX(0)",
-            transition: "transform 0.3s ease",
+            transform: isHovered ? 'translateX(8px)' : 'translateX(0)',
+            transition: 'transform 0.3s ease',
           }}
         >
           Explore Project
           <svg
             className={`w-4 h-4 ml-1 transition-transform duration-300 ${
-              isHovered ? "translate-x-1" : ""
+              isHovered ? 'translate-x-1' : ''
             }`}
             fill="none"
             stroke="currentColor"
@@ -165,57 +162,52 @@ export default function Projects() {
 
   const projects: ProjectProps[] = [
     {
-      title: "Rust Logger",
+      title: 'Rust Logger',
       description:
-        "A lightweight, configurable logging library for Rust applications with multiple output formats and log level filtering.",
-      image: "/images/project1.jpg",
-      tags: ["Rust", "CLI", "Logging", "Beginner-Friendly"],
-      url: "https://github.com/example/rust-logger",
+        'A lightweight, configurable logging library for Rust applications with multiple output formats and log level filtering.',
+      image: '/images/project1.jpg',
+      tags: ['Rust', 'CLI', 'Logging', 'Beginner-Friendly'],
+      url: 'https://github.com/example/rust-logger',
     },
     {
-      title: "GoMicro",
+      title: 'GoMicro',
       description:
-        "A microservices framework in Go that simplifies service discovery, communication, and deployment for distributed systems.",
-      image: "/images/project2.jpg",
-      tags: ["Go", "Microservices", "Docker", "Intermediate"],
-      url: "https://github.com/example/gomicro",
+        'A microservices framework in Go that simplifies service discovery, communication, and deployment for distributed systems.',
+      image: '/images/project2.jpg',
+      tags: ['Go', 'Microservices', 'Docker', 'Intermediate'],
+      url: 'https://github.com/example/gomicro',
     },
     {
-      title: "TypeStruct",
+      title: 'TypeStruct',
       description:
-        "TypeScript utility library providing strongly-typed data structures with comprehensive validation and transformation capabilities.",
-      image: "/images/project3.jpg",
-      tags: ["TypeScript", "Data Structures", "Validation", "Advanced"],
-      url: "https://github.com/example/typestruct",
+        'TypeScript utility library providing strongly-typed data structures with comprehensive validation and transformation capabilities.',
+      image: '/images/project3.jpg',
+      tags: ['TypeScript', 'Data Structures', 'Validation', 'Advanced'],
+      url: 'https://github.com/example/typestruct',
     },
     {
-      title: "Community Dashboard",
+      title: 'Community Dashboard',
       description:
-        "An open-source dashboard for tracking contributions, maintaining project health, and recognizing community members.",
-      image: "/images/project4.jpg",
-      tags: ["React", "Node.js", "GitHub API", "Intermediate"],
-      url: "https://github.com/example/community-dashboard",
+        'An open-source dashboard for tracking contributions, maintaining project health, and recognizing community members.',
+      image: '/images/project4.jpg',
+      tags: ['React', 'Node.js', 'GitHub API', 'Intermediate'],
+      url: 'https://github.com/example/community-dashboard',
     },
     {
-      title: "Learning Path Generator",
+      title: 'Learning Path Generator',
       description:
-        "Tool that creates personalized learning paths for developers based on their experience level and learning goals.",
-      image: "/images/project5.jpg",
-      tags: [
-        "JavaScript",
-        "Machine Learning",
-        "Education",
-        "Beginner-Friendly",
-      ],
-      url: "https://github.com/example/learning-path-generator",
+        'Tool that creates personalized learning paths for developers based on their experience level and learning goals.',
+      image: '/images/project5.jpg',
+      tags: ['JavaScript', 'Machine Learning', 'Education', 'Beginner-Friendly'],
+      url: 'https://github.com/example/learning-path-generator',
     },
     {
-      title: "Contribution Matcher",
+      title: 'Contribution Matcher',
       description:
-        "Matches developers with open-source projects based on their skills, interests, and project requirements.",
-      image: "/images/project6.jpg",
-      tags: ["Python", "Django", "Recommendation System", "Advanced"],
-      url: "https://github.com/example/contribution-matcher",
+        'Matches developers with open-source projects based on their skills, interests, and project requirements.',
+      image: '/images/project6.jpg',
+      tags: ['Python', 'Django', 'Recommendation System', 'Advanced'],
+      url: 'https://github.com/example/contribution-matcher',
     },
   ];
 
@@ -232,7 +224,7 @@ export default function Projects() {
             className="absolute -top-12 left-1/2 transform -translate-x-1/2 w-96 h-96 rounded-full bg-primary/5 blur-3xl opacity-70 -z-10"
             style={{
               opacity: isVisible ? 0.7 : 0,
-              transition: "opacity 1.5s ease-out",
+              transition: 'opacity 1.5s ease-out',
             }}
           ></div>
         </div>
@@ -253,17 +245,16 @@ export default function Projects() {
           className="mt-20 text-center relative"
           style={{
             opacity: isVisible ? 1 : 0,
-            transform: isVisible ? "translateY(0)" : "translateY(20px)",
-            transition:
-              "opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s",
+            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
           }}
         >
           <div className="w-full max-w-2xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg"></div>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
-              Ready to contribute? Join our community to work on these and other
-              exciting open-source projects. We help match you with projects
-              that align with your skills and interests.
+              Ready to contribute? Join our community to work on these and other exciting
+              open-source projects. We help match you with projects that align with your skills and
+              interests.
             </p>
             <button className="btn-primary hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
               Browse All Projects

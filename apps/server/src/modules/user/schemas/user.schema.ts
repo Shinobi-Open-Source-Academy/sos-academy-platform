@@ -1,15 +1,50 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
 import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type UserDocument = User & Document;
+
+export interface GitHubProfile {
+  login: string;
+  avatarUrl?: string;
+  htmlUrl?: string;
+  publicRepos?: number;
+  followers?: number;
+  following?: number;
+  createdAt?: Date;
+  lastUpdated: Date;
+  email?: string;
+  bio?: string;
+  location?: string;
+  company?: string;
+  blog?: string;
+  twitterUsername?: string;
+  githubId?: number;
+}
+
+export interface GitHubApiResponse {
+  login: string;
+  avatar_url: string;
+  html_url: string;
+  public_repos: number;
+  followers: number;
+  following: number;
+  created_at: string;
+  email: string;
+  bio: string;
+  location: string;
+  company: string;
+  blog: string;
+  twitter_username: string;
+  id: number;
+}
 
 @Schema({
   timestamps: true,
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      delete ret.__v;
+      ret.__v = undefined;
       return ret;
     },
   },
@@ -25,12 +60,14 @@ export class User {
 
   @Prop({
     required: true,
-    unique: true,
     lowercase: true,
     trim: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
   })
   email: string;
+
+  @Prop({ required: false })
+  profilePicture: string;
 
   @Prop({ required: false })
   password: string;
@@ -79,9 +116,6 @@ export class User {
   @Prop({ required: false })
   bio: string;
 
-  @Prop({ required: false })
-  profilePicture: string;
-
   @Prop({ default: 0, required: false })
   experiencePoints: number;
 
@@ -90,9 +124,7 @@ export class User {
     required: false,
     type: [String],
     validate: {
-      validator: function (skills: string[]) {
-        return skills.length <= 20;
-      },
+      validator: (skills: string[]) => skills.length <= 20,
       message: 'Maximum 20 skills allowed',
     },
   })
@@ -103,9 +135,7 @@ export class User {
     required: false,
     type: [String],
     validate: {
-      validator: function (interests: string[]) {
-        return interests.length <= 15;
-      },
+      validator: (interests: string[]) => interests.length <= 15,
       message: 'Maximum 15 interests allowed',
     },
   })
@@ -140,23 +170,7 @@ export class User {
     required: false,
     _id: false,
   })
-  githubProfile?: {
-    login: string;
-    avatarUrl?: string;
-    htmlUrl?: string;
-    publicRepos?: number;
-    followers?: number;
-    following?: number;
-    createdAt?: Date;
-    lastUpdated: Date;
-    email?: string;
-    bio?: string;
-    location?: string;
-    company?: string;
-    blog?: string;
-    twitterUsername?: string;
-    githubId?: number;
-  };
+  githubProfile?: GitHubProfile;
 
   @Prop({ required: false })
   expertise?: string;

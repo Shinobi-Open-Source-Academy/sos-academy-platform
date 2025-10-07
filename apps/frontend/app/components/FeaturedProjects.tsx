@@ -1,12 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
-import SectionHeading from "./ui/SectionHeading";
-import {
-  FEATURED_PROJECTS_LIST,
-  FEATURED_PROJECTS_DATA,
-} from "../data/siteData";
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import { FEATURED_PROJECTS_DATA, FEATURED_PROJECTS_LIST } from '../data/siteData';
+import SectionHeading from './ui/SectionHeading';
 
 // Type for featured project props
 type FeaturedProjectProps = {
@@ -67,14 +64,11 @@ const FeaturedProjectCard = ({
         opacity: isVisible ? 1 : 0,
         transform: isVisible
           ? isHovered
-            ? "translateY(-8px)"
-            : "translateY(0)"
-          : "translateY(30px)",
-        transition:
-          "transform 0.3s ease, opacity 0.6s ease, box-shadow 0.3s ease",
-        boxShadow: isHovered
-          ? "0 10px 30px rgba(0, 0, 0, 0.1)"
-          : "0 2px 10px rgba(0, 0, 0, 0.05)",
+            ? 'translateY(-8px)'
+            : 'translateY(0)'
+          : 'translateY(30px)',
+        transition: 'transform 0.3s ease, opacity 0.6s ease, box-shadow 0.3s ease',
+        boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.1)' : '0 2px 10px rgba(0, 0, 0, 0.05)',
       }}
     >
       {/* Top Tag */}
@@ -93,7 +87,7 @@ const FeaturedProjectCard = ({
           fill
           className="object-cover transition-transform duration-500"
           style={{
-            transform: isHovered ? "scale(1.08)" : "scale(1)",
+            transform: isHovered ? 'scale(1.08)' : 'scale(1)',
           }}
         />
 
@@ -111,12 +105,12 @@ const FeaturedProjectCard = ({
       <div className="p-6">
         <h3
           className="text-xl font-bold mb-2 transition-colors duration-300 flex items-center"
-          style={{ color: isHovered ? "var(--primary)" : "inherit" }}
+          style={{ color: isHovered ? 'var(--primary)' : 'inherit' }}
         >
           {title}
           <div
             className={`ml-2 h-1 w-0 bg-primary rounded-full transition-all duration-300 ${
-              isHovered ? "w-12" : ""
+              isHovered ? 'w-12' : ''
             }`}
           ></div>
         </h3>
@@ -166,18 +160,17 @@ const FeaturedProjectCard = ({
           target="_blank"
           rel="noopener noreferrer"
           className={`text-primary font-medium hover:text-primary/80 transition-colors duration-300 flex items-center ${
-            isInternal ? "opacity-70 pointer-events-none" : ""
+            isInternal ? 'opacity-70 pointer-events-none' : ''
           }`}
           style={{
-            transform:
-              isHovered && !isInternal ? "translateX(8px)" : "translateX(0)",
-            transition: "transform 0.3s ease",
+            transform: isHovered && !isInternal ? 'translateX(8px)' : 'translateX(0)',
+            transition: 'transform 0.3s ease',
           }}
         >
-          {isInternal ? "Join Our Community" : "Explore Project"}
+          {isInternal ? 'Join Our Community' : 'Explore Project'}
           <svg
             className={`w-4 h-4 ml-1 transition-transform duration-300 ${
-              isHovered && !isInternal ? "translate-x-1" : ""
+              isHovered && !isInternal ? 'translate-x-1' : ''
             }`}
             fill="none"
             stroke="currentColor"
@@ -234,7 +227,7 @@ export default function FeaturedProjects() {
             className="absolute -top-12 left-1/2 transform -translate-x-1/2 w-96 h-96 rounded-full bg-primary/5 blur-3xl opacity-70 -z-10"
             style={{
               opacity: isVisible ? 0.7 : 0,
-              transition: "opacity 1.5s ease-out",
+              transition: 'opacity 1.5s ease-out',
             }}
           ></div>
         </div>
@@ -255,25 +248,24 @@ export default function FeaturedProjects() {
           className="mt-20 text-center relative"
           style={{
             opacity: isVisible ? 1 : 0,
-            transform: isVisible ? "translateY(0)" : "translateY(20px)",
-            transition:
-              "opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s",
+            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
           }}
         >
           <div className="w-full max-w-2xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg"></div>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
-              Join our community to work on these and other exciting open-source
-              projects. We&apos;ll help you connect with maintainers, understand
-              project requirements, and make your first contributions.
+              Join our community to work on these and other exciting open-source projects.
+              We&apos;ll help you connect with maintainers, understand project requirements, and
+              make your first contributions.
             </p>
             <button
-              onClick={() => window.location.href = '/documentation'}
+              onClick={() => (window.location.href = '/documentation')}
               className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl cursor-pointer"
             >
-             <span className="relative z-10">Get Started</span>
-             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
-           </button>
+              <span className="relative z-10">Get Started</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+            </button>
           </div>
         </div>
       </div>

@@ -1,12 +1,5 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsArray,
-  ArrayMinSize,
-} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ArrayMinSize, IsArray, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class SubscribeUserDto {
   @ApiProperty({

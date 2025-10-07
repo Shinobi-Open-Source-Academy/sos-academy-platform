@@ -1,25 +1,24 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { MentorApplicationDto } from './dto/mentor-application.dto';
-import { MemberInvitationDto } from './dto/member-invitation.dto';
-import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import * as bcrypt from 'bcrypt';
-import { EmailService } from '../email/email.service';
 import axios from 'axios';
+import * as bcrypt from 'bcrypt';
+import mongoose, { Model, Schema } from 'mongoose';
+import { Community, CommunityDocument } from '../community/schemas/community.schema';
+import { EmailService } from '../email/email.service';
+import { CommunityJoinDto } from './dto/community-join.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { MemberInvitationDto } from './dto/member-invitation.dto';
+import { MentorApplicationDto } from './dto/mentor-application.dto';
+import { SubscribeUserDto } from './dto/subscribe-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
     private readonly emailService: EmailService
   ) {}
 
@@ -37,7 +36,7 @@ export class UserService {
     }
 
     // Hash password if provided
-    let hashedPassword;
+    let hashedPassword: string;
     if (password) {
       hashedPassword = await this.hashPassword(password);
     }
@@ -100,29 +99,72 @@ export class UserService {
 
   /**
    * Join community with just an email address
-   * @param email User's email address
-   * @param name Optional user's name
+   * @param communityJoinDto Community join data
    */
-  async joinCommunity(email: string, name?: string): Promise<User> {
+  async joinCommunity(communityJoinDto: CommunityJoinDto): Promise<User> {
+    const { email, name, communities, githubHandle } = communityJoinDto;
     // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Create minimal user entry
+    // Look up community ObjectIds by slug or name with SIMPLE case-insensitive matching
+    let communityObjectIds: mongoose.Types.ObjectId[] = [];
+    if (communities && communities.length > 0) {
+      // Get all communities first
+      const allCommunities = await this.communityModel.find({}).select('_id name slug').exec();
+
+      // Simple case-insensitive matching
+      const foundCommunities = allCommunities.filter((community) => {
+        return communities.some((inputCommunity) => {
+          const inputLower = inputCommunity.toLowerCase();
+          const nameLower = community.name.toLowerCase();
+          const slugLower = community.slug.toLowerCase();
+          return nameLower === inputLower || slugLower === inputLower;
+        });
+      });
+
+      communityObjectIds = foundCommunities.map(
+        (community) => community._id as mongoose.Types.ObjectId
+      );
+
+      // Log any communities that weren't found
+      const foundNames = foundCommunities.map((c) => c.name.toLowerCase());
+      const notFound = communities.filter(
+        (identifier) => !foundNames.includes(identifier.toLowerCase())
+      );
+      if (notFound.length > 0) {
+        console.warn(`Communities not found: ${notFound.join(', ')}`);
+      }
+    }
+
+    // Create user entry
     const newUser = new this.userModel({
       email,
       name: name || '',
       role: UserRole.MEMBER,
       status: UserStatus.INACTIVE,
+      communities: communityObjectIds,
     });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newUser.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
 
     const savedUser = await newUser.save();
 
     // Send confirmation email
     try {
-      await this.emailService.sendCommunityJoinConfirmation(email, name);
+      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
     } catch (error) {
       console.error('Failed to send community join email:', error);
     }
@@ -134,9 +176,7 @@ export class UserService {
    * Apply as a mentor with full application
    * @param mentorApplicationDto Mentor application data
    */
-  async applyAsMentor(
-    mentorApplicationDto: MentorApplicationDto
-  ): Promise<User> {
+  async applyAsMentor(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
     // Check if user already exists
@@ -236,15 +276,15 @@ export class UserService {
     const { email, name, communities, githubHandle } = subscribeUserDto;
 
     // Check if user already exists
-    let existingUser = await this.userModel.findOne({ email }).exec();
-    
+    const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
       // Update existing user
       existingUser.name = name || existingUser.name;
-      existingUser.communityIds = communities;
+      existingUser.communities = communities.map((id) => new Schema.Types.ObjectId(id));
       existingUser.source = 'subscription';
       existingUser.status = UserStatus.PENDING;
-      
+
       // Enrich with GitHub profile if handle provided
       if (githubHandle) {
         try {
@@ -256,41 +296,8 @@ export class UserService {
           console.error('Failed to fetch GitHub profile:', error);
         }
       }
-      
+
       const savedUser = await existingUser.save();
-      
-      // Send confirmation email
-      try {
-        await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
-      } catch (error) {
-        console.error('Failed to send subscription confirmation email:', error);
-      }
-      
-      return savedUser;
-    } else {
-      // Create new user
-      const newUser = new this.userModel({
-        email,
-        name: name || '',
-        communityIds: communities,
-        role: UserRole.MEMBER,
-        status: UserStatus.PENDING,
-        source: 'subscription',
-      });
-
-      // Enrich with GitHub profile if handle provided
-      if (githubHandle) {
-        try {
-          const githubProfile = await this.fetchGitHubProfile(githubHandle);
-          if (githubProfile) {
-            newUser.githubProfile = githubProfile;
-          }
-        } catch (error) {
-          console.error('Failed to fetch GitHub profile:', error);
-        }
-      }
-
-      const savedUser = await newUser.save();
 
       // Send confirmation email
       try {
@@ -301,6 +308,38 @@ export class UserService {
 
       return savedUser;
     }
+    // Create new user
+    const newUser = new this.userModel({
+      email,
+      name: name || '',
+      communities: communities.map((id) => new Schema.Types.ObjectId(id)),
+      role: UserRole.MEMBER,
+      status: UserStatus.PENDING,
+      source: 'subscription',
+    });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newUser.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
+
+    const savedUser = await newUser.save();
+
+    // Send confirmation email
+    try {
+      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
+    } catch (error) {
+      console.error('Failed to send subscription confirmation email:', error);
+    }
+
+    return savedUser;
   }
 
   /**
@@ -375,7 +414,7 @@ export class UserService {
     try {
       const token = process.env.GITHUB_TOKEN;
       const headers = token ? { Authorization: `token ${token}` } : {};
-      
+
       const response = await axios.get(`https://api.github.com/users/${handle}`, {
         headers,
         timeout: 5000,

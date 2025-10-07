@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import SectionHeading from "./ui/SectionHeading";
-import MentorCard from "./MentorCard";
-import { MENTORS_LIST, MENTORS_DATA } from "../data/siteData";
-import MentorApplicationModal from "./MentorApplicationModal";
+import { useEffect, useRef, useState } from 'react';
+import { MENTORS_DATA, MENTORS_LIST } from '../data/siteData';
+import MentorApplicationModal from './MentorApplicationModal';
+import MentorCard from './MentorCard';
+import SectionHeading from './ui/SectionHeading';
 
 export default function Mentors() {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,11 +32,7 @@ export default function Mentors() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="mentors"
-      className="section bg-white dark:bg-gray-900 py-20"
-    >
+    <section ref={sectionRef} id="mentors" className="section bg-white dark:bg-gray-900 py-20">
       <div className="container mx-auto px-4">
         <SectionHeading
           title1={MENTORS_DATA.heading.title}
@@ -48,8 +44,8 @@ export default function Mentors() {
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           style={{
             opacity: isVisible ? 1 : 0,
-            transform: isVisible ? "translateY(0)" : "translateY(20px)",
-            transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
           }}
         >
           {MENTORS_LIST.map((mentor, index) => (
@@ -61,9 +57,8 @@ export default function Mentors() {
           className="mt-16 text-center"
           style={{
             opacity: isVisible ? 1 : 0,
-            transform: isVisible ? "translateY(0)" : "translateY(20px)",
-            transition:
-              "opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s",
+            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s',
           }}
         >
           <button

@@ -1,8 +1,6 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
-export default function BookIcon({
-  className = 'h-6 w-6 text-primary',
-}: IconProps) {
+export default function BookIcon({ className = 'h-6 w-6 text-primary' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

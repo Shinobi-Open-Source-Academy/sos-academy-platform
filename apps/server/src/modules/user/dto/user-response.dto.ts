@@ -1,7 +1,7 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
-import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
-import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class UserResponseDto {
   @ApiProperty({

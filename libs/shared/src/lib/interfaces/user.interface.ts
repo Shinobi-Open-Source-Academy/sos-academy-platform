@@ -1,4 +1,4 @@
-import { MembershipLevel, UserRole, UserStatus } from '../enums';
+import type { MembershipLevel, UserRole, UserStatus } from '../enums';
 
 export interface IUser {
   id?: string;

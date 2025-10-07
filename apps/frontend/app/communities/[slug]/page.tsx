@@ -1,16 +1,13 @@
-import { notFound } from "next/navigation";
-import CommunityHeader from "@/app/components/community/CommunityHeader";
-import CommunityAbout from "@/app/components/community/CommunityAbout";
-import CommunityLeadership from "@/app/components/community/CommunityLeadership";
-import CommunityMembers from "@/app/components/community/CommunityMembers";
-import CommunityProjects from "@/app/components/community/CommunityProjects";
-import { COMMUNITIES_CONSTANTS } from "@/app/constants/communities";
-import {
-  getCommunityBySlug,
-  getAllCommunitySlugs,
-} from "@/app/config/communityData";
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer";
+import Footer from '@/app/components/Footer';
+import Navbar from '@/app/components/Navbar';
+import CommunityAbout from '@/app/components/community/CommunityAbout';
+import CommunityHeader from '@/app/components/community/CommunityHeader';
+import CommunityLeadership from '@/app/components/community/CommunityLeadership';
+import CommunityMembers from '@/app/components/community/CommunityMembers';
+import CommunityProjects from '@/app/components/community/CommunityProjects';
+import { getAllCommunitySlugs, getCommunityBySlug } from '@/app/config/communityData';
+import { COMMUNITIES_DATA } from '@/app/data/siteData';
+import { notFound } from 'next/navigation';
 
 // Generate static paths for all community pages
 export async function generateStaticParams() {
@@ -25,13 +22,14 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const community = getCommunityBySlug(params.slug);
+  const { slug } = await params;
+  const community = getCommunityBySlug(slug);
 
   if (!community) {
     return {
-      title: "Community Not Found",
+      title: 'Community Not Found',
       description: "The community you're looking for doesn't exist",
     };
   }
@@ -42,43 +40,44 @@ export async function generateMetadata({
   };
 }
 
-export default function CommunityPage({
+export default async function CommunityPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const community = getCommunityBySlug(params.slug);
+  const { slug } = await params;
+  const community = getCommunityBySlug(slug);
 
   if (!community) {
     notFound();
   }
 
   return (
-    <main className={COMMUNITIES_CONSTANTS.STYLE.SECTION_BG}>
+    <main className={COMMUNITIES_DATA.style.sectionBg}>
       <Navbar />
 
       <CommunityHeader community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityAbout community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityLeadership community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityProjects community={community} />
 
       <div className="container mx-auto px-6">
-        <div className="h-px w-full bg-gray-800/70"></div>
+        <div className="h-px w-full bg-gray-800/70" />
       </div>
 
       <CommunityMembers community={community} />

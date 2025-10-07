@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface CodeSnippet {
   language: string;
@@ -18,202 +18,202 @@ interface CodeSnippet {
 // Code snippets for various programming languages
 const codeSnippets = [
   {
-    language: "TypeScript",
+    language: 'TypeScript',
     code: [
-      "function calculateScore(prs: number): string {",
-      "  // Convert PR count to ninja rank",
+      'function calculateScore(prs: number): string {',
+      '  // Convert PR count to ninja rank',
       '  if (prs > 500) return "Shinobi Master 🥷";',
       '  if (prs > 100) return "Code Ninja ⚔️";',
       '  return "Apprentice Developer 🌱";',
-      "}",
-      "",
-      "interface Contributor {",
-      "  name: string;",
-      "  prs: number;",
-      "  languages: string[];",
-      "}",
-      "",
-      "// TODO: Implement reputation system",
+      '}',
+      '',
+      'interface Contributor {',
+      '  name: string;',
+      '  prs: number;',
+      '  languages: string[];',
+      '}',
+      '',
+      '// TODO: Implement reputation system',
     ],
-    color: "#3178C6",
+    color: '#3178C6',
   },
   {
-    language: "Rust",
+    language: 'Rust',
     code: [
-      "struct Shinobi {",
-      "    name: String,",
-      "    rank: u32,",
-      "    specialities: Vec<String>,",
-      "}",
-      "",
-      "impl Shinobi {",
-      "    fn new(name: &str) -> Self {",
+      'struct Shinobi {',
+      '    name: String,',
+      '    rank: u32,',
+      '    specialities: Vec<String>,',
+      '}',
+      '',
+      'impl Shinobi {',
+      '    fn new(name: &str) -> Self {',
       '        println!("Training new shinobi: {}", name);',
-      "        Shinobi {",
-      "            name: name.to_string(),",
-      "            rank: 1,",
-      "            specialities: vec![],",
-      "        }",
-      "    }",
-      "",
-      "    // Secret technique - memory safe code",
-      "}",
+      '        Shinobi {',
+      '            name: name.to_string(),',
+      '            rank: 1,',
+      '            specialities: vec![],',
+      '        }',
+      '    }',
+      '',
+      '    // Secret technique - memory safe code',
+      '}',
     ],
-    color: "#DEA584",
+    color: '#DEA584',
   },
   {
-    language: "Go",
+    language: 'Go',
     code: [
-      "package main",
-      "",
+      'package main',
+      '',
       'import "fmt"',
-      "",
-      "type Contribution struct {",
-      "    RepoName string",
-      "    PrCount  int",
-      "    IsMerged bool",
-      "}",
-      "",
-      "func handleOpenSource(username string) {",
-      "    // Gophers make great ninjas",
+      '',
+      'type Contribution struct {',
+      '    RepoName string',
+      '    PrCount  int',
+      '    IsMerged bool',
+      '}',
+      '',
+      'func handleOpenSource(username string) {',
+      '    // Gophers make great ninjas',
       '    fmt.Println("Welcome to SOSA,", username)',
-      "    // TODO: Track user progress",
-      "}",
-      "",
-      "// Speed is our advantage",
+      '    // TODO: Track user progress',
+      '}',
+      '',
+      '// Speed is our advantage',
     ],
-    color: "#00ADD8",
+    color: '#00ADD8',
   },
   {
-    language: "Python",
+    language: 'Python',
     code: [
       'def train_shinobi(student_name, path="backend"):',
       '    """Train a student in the way of open source."""',
-      "    paths = {",
+      '    paths = {',
       '        "backend": ["Python", "Django", "FastAPI"],',
       '        "frontend": ["React", "Vue", "Svelte"],',
       '        "data": ["Pandas", "NumPy", "TensorFlow"]',
-      "    }",
-      "    ",
+      '    }',
+      '    ',
       '    print(f"{student_name} is learning {path}!")',
-      "    # The journey of 1000 PRs begins with a single commit",
+      '    # The journey of 1000 PRs begins with a single commit',
       '    return paths.get(path, ["Git", "GitHub"])',
-      "",
-      "# Ninja-level code incoming",
+      '',
+      '# Ninja-level code incoming',
     ],
-    color: "#3776AB",
+    color: '#3776AB',
   },
   {
-    language: "JavaScript",
+    language: 'JavaScript',
     code: [
-      "const calculateProjectImpact = (stars, forks) => {",
-      "  // Complex algorithm to measure project success",
-      "  let impact = stars * 0.7 + forks * 0.3;",
-      "  console.log(`Project impact score: ${impact.toFixed(2)}`);",
+      'const calculateProjectImpact = (stars, forks) => {',
+      '  // Complex algorithm to measure project success',
+      '  let impact = stars * 0.7 + forks * 0.3;',
+      '  console.log(`Project impact score: ${impact.toFixed(2)}`);',
       '  return impact > 100 ? "High impact! 🚀" : "Growing! 📈";',
-      "};",
-      "",
-      "// JavaScript ninjas move silently through the DOM",
+      '};',
+      '',
+      '// JavaScript ninjas move silently through the DOM',
       'document.querySelectorAll(".shinobi").forEach(el => {',
       '  el.addEventListener("click", () => alert("⚡️"));',
-      "});",
+      '});',
     ],
-    color: "#F7DF1E",
+    color: '#F7DF1E',
   },
   {
-    language: "Solidity",
+    language: 'Solidity',
     code: [
-      "pragma solidity ^0.8.0;",
-      "",
-      "contract ShinobiDAO {",
-      "    mapping(address => uint256) public contributions;",
-      "    address public sensei;",
-      "    ",
-      "    event NewContribution(address indexed contributor, uint256 prCount);",
-      "    ",
-      "    constructor() {",
-      "        sensei = msg.sender;",
-      "        // Blockchain ninjas are unstoppable",
-      "    }",
-      "    ",
-      "    // TODO: Add governance mechanism",
-      "}",
+      'pragma solidity ^0.8.0;',
+      '',
+      'contract ShinobiDAO {',
+      '    mapping(address => uint256) public contributions;',
+      '    address public sensei;',
+      '    ',
+      '    event NewContribution(address indexed contributor, uint256 prCount);',
+      '    ',
+      '    constructor() {',
+      '        sensei = msg.sender;',
+      '        // Blockchain ninjas are unstoppable',
+      '    }',
+      '    ',
+      '    // TODO: Add governance mechanism',
+      '}',
     ],
-    color: "#AA6746",
+    color: '#AA6746',
   },
   {
-    language: "Elixir",
+    language: 'Elixir',
     code: [
-      "defmodule Shinobi.Training do",
+      'defmodule Shinobi.Training do',
       '  @moduledoc """',
-      "  Handles concurrent training for ninjas",
+      '  Handles concurrent training for ninjas',
       '  """',
-      "  ",
-      "  def train_concurrently(ninjas) do",
-      "    ninjas",
-      "    |> Task.async_stream(fn ninja ->",
+      '  ',
+      '  def train_concurrently(ninjas) do',
+      '    ninjas',
+      '    |> Task.async_stream(fn ninja ->',
       '      IO.puts("#{ninja.name} is mastering #{ninja.language}")',
-      "      Process.sleep(100) # Lightning fast training",
-      "      %{ninja | level: ninja.level + 1}",
-      "    end)",
-      "    |> Enum.to_list()",
-      "  end",
-      "end",
+      '      Process.sleep(100) # Lightning fast training',
+      '      %{ninja | level: ninja.level + 1}',
+      '    end)',
+      '    |> Enum.to_list()',
+      '  end',
+      'end',
     ],
-    color: "#4E2A8E",
+    color: '#4E2A8E',
   },
   {
-    language: "C",
+    language: 'C',
     code: [
-      "#include <stdio.h>",
-      "#include <stdlib.h>",
-      "",
-      "typedef struct {",
-      "    char name[50];",
-      "    int contributions;",
-      "    float skill_level;",
-      "} Shinobi;",
-      "",
-      "Shinobi* create_shinobi(const char* name) {",
-      "    Shinobi* s = (Shinobi*)malloc(sizeof(Shinobi));",
-      "    strcpy(s->name, name);",
-      "    s->contributions = 0;",
-      "    s->skill_level = 1.0;",
+      '#include <stdio.h>',
+      '#include <stdlib.h>',
+      '',
+      'typedef struct {',
+      '    char name[50];',
+      '    int contributions;',
+      '    float skill_level;',
+      '} Shinobi;',
+      '',
+      'Shinobi* create_shinobi(const char* name) {',
+      '    Shinobi* s = (Shinobi*)malloc(sizeof(Shinobi));',
+      '    strcpy(s->name, name);',
+      '    s->contributions = 0;',
+      '    s->skill_level = 1.0;',
       '    printf("Shinobi %s initialized!\\n", name);',
-      "    /* TODO: free after use */",
-      "    return s;",
-      "}",
+      '    /* TODO: free after use */',
+      '    return s;',
+      '}',
     ],
-    color: "#555555",
+    color: '#555555',
   },
   {
-    language: "Java",
+    language: 'Java',
     code: [
-      "public class OpenSourceAcademy {",
-      "    private static final Logger logger = LoggerFactory.getLogger(OpenSourceAcademy.class);",
-      "    ",
-      "    @Autowired",
-      "    private ContributorRepository repo;",
-      "    ",
-      "    public List<ProjectDTO> findProjects(String language) {",
-      "        // Enterprise-grade ninja code",
+      'public class OpenSourceAcademy {',
+      '    private static final Logger logger = LoggerFactory.getLogger(OpenSourceAcademy.class);',
+      '    ',
+      '    @Autowired',
+      '    private ContributorRepository repo;',
+      '    ',
+      '    public List<ProjectDTO> findProjects(String language) {',
+      '        // Enterprise-grade ninja code',
       '        logger.info("Finding projects for {}", language);',
-      "        return repo.findByLanguage(language).stream()",
-      "            .filter(p -> p.getDifficulty() <= 3)",
-      "            .map(this::convertToDTO)",
-      "            .collect(Collectors.toList());",
-      "    }",
-      "}",
+      '        return repo.findByLanguage(language).stream()',
+      '            .filter(p -> p.getDifficulty() <= 3)',
+      '            .map(this::convertToDTO)',
+      '            .collect(Collectors.toList());',
+      '    }',
+      '}',
     ],
-    color: "#B07219",
+    color: '#B07219',
   },
 ];
 
 // Helper function for rgba color
 const hexToRgba = (hex: string, alpha: number): string => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const r = Number.parseInt(hex.slice(1, 3), 16);
+  const g = Number.parseInt(hex.slice(3, 5), 16);
+  const b = Number.parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
@@ -240,11 +240,8 @@ export default function CodeBackground() {
       const newSnippets: CodeSnippet[] = [];
 
       for (let i = 0; i < 15; i++) {
-        const snippetData =
-          codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-        const randomCodeIndex = Math.floor(
-          Math.random() * snippetData.code.length
-        );
+        const snippetData = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        const randomCodeIndex = Math.floor(Math.random() * snippetData.code.length);
         const randomCode = snippetData.code[randomCodeIndex];
 
         newSnippets.push({
@@ -272,8 +269,8 @@ export default function CodeBackground() {
       generateSnippets();
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
@@ -290,29 +287,23 @@ export default function CodeBackground() {
             top: `${snippet.y}px`,
             transform: `scale(${snippet.scale}) rotate(${snippet.rotation}deg)`,
             opacity: isVisible ? snippet.opacity : 0,
-            color: "white",
+            color: 'white',
             transition: `opacity 1.2s cubic-bezier(0.4,0,0.2,1) ${snippet.delay}s`,
             animation: isVisible
               ? `float ${
                   7.5 + snippet.delay
                 }s ease-in-out infinite alternate, pulse-fade 6s ease-in-out infinite alternate`
-              : "none",
+              : 'none',
           }}
         >
           <div className="max-w-xs bg-black/50 rounded p-2 backdrop-blur-sm">
-            <div
-              className="text-xs font-semibold mb-1"
-              style={{ color: snippet.color }}
-            >
+            <div className="text-xs font-semibold mb-1" style={{ color: snippet.color }}>
               {`// ${snippet.language}`}
             </div>
             <div
               className="text-xs whitespace-pre"
               style={{
-                textShadow: `0 0 18px ${hexToRgba(
-                  snippet.color,
-                  0.7
-                )}, 0 0 4px #000`,
+                textShadow: `0 0 18px ${hexToRgba(snippet.color, 0.7)}, 0 0 4px #000`,
               }}
             >
               {snippet.code}
