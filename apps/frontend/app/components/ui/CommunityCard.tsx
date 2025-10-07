@@ -4,6 +4,7 @@ import type { Community } from '@/app/constants/communities';
 import { COMMUNITIES_CONSTANTS } from '@/app/constants/communities';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import CommunityJoinModal from '../CommunityJoinModal';
 
 interface CommunityCardProps {
   community: Community;
@@ -13,6 +14,7 @@ interface CommunityCardProps {
 
 export default function CommunityCard({ community, index, isInView }: CommunityCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const codeRef = useRef<HTMLDivElement>(null);
   const { ANIMATION, STYLE } = COMMUNITIES_CONSTANTS;
 
@@ -65,7 +67,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
             : 'translateY(0)'
           : 'translateY(20px)',
         transition: `opacity ${ANIMATION.CARD_ANIMATION_DURATION}s ease-out ${animationDelay}, transform 0.4s ease-out`,
-        borderTop: `3px solid`,
+        borderTop: '3px solid',
         borderColor: community.color.replace('bg-', ''),
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -96,7 +98,9 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
       <div className="relative z-10 p-6">
         <div className="flex items-center mb-4">
           <div
-            className={`w-10 h-10 mr-3 flex items-center justify-center rounded-full transition-all duration-300 font-bold text-white`}
+            className={
+              'w-10 h-10 mr-3 flex items-center justify-center rounded-full transition-all duration-300 font-bold text-white'
+            }
             style={{
               backgroundColor: community.color.replace('bg-', ''),
               boxShadow: isHovered ? `0 0 15px ${community.color.replace('bg-', '')}` : 'none',
@@ -108,7 +112,7 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
 
           <div>
             <h3
-              className={`text-xl font-bold text-white transition-all duration-300`}
+              className={'text-xl font-bold text-white transition-all duration-300'}
               style={{
                 transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
               }}
@@ -121,51 +125,55 @@ export default function CommunityCard({ community, index, isInView }: CommunityC
 
         <p className={`${STYLE.TEXT_COLOR} transition-all duration-300`}>{community.description}</p>
 
-        {/* Learn more button - appears on hover */}
-        <Link
-          href={`/communities/${community.id}`}
-          className="mt-4 text-primary py-1 px-0 group flex items-center text-sm font-medium opacity-0 transition-all duration-300"
+        {/* Action buttons - appear on hover */}
+        <div
+          className="mt-4 flex gap-3 opacity-0 transition-all duration-300"
           style={{
             opacity: isHovered ? 1 : 0,
             transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
           }}
         >
-          Learn more
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <button
+            type="button"
+            onClick={() => setShowJoinModal(true)}
+            className="flex-1 bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
           >
-            <path
-              fillRule="evenodd"
-              d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </Link>
+            Join Community
+          </button>
+          <Link
+            href={`/communities/${community.id}`}
+            className="flex-1 text-primary border border-primary hover:bg-primary hover:text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-center"
+          >
+            Learn More
+          </Link>
+        </div>
       </div>
 
       {/* Particle effects (only shown when hovered) */}
-      {isHovered && (
-        <>
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-white/30"
-              style={{
-                width: `${Math.random() * 4 + 2}px`,
-                height: `${Math.random() * 4 + 2}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animation: `float ${Math.random() * 3 + 2}s infinite ease-in-out ${
-                  Math.random() * 1
-                }s`,
-              }}
-            />
-          ))}
-        </>
-      )}
+      {isHovered &&
+        [...Array(3)].map((_) => (
+          <div
+            key={`particle-${Math.random()}`}
+            className="absolute rounded-full bg-white/30"
+            style={{
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `float ${Math.random() * 3 + 2}s infinite ease-in-out ${
+                Math.random() * 1
+              }s`,
+            }}
+          />
+        ))}
+
+      {/* Community Join Modal */}
+      <CommunityJoinModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        communityName={community.name}
+        communityId={community.id}
+      />
     </div>
   );
 }

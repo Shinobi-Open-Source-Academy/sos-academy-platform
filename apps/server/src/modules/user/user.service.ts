@@ -135,7 +135,7 @@ export class UserService {
         (identifier) => !foundNames.includes(identifier.toLowerCase())
       );
       if (notFound.length > 0) {
-        console.warn(`❌ Communities not found: ${notFound.join(', ')}`);
+        console.warn(`Communities not found: ${notFound.join(', ')}`);
       }
     }
 

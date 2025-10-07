@@ -85,17 +85,17 @@ export class SeederService {
    */
   async seedCommunities(): Promise<SeedingResult> {
     try {
-      this.logger.log('🚀 Starting community seeding...');
+      this.logger.log('Starting community seeding...');
 
       // Check if communities already exist
       const existingCommunities = await this.communityModel.find({}).select('name').lean().exec();
 
       if (existingCommunities.length > 0) {
-        this.logger.log(`✅ Communities already exist (${existingCommunities.length} found)`);
+        this.logger.log(`Communities already exist (${existingCommunities.length} found)`);
         for (const community of existingCommunities) {
           this.logger.log(`   - ${community.name}`);
         }
-        this.logger.log('ℹ️  Skipping seeding to prevent duplicates.');
+        this.logger.log('Skipping seeding to prevent duplicates.');
 
         return {
           success: true,
@@ -119,7 +119,7 @@ export class SeederService {
         ordered: false,
       });
 
-      this.logger.log(`✅ Successfully seeded ${createdCommunities.length} communities:`);
+      this.logger.log(`Successfully seeded ${createdCommunities.length} communities:`);
       for (const community of createdCommunities) {
         this.logger.log(`   - ${community.name}`);
       }
@@ -132,9 +132,9 @@ export class SeederService {
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
         // Duplicate key error - some communities already exist
-        this.logger.warn('⚠️  Some communities already exist. Checking current state...');
+        this.logger.warn('Some communities already exist. Checking current state...');
         const existingCommunities = await this.communityModel.find({}).select('name').lean().exec();
-        this.logger.log(`✅ Found ${existingCommunities.length} existing communities:`);
+        this.logger.log(`Found ${existingCommunities.length} existing communities:`);
         for (const community of existingCommunities) {
           this.logger.log(`   - ${community.name}`);
         }
@@ -146,7 +146,7 @@ export class SeederService {
         };
       }
 
-      this.logger.error('❌ Error seeding communities:', (error as Error).message);
+      this.logger.error('Error seeding communities:', (error as Error).message);
       throw error;
     }
   }
@@ -158,7 +158,7 @@ export class SeederService {
     try {
       this.logger.log('🧹 Clearing communities...');
       const result = await this.communityModel.deleteMany({}).exec();
-      this.logger.log(`✅ Cleared ${result.deletedCount} communities`);
+      this.logger.log(`Cleared ${result.deletedCount} communities`);
 
       return {
         success: true,
@@ -166,7 +166,7 @@ export class SeederService {
         message: 'Communities cleared successfully',
       };
     } catch (error) {
-      this.logger.error('❌ Error clearing communities:', (error as Error).message);
+      this.logger.error('Error clearing communities:', (error as Error).message);
       throw error;
     }
   }
@@ -175,7 +175,7 @@ export class SeederService {
    * Reset communities (clear + seed)
    */
   async resetCommunities(): Promise<SeedingResult> {
-    this.logger.log('🔄 Resetting communities (clear + seed)...');
+    this.logger.log('Resetting communities (clear + seed)...');
     await this.clearCommunities();
     return await this.seedCommunities();
   }
@@ -190,7 +190,7 @@ export class SeederService {
       const activeCommunities = communities.filter((c) => c.isActive).length;
       const inactiveCommunities = communities.length - activeCommunities;
 
-      this.logger.log('📊 Database Status:');
+      this.logger.log('Database Status:');
       this.logger.log(`   Total Communities: ${communities.length}`);
       this.logger.log(`   Active: ${activeCommunities}`);
       this.logger.log(`   Inactive: ${inactiveCommunities}`);
@@ -213,7 +213,7 @@ export class SeederService {
         })),
       };
     } catch (error) {
-      this.logger.error('❌ Error getting database status:', (error as Error).message);
+      this.logger.error('Error getting database status:', (error as Error).message);
       throw error;
     }
   }

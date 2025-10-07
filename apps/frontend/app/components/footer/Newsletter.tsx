@@ -2,42 +2,40 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { useNewsletterSubscription } from '../../../lib/hooks/use-api';
+import { isValidEmail } from '../../../lib/utils/validation';
 import { FOOTER_DATA } from '../../data/siteData';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const { subscribe, loading, error, success, reset } = useNewsletterSubscription();
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setSuccess(false);
-    setError('');
+    setValidationError('');
+
+    // Validate email
+    if (!email.trim()) {
+      setValidationError('Email is required');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setValidationError('Please enter a valid email address');
+      return;
+    }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
-      const response = await fetch(`${apiUrl}/users/join/community`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to join community');
-      }
-
-      setSuccess(true);
+      await subscribe({ email });
       setEmail('');
+      // Reset after 3 seconds
+      setTimeout(() => {
+        reset();
+      }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('Error joining community:', err);
-    } finally {
-      setIsLoading(false);
+      // Error is handled by the hook
+      console.error('Newsletter subscription failed:', err);
     }
   };
 
@@ -71,25 +69,25 @@ export default function Newsletter() {
               placeholder={FOOTER_DATA.newsletter.placeholder}
               required
               className="px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary w-full"
-              disabled={isLoading}
+              disabled={loading}
             />
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loading}
               className={`relative overflow-hidden whitespace-nowrap shrink-0 px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group cursor-pointer ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl'
+                loading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl'
               }`}
             >
               <span className="relative z-10">
-                {isLoading ? 'Joining...' : FOOTER_DATA.newsletter.buttonText}
+                {loading ? 'Joining...' : FOOTER_DATA.newsletter.buttonText}
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
             </button>
           </form>
         )}
-        {error && (
+        {(error || validationError) && (
           <div className="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg mt-4">
-            {error}
+            {error || validationError}
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMentorApplication } from '../../lib/hooks/use-api';
+import { useCommunityJoin } from '../../lib/hooks/use-api';
 import type { FormErrors } from '../../lib/types/api';
 import {
   VALIDATION_RULES,
@@ -11,38 +11,39 @@ import {
 } from '../../lib/utils/validation';
 import Modal from './ui/Modal';
 
-interface MentorApplicationModalProps {
+interface CommunityJoinModalProps {
   isOpen: boolean;
   onClose: () => void;
+  communityName?: string;
+  communityId?: string;
 }
 
 interface FormData extends Record<string, string> {
   email: string;
   name: string;
-  expertise: string;
   githubHandle: string;
-  motivation: string;
 }
 
-export default function MentorApplicationModal({ isOpen, onClose }: MentorApplicationModalProps) {
+export default function CommunityJoinModal({
+  isOpen,
+  onClose,
+  communityName,
+  communityId,
+}: CommunityJoinModalProps) {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     name: '',
-    expertise: '',
     githubHandle: '',
-    motivation: '',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const { submitApplication, loading, error, success, reset } = useMentorApplication();
+  const { joinCommunity, loading, error, success, reset } = useCommunityJoin();
 
   const validateFormData = (): boolean => {
     const validationRules = {
       email: VALIDATION_RULES.email,
       name: VALIDATION_RULES.name,
       githubHandle: VALIDATION_RULES.githubHandle,
-      expertise: VALIDATION_RULES.expertise,
-      motivation: VALIDATION_RULES.motivation,
     };
 
     const newErrors = validateForm(formData, validationRules);
@@ -58,23 +59,22 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
     }
 
     try {
-      await submitApplication({
+      await joinCommunity({
         email: formData.email,
         name: formData.name,
-        expertise: formData.expertise || undefined,
         githubHandle: formData.githubHandle || undefined,
-        motivation: formData.motivation || undefined,
+        communities: communityId ? [communityId] : undefined,
       });
 
       // Reset form after 3 seconds and close modal
       setTimeout(() => {
-        setFormData({ email: '', name: '', expertise: '', githubHandle: '', motivation: '' });
+        setFormData({ email: '', name: '', githubHandle: '' });
         reset();
         onClose();
       }, 3000);
     } catch (err) {
       // Error is handled by the hook
-      console.error('Mentor application failed:', err);
+      console.error('Community join failed:', err);
     }
   };
 
@@ -88,12 +88,12 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
   if (success) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Application Submitted!">
+      <Modal isOpen={isOpen} onClose={onClose} title="Welcome to the Community!">
         <div className="text-center py-4">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg
-              className="w-8 h-8 text-blue-600 dark:text-blue-400"
+              className="w-8 h-8 text-green-600 dark:text-green-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -107,12 +107,12 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Thank You for Your Interest!
+            Successfully Joined!
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            Your mentor application has been submitted successfully. Our team will review your
-            application and get back to you within 3-5 business days. You'll receive a confirmation
-            email shortly.
+            {communityName
+              ? `Welcome to the ${communityName} community! You'll receive a confirmation email shortly with next steps.`
+              : "Welcome to Shinobi Open-Source Academy! You'll receive a confirmation email shortly with next steps."}
           </p>
         </div>
       </Modal>
@@ -120,7 +120,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Apply as a Mentor">
+    <Modal isOpen={isOpen} onClose={onClose} title={`Join ${communityName || 'Community'}`}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
@@ -168,25 +168,6 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
           )}
         </div>
 
-        {/* Expertise */}
-        <div>
-          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Areas of Expertise (Optional)
-          </label>
-          <textarea
-            value={formData.expertise}
-            onChange={(e) => handleInputChange('expertise', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors resize-none"
-            placeholder="e.g., React, Node.js, Python, System Design, DevOps..."
-            rows={3}
-            disabled={loading}
-          />
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            List your technical skills and areas of expertise
-          </p>
-        </div>
-
         {/* GitHub Handle */}
         <div>
           {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
@@ -197,29 +178,20 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
             type="text"
             value={formData.githubHandle}
             onChange={(e) => handleInputChange('githubHandle', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+              errors.githubHandle
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
+            } bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
             placeholder="username"
             disabled={loading}
           />
+          {errors.githubHandle && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.githubHandle}</p>
+          )}
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             Help us understand your open-source contributions
           </p>
-        </div>
-
-        {/* Motivation */}
-        <div>
-          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Why do you want to be a mentor? (Optional)
-          </label>
-          <textarea
-            value={formData.motivation}
-            onChange={(e) => handleInputChange('motivation', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:border-primary focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors resize-none"
-            placeholder="Share your motivation for mentoring and what you hope to contribute..."
-            rows={3}
-            disabled={loading}
-          />
         </div>
 
         {/* Submit Button */}
@@ -247,10 +219,10 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Submitting...
+                Joining...
               </>
             ) : (
-              'Submit Application'
+              `Join ${communityName || 'Community'}`
             )}
           </button>
         </div>
@@ -265,7 +237,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
         {/* Info Text */}
         <div className="text-center pt-2">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Applications are reviewed manually. We'll get back to you within 3-5 business days.
+            You'll receive a confirmation email with community details and next steps.
           </p>
         </div>
       </form>

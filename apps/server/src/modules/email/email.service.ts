@@ -81,26 +81,6 @@ const FALLBACK_TEMPLATES = {
   `,
 };
 
-interface SendGridMessage {
-  to: string;
-  from: string;
-  subject: string;
-  html: string;
-  trackingSettings?: {
-    clickTracking: {
-      enable: boolean;
-      enableText: boolean;
-    };
-  };
-  attachments?: Array<{
-    content: string;
-    filename: string;
-    type: string;
-    disposition: string;
-    contentId: string;
-  }>;
-}
-
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
@@ -142,6 +122,7 @@ export class EmailService {
       try {
         const templatePath = join(__dirname, 'templates', `${template}.hbs`);
         const templateContent = fs.readFileSync(templatePath, 'utf8');
+
         const compiledTemplate = handlebars.compile(templateContent);
         html = compiledTemplate(params);
       } catch (_error) {
@@ -190,7 +171,7 @@ export class EmailService {
             filename: 'logo.png',
             type: 'image/png',
             disposition: 'inline',
-            contentId: 'logo',
+            content_id: 'logo',
           },
         ];
 
