@@ -21,12 +21,6 @@
       "exclude": ["apps/server-e2e/**/*"]
     },
     {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
-    {
       "plugin": "@nx/webpack/plugin",
       "options": {
         "buildTargetName": "build",
@@ -40,8 +34,7 @@
   "generators": {
     "@nx/next": {
       "application": {
-        "style": "css",
-        "linter": "eslint"
+        "style": "css"
       }
     }
   }

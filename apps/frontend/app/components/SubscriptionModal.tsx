@@ -56,7 +56,9 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -86,7 +88,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
         const errorData = await response.json();
         setErrors({ email: errorData.message || 'Something went wrong. Please try again.' });
       }
-    } catch (error) {
+    } catch (_error) {
       setErrors({ email: 'Network error. Please check your connection and try again.' });
     } finally {
       setIsSubmitting(false);
@@ -112,6 +114,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
+              <title> Success </title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -137,7 +140,10 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            htmlFor="email"
+          >
             Email Address <span className="text-red-500">*</span>
           </label>
           <input
@@ -159,7 +165,10 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
 
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            htmlFor="name"
+          >
             Full Name (Optional)
           </label>
           <input
@@ -185,7 +194,10 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
 
         {/* GitHub Handle */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            htmlFor="githubHandle"
+          >
             GitHub Handle (Optional)
           </label>
           <input
@@ -211,6 +223,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
             {isSubmitting ? (
               <>
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <title> Loading </title>
                   <circle
                     className="opacity-25"
                     cx="12"

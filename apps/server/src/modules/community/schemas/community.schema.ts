@@ -8,12 +8,15 @@ export type CommunityDocument = Community & Document;
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      delete ret.__v;
+      ret.__v = undefined;
       return ret;
     },
   },
 })
 export class Community {
+  @Prop({ required: true, unique: true })
+  slug: string; // this can be Konoha, Taki, Iwa, Suna, Kiri, etc -- inspired by the ninja villages in the Naruto universe
+
   @Prop({ required: true })
   name: string;
 
@@ -53,22 +56,6 @@ export class Community {
 
   @Prop({ default: true })
   isActive: boolean;
-
-  // Denormalized counters for performance
-  @Prop({ default: 0 })
-  memberCount: number;
-
-  @Prop({ default: 0 })
-  mentorCount: number;
-
-  @Prop({ default: 0 })
-  activeProjectCount: number;
-
-  @Prop({ default: 0 })
-  totalProjectCount: number;
-
-  @Prop({ default: 0 })
-  totalContributions: number;
 }
 
 export const CommunitySchema = SchemaFactory.createForClass(Community);
@@ -77,6 +64,4 @@ export const CommunitySchema = SchemaFactory.createForClass(Community);
 CommunitySchema.index({ name: 1 }, { unique: true });
 CommunitySchema.index({ isActive: 1 });
 CommunitySchema.index({ kage: 1 });
-CommunitySchema.index({ memberCount: -1 });
-CommunitySchema.index({ activeProjectCount: -1 });
 CommunitySchema.index({ tags: 1 });

@@ -56,7 +56,9 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -87,7 +89,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
         const errorData = await response.json();
         setErrors({ email: errorData.message || 'Something went wrong. Please try again.' });
       }
-    } catch (error) {
+    } catch (_error) {
       setErrors({ email: 'Network error. Please check your connection and try again.' });
     } finally {
       setIsSubmitting(false);
@@ -107,6 +109,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
       <Modal isOpen={isOpen} onClose={onClose} title="Application Submitted!">
         <div className="text-center py-4">
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg
               className="w-8 h-8 text-blue-600 dark:text-blue-400"
               fill="none"
@@ -139,6 +142,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Email Address <span className="text-red-500">*</span>
           </label>
@@ -161,6 +165,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
         {/* Name */}
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Full Name <span className="text-red-500">*</span>
           </label>
@@ -183,6 +188,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
         {/* Expertise */}
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Areas of Expertise (Optional)
           </label>
@@ -201,6 +207,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
         {/* GitHub Handle */}
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             GitHub Handle (Optional)
           </label>
@@ -219,6 +226,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
 
         {/* Motivation */}
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Why do you want to be a mentor? (Optional)
           </label>
@@ -241,6 +249,7 @@ export default function MentorApplicationModal({ isOpen, onClose }: MentorApplic
           >
             {isSubmitting ? (
               <>
+                {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"

@@ -88,10 +88,7 @@ export class UserController {
   })
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
   async joinCommunity(@Body() communityJoinDto: CommunityJoinDto) {
-    const user = await this.userService.joinCommunity(
-      communityJoinDto.email,
-      communityJoinDto.name
-    );
+    const user = await this.userService.joinCommunity(communityJoinDto);
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
 

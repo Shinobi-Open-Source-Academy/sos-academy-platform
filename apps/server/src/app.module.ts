@@ -10,6 +10,7 @@ import { envConfig } from './common/config/env.config';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { CommunityModule } from './modules/community/community.module';
 import { ProjectModule } from './modules/project/project.module';
+import { SeederModule } from './modules/seeder/seeder.module';
 // Import modules
 import { UserModule } from './modules/user/user.module';
 
@@ -24,6 +25,7 @@ import { UserModule } from './modules/user/user.module';
     ProjectModule,
     CommunityModule,
     CalendarModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,5 @@
 # SOS Academy Platform
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
-
 🚀 **Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
 
 A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
@@ -26,7 +24,7 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - MongoDB (local or cloud)
 - SendGrid account (for emails)
 
@@ -74,7 +72,7 @@ mongod
 npx nx serve server
 
 # Start the frontend (in another terminal)
-npx nx serve frontend
+npx nx dev frontend
 ```
 
 #### Option 2: Docker (Recommended for Production)

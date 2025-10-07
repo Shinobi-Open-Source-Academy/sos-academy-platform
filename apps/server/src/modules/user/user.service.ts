@@ -3,8 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
-import { Model, Schema } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
+import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
+import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
@@ -16,6 +18,7 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
     private readonly emailService: EmailService
   ) {}
 
@@ -96,29 +99,64 @@ export class UserService {
 
   /**
    * Join community with just an email address
-   * @param email User's email address
-   * @param name Optional user's name
+   * @param communityJoinDto Community join data
    */
-  async joinCommunity(email: string, name?: string): Promise<User> {
+  async joinCommunity(communityJoinDto: CommunityJoinDto): Promise<User> {
+    const { email, name, communities, githubHandle } = communityJoinDto;
     // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Create minimal user entry
+    // Look up community ObjectIds by slug or name
+    let communityObjectIds: mongoose.Types.ObjectId[] = [];
+    if (communities && communities.length > 0) {
+      const foundCommunities = await this.communityModel
+        .find({
+          $or: [{ slug: { $in: communities } }, { name: { $in: communities } }],
+        })
+        .select('_id name slug')
+        .exec();
+
+      communityObjectIds = foundCommunities.map(
+        (community) => community._id as mongoose.Types.ObjectId
+      );
+
+      // Log any communities that weren't found
+      const foundIdentifiers = foundCommunities.flatMap((c) => [c.name, c.slug]);
+      const notFound = communities.filter((identifier) => !foundIdentifiers.includes(identifier));
+      if (notFound.length > 0) {
+        console.warn(`Communities not found: ${notFound.join(', ')}`);
+      }
+    }
+
+    // Create user entry
     const newUser = new this.userModel({
       email,
       name: name || '',
       role: UserRole.MEMBER,
       status: UserStatus.INACTIVE,
+      communities: communityObjectIds,
     });
+
+    // Enrich with GitHub profile if handle provided
+    if (githubHandle) {
+      try {
+        const githubProfile = await this.fetchGitHubProfile(githubHandle);
+        if (githubProfile) {
+          newUser.githubProfile = githubProfile;
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub profile:', error);
+      }
+    }
 
     const savedUser = await newUser.save();
 
     // Send confirmation email
     try {
-      await this.emailService.sendCommunityJoinConfirmation(email, name);
+      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
     } catch (error) {
       console.error('Failed to send community join email:', error);
     }

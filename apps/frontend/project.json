@@ -37,8 +37,8 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next lint",
-        "cwd": "apps/frontend"
+        "command": "biome lint apps/frontend",
+        "cwd": "."
       }
     }
   }

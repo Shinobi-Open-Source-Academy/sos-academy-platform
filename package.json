@@ -2,6 +2,7 @@
   "name": "@sos-academy-platform/source",
   "version": "0.0.0",
   "license": "MIT",
+  "packageManager": "pnpm@10.18.1",
   "scripts": {
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -9,7 +10,11 @@
     "lint:fix": "biome lint --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed": "npx nx run server:build:development && node dist/apps/server/main.js seed",
+    "seed:clear": "npx nx run server:build:development && node dist/apps/server/main.js clear",
+    "seed:reset": "npx nx run server:build:development && node dist/apps/server/main.js reset",
+    "seed:status": "npx nx run server:build:development && node dist/apps/server/main.js status"
   },
   "private": true,
   "devDependencies": {
@@ -50,12 +55,11 @@
     "typescript": "~5.7.2",
     "webpack-cli": "^5.1.4"
   },
-  "workspaces": ["packages/*"],
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,jsonc,md}": ["biome format --write --no-errors-on-unmatched"]
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^1.6.1",
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.2",
