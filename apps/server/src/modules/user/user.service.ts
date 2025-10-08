@@ -1,11 +1,18 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import mongoose, { Model, Schema } from 'mongoose';
+import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
@@ -441,5 +448,85 @@ export class UserService {
       console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);
       return null;
     }
+  }
+
+  /**
+   * Admin login - simple hardcoded check
+   */
+  async adminLogin(adminLoginDto: AdminLoginDto): Promise<{ success: boolean; message: string }> {
+    const { email, password } = adminLoginDto;
+
+    if (email === envConfig.admin.email && password === envConfig.admin.password) {
+      return {
+        success: true,
+        message: 'Login successful',
+      };
+    }
+
+    throw new UnauthorizedException('Invalid admin credentials');
+  }
+
+  /**
+   * Get admin dashboard statistics
+   */
+  async getAdminStats() {
+    const [totalUsers, pendingMentors, pendingMembers, activeUsers, totalCommunities] =
+      await Promise.all([
+        this.userModel.countDocuments().exec(),
+        this.userModel
+          .countDocuments({
+            $or: [
+              { status: UserStatus.APPLIED_MENTOR },
+              { status: UserStatus.PENDING, source: 'mentor-application' },
+            ],
+          })
+          .exec(),
+        this.userModel
+          .countDocuments({
+            status: { $in: [UserStatus.PENDING, UserStatus.INACTIVE] },
+            source: { $ne: 'mentor-application' },
+          })
+          .exec(),
+        this.userModel.countDocuments({ status: UserStatus.ACTIVE }).exec(),
+        this.communityModel.countDocuments().exec(),
+      ]);
+
+    return {
+      totalUsers,
+      pendingMentors,
+      pendingMembers,
+      activeUsers,
+      totalCommunities,
+    };
+  }
+
+  /**
+   * Get pending mentor applications
+   */
+  async getPendingMentors() {
+    return this.userModel
+      .find({
+        $or: [
+          { status: UserStatus.APPLIED_MENTOR },
+          { status: UserStatus.PENDING, source: 'mentor-application' },
+        ],
+      })
+      .populate('communities', 'name slug')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  /**
+   * Get pending member registrations
+   */
+  async getPendingMembers() {
+    return this.userModel
+      .find({
+        status: { $in: [UserStatus.PENDING, UserStatus.INACTIVE] },
+        source: { $ne: 'mentor-application' },
+      })
+      .populate('communities', 'name slug')
+      .sort({ createdAt: -1 })
+      .exec();
   }
 }

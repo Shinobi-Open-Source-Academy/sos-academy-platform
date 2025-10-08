@@ -34,7 +34,8 @@
   "generators": {
     "@nx/next": {
       "application": {
-        "style": "css"
+        "style": "css",
+        "linter": "none"
       }
     }
   }

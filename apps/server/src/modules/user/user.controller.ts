@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AdminLoginDto } from './dto/admin-login.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
@@ -162,5 +163,39 @@ export class UserController {
   async rejectUser(@Param('id') id: string) {
     const user = await this.userService.rejectUser(id);
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
+  }
+
+  // Admin endpoints
+  @Post('admin/login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Admin login' })
+  @ApiBody({ type: AdminLoginDto })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  async adminLogin(@Body() adminLoginDto: AdminLoginDto) {
+    return this.userService.adminLogin(adminLoginDto);
+  }
+
+  @Get('admin/stats')
+  @ApiOperation({ summary: 'Get admin dashboard statistics' })
+  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  async getAdminStats() {
+    return this.userService.getAdminStats();
+  }
+
+  @Get('admin/pending-mentors')
+  @ApiOperation({ summary: 'Get pending mentor applications' })
+  @ApiResponse({ status: 200, description: 'Pending mentors retrieved successfully' })
+  async getPendingMentors() {
+    const users = await this.userService.getPendingMentors();
+    return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
+  }
+
+  @Get('admin/pending-members')
+  @ApiOperation({ summary: 'Get pending member registrations' })
+  @ApiResponse({ status: 200, description: 'Pending members retrieved successfully' })
+  async getPendingMembers() {
+    const users = await this.userService.getPendingMembers();
+    return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
   }
 }

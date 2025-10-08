@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CommunityModule } from '../community/community.module';
 import { ProjectModule } from '../project/project.module';
 import { UserModule } from '../user/user.module';
+import { CalendarController } from './calendar.controller';
+import { CalendarService } from './calendar.service';
 import { CalendarEvent, CalendarEventSchema } from './schemas/calendar-event.schema';
 
 @Module({
@@ -12,8 +14,8 @@ import { CalendarEvent, CalendarEventSchema } from './schemas/calendar-event.sch
     ProjectModule,
     CommunityModule,
   ],
-  controllers: [],
-  providers: [],
-  exports: [MongooseModule],
+  controllers: [CalendarController],
+  providers: [CalendarService],
+  exports: [MongooseModule, CalendarService],
 })
 export class CalendarModule {}

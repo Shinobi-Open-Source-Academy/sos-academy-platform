@@ -23,4 +23,8 @@ export const envConfig = {
   logging: {
     level: getEnvValue('LOG_LEVEL', 'debug'),
   },
+  admin: {
+    email: getEnvValue('ADMIN_EMAIL', 'admin@shinobi-open-source.academy'),
+    password: getEnvValue('ADMIN_PASSWORD', 'admin123'),
+  },
 };
