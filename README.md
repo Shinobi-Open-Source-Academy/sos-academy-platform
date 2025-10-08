@@ -28,6 +28,28 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 - **Database Seeders**: Smart seeding system to populate communities
 - **Beautiful UI**: Modern, responsive design with modal-based forms
 - **API Documentation**: Full Swagger/OpenAPI documentation
+- **Admin Panel**: Full-featured admin dashboard for platform management
+
+## 🔐 Admin Panel
+
+A dedicated admin dashboard for managing the platform:
+
+- **Authentication**: Secure login with hardcoded credentials (MVP)
+- **User Management**: Review and approve mentor applications & member registrations
+- **Event Management**: Create academy-wide or community-specific events
+- **Calendar Integration**: Generate Google Calendar & iCal invite links
+- **Dashboard**: Real-time statistics and quick actions
+
+**Quick Start:**
+```bash
+# Setup environment & start admin panel
+pnpm setup:admin-env && pnpm dev:admin
+
+# Access at http://localhost:4200
+# Login: admin@shinobi-open-source.academy / admin123
+```
+
+📚 **Full docs:** [apps/admin/README.md](apps/admin/README.md)
 
 ## 🏗️ Architecture
 

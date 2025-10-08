@@ -14,7 +14,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build admin app
+# Build admin app with production NODE_ENV
+ENV NODE_ENV=production
 RUN npx nx build admin --prod
 
 # Production stage
