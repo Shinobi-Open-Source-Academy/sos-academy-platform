@@ -13,13 +13,6 @@
         "cwd": "apps/frontend"
       }
     },
-    "serve": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next dev -p 3000",
-        "cwd": "apps/frontend"
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "options": {

@@ -1,13 +1,21 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import mongoose, { Model, Schema } from 'mongoose';
+import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetUsersQueryDto } from './dto/get-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
@@ -441,5 +449,185 @@ export class UserService {
       console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);
       return null;
     }
+  }
+
+  /**
+   * Admin login - verify against database user with hashed password
+   */
+  async adminLogin(adminLoginDto: AdminLoginDto): Promise<{ success: boolean; message: string }> {
+    const { email, password } = adminLoginDto;
+
+    // Find admin user in database
+    const adminUser = await this.userModel
+      .findOne({
+        email: email,
+        role: UserRole.KAGE,
+        status: UserStatus.ACTIVE,
+      })
+      .select('+password')
+      .exec();
+
+    if (!adminUser) {
+      throw new UnauthorizedException('Invalid admin credentials');
+    }
+
+    // Verify password against hashed password
+    const isPasswordValid = await bcrypt.compare(password, adminUser.password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid admin credentials');
+    }
+
+    return {
+      success: true,
+      message: 'Login successful',
+    };
+  }
+
+  /**
+   * Get admin dashboard statistics
+   */
+  async getAdminStats() {
+    const [totalUsers, pendingMentors, pendingMembers, activeUsers, totalCommunities] =
+      await Promise.all([
+        this.userModel.countDocuments().exec(),
+        this.userModel
+          .countDocuments({
+            $or: [
+              { status: UserStatus.APPLIED_MENTOR },
+              { status: UserStatus.PENDING, source: 'mentor-application' },
+            ],
+          })
+          .exec(),
+        this.userModel
+          .countDocuments({
+            status: { $in: [UserStatus.PENDING, UserStatus.INACTIVE] },
+            source: { $ne: 'mentor-application' },
+          })
+          .exec(),
+        this.userModel.countDocuments({ status: UserStatus.ACTIVE }).exec(),
+        this.communityModel.countDocuments().exec(),
+      ]);
+
+    return {
+      totalUsers,
+      pendingMentors,
+      pendingMembers,
+      activeUsers,
+      totalCommunities,
+    };
+  }
+
+  /**
+   * Get pending mentor applications
+   */
+  async getPendingMentors() {
+    return this.userModel
+      .find({
+        $or: [
+          { status: UserStatus.APPLIED_MENTOR },
+          { status: UserStatus.PENDING, source: 'mentor-application' },
+        ],
+      })
+      .populate('communities', 'name slug')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  /**
+   * Get pending member registrations
+   */
+  async getPendingMembers() {
+    return this.userModel
+      .find({
+        status: { $in: [UserStatus.PENDING, UserStatus.INACTIVE] },
+        source: { $ne: 'mentor-application' },
+      })
+      .populate('communities', 'name slug')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  /**
+   * Get users with pagination and filters
+   */
+  async getUsers(query: GetUsersQueryDto) {
+    const { role, status, search, community } = query;
+
+    // Cap limit and normalize page
+    const limit = Math.min(Math.max(query.limit ?? 20, 1), 100);
+    const page = Math.max(query.page ?? 1, 1);
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, unknown> = {};
+    if (role) {
+      filter.role = role;
+    }
+    if (status) {
+      filter.status = status;
+    }
+
+    if (search) {
+      const safe = this.escapeRegex(search);
+      const regex = new RegExp(safe, 'i');
+      filter.$or = [{ name: regex }, { email: regex }, { 'githubProfile.login': regex }];
+    }
+
+    // Optional community slug filter
+    if (community) {
+      const communityDoc = await this.communityModel
+        .findOne({ slug: community })
+        .select('_id')
+        .lean()
+        .exec();
+      if (!communityDoc) {
+        // Early return when community slug not found
+        return {
+          users: [],
+          pagination: { total: 0, page, limit, pages: 0 },
+        };
+      }
+      filter.communities = communityDoc._id;
+    }
+
+    // Projection to reduce payload; adjust fields to your schema
+    const projection = {
+      _id: 1,
+      name: 1,
+      email: 1,
+      role: 1,
+      status: 1,
+      githubProfile: 1,
+      communities: 1,
+      createdAt: 1,
+    };
+
+    // Query with lean to avoid class-transformer recursion
+    const [users, total] = await Promise.all([
+      this.userModel
+        .find(filter, projection)
+        .populate({ path: 'communities', select: 'name slug', options: { lean: true } })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.userModel.countDocuments(filter).exec(),
+    ]);
+
+    return {
+      users, // plain objects (safe to transform)
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: total === 0 ? 0 : Math.ceil(total / limit),
+      },
+    };
+  }
+
+  private escapeRegex(input: string): string {
+    // Prevent ReDoS / special char issues in regex
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

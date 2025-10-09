@@ -21,9 +21,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // Configure CORS
+  // Configure CORS - support multiple origins
+  const corsOrigins = envConfig.cors.origin.split(',').map((origin) => origin.trim());
   app.enableCors({
-    origin: envConfig.cors.origin,
+    origin: corsOrigins.length > 1 ? corsOrigins : corsOrigins[0],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -102,6 +103,11 @@ async function autoSeedDatabase(app): Promise<void> {
     } else {
       logger.log(`Database already seeded (${status.totalCommunities} communities found)`);
     }
+
+    // Always try to seed admin user if it doesn't exist
+    logger.log('Checking admin user status...');
+    await seederService.seedAdmin();
+    logger.log('Admin user check completed');
   } catch (error) {
     logger.error('Auto-seeding failed:', error);
     logger.warn('Application will continue without seeding');

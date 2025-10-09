@@ -6,7 +6,7 @@ export const developmentEnv = {
   MONGODB_URI: 'mongodb://localhost:27017/sos-academy',
   JWT_SECRET: 'dev_jwt_secret_key',
   JWT_EXPIRATION: '1d',
-  CORS_ORIGIN: 'http://localhost:3000',
+  CORS_ORIGIN: 'http://localhost:3000,http://localhost:3001',
   LOG_LEVEL: 'debug',
 
   // Email configuration

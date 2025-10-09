@@ -20,7 +20,7 @@ export class CommunityController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Get community statistics' })
+  @ApiOperation({ summary: 'Get community  statistics' })
   @ApiResponse({
     status: 200,
     description: 'Community statistics including total counts',

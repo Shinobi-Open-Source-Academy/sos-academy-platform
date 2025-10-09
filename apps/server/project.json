@@ -5,34 +5,48 @@
   "projectType": "application",
   "tags": [],
   "targets": {
-    "build": {
+    "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"]
+        "command": "nest start --watch --entryFile apps/server/src/main",
+        "cwd": "apps/server"
+      }
+    },
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/server",
+        "main": "apps/server/src/main.ts",
+        "tsConfig": "apps/server/tsconfig.app.json",
+        "webpackConfig": "apps/server/webpack.config.js",
+        "assets": [
+          "apps/server/src/assets",
+          {
+            "glob": "**/*.hbs",
+            "input": "apps/server/src/modules/email/templates/",
+            "output": "./templates/"
+          }
+        ]
       },
       "configurations": {
         "development": {
-          "args": ["node-env=development"]
+          "optimization": false
+        },
+        "production": {
+          "optimization": true,
+          "extractLicenses": true
         }
       }
     },
-    "serve": {
-      "continuous": true,
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
+    "start": {
+      "executor": "nx:run-commands",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "server:build",
-        "runBuildTargetDependencies": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "server:build:development"
-        },
-        "production": {
-          "buildTarget": "server:build:production"
-        }
+        "command": "node dist/apps/server/main.js"
       }
     },
     "test": {

@@ -1,6 +1,20 @@
 # SOS Academy Platform
 
+<div align="center">
+
 🚀 **Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
+
+[![CI](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/Code%20of-Conduct-blue.svg)](CODE_OF_CONDUCT.md)
+[![Discord](https://img.shields.io/discord/YOUR_DISCORD_ID?color=7389D8&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/9Wgx7bCh)
+
+[Features](#-mvp-features) • [Quick Start](#-quick-start) • [Contributing](CONTRIBUTING.md) • [Documentation](#-api-endpoints) • [Community](#-community)
+
+</div>
+
+---
 
 A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
 
@@ -14,6 +28,28 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 - **Database Seeders**: Smart seeding system to populate communities
 - **Beautiful UI**: Modern, responsive design with modal-based forms
 - **API Documentation**: Full Swagger/OpenAPI documentation
+- **Admin Panel**: Full-featured admin dashboard for platform management
+
+## 🔐 Admin Panel
+
+A dedicated admin dashboard for managing the platform:
+
+- **Authentication**: Secure login with hardcoded credentials (MVP)
+- **User Management**: Review and approve mentor applications & member registrations
+- **Event Management**: Create academy-wide or community-specific events
+- **Calendar Integration**: Generate Google Calendar & iCal invite links
+- **Dashboard**: Real-time statistics and quick actions
+
+**Quick Start:**
+```bash
+# Setup environment & start admin panel
+pnpm setup:admin-env && pnpm dev:admin
+
+# Access at http://localhost:4200
+# Login: admin@shinobi-open-source.academy / admin123
+```
+
+📚 **Full docs:** [apps/admin/README.md](apps/admin/README.md)
 
 ## 🏗️ Architecture
 
@@ -114,7 +150,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4200/api
 
 ### Development
 
-#### Option 1: Local Development
+#### Quick Start (Recommended)
 
 ```sh
 # Install dependencies
@@ -123,11 +159,22 @@ pnpm install
 # Start MongoDB (if running locally)
 mongod
 
-# Start the backend server (auto-seeds database if empty)
-npx nx serve server
+# Start both backend and frontend at once
+pnpm start
+```
 
-# Start the frontend (in another terminal)
-npx nx serve frontend
+This will start both services in parallel:
+- Backend: http://localhost:4200
+- Frontend: http://localhost:3000
+
+#### Individual Services
+
+```sh
+# Start backend only
+pnpm start:backend
+
+# Start frontend only
+pnpm start:frontend
 ```
 
 **Note**: The backend automatically checks and seeds the database on startup if it's empty. You can also manually seed using:
@@ -174,12 +221,32 @@ The application will be available at:
 - Backend API: http://localhost:4200
 - API Documentation: http://localhost:4200/api/docs
 
-### Build for Production
+### Available Scripts
 
 ```sh
-# Build both frontend and backend
-npx nx build frontend
-npx nx build server
+# Development
+pnpm start              # Start both backend and frontend
+pnpm start:backend      # Start backend only
+pnpm start:frontend     # Start frontend only
+
+# Build
+pnpm build              # Build both projects
+pnpm build:backend      # Build backend only
+pnpm build:frontend     # Build frontend only
+
+# Code Quality
+pnpm format             # Format all code
+pnpm format:check       # Check formatting
+pnpm lint               # Lint code
+pnpm lint:fix           # Lint and fix issues
+pnpm check              # Check format + lint
+pnpm check:fix          # Fix format + lint
+
+# Database Seeding
+pnpm seed               # Seed database
+pnpm seed:clear         # Clear database
+pnpm seed:reset         # Reset database
+pnpm seed:status        # Check seed status
 ```
 
 ### Deployment Configuration
@@ -249,19 +316,19 @@ docker-compose exec mongodb mongosh sos-academy
 
 ```sh
 # Format all code
-npm run format
+pnpm run format
 
 # Check formatting without fixing
-npm run format:check
+pnpm run format:check
 
 # Lint and fix issues
-npm run lint:fix
+pnpm run lint:fix
 
 # Check everything (format + lint)
-npm run check
+pnpm run check
 
 # Fix everything (format + lint)
-npm run check:fix
+pnpm run check:fix
 ```
 
 **Pre-commit Hook**: Code is automatically formatted before each commit using Husky and lint-staged. Linting is available via npm scripts but not enforced on commit to avoid blocking development.
@@ -271,10 +338,10 @@ npm run check:fix
 This project uses **Biome** for code formatting and linting instead of ESLint/Prettier for better performance and consistency. All ESLint configurations have been removed to avoid conflicts.
 
 **Key Features:**
-- ⚡ **Fast**: Biome is 10-100x faster than ESLint/Prettier
-- 🎯 **All-in-one**: Combines formatting and linting in a single tool
-- 🔧 **Zero config**: Works out of the box with sensible defaults
-- 🚀 **Pre-commit hooks**: Automatically formats code before commits
+- **Fast**: Biome is 10-100x faster than ESLint/Prettier
+- **All-in-one**: Combines formatting and linting in a single tool
+- **Zero config**: Works out of the box with sensible defaults
+- **Pre-commit hooks**: Automatically formats code before commits
 
 **Configuration:**
 - **Formatter**: 2-space indentation, single quotes, semicolons
@@ -332,7 +399,7 @@ Full API documentation is available at: http://localhost:4200/api/docs (Swagger 
 3. GitHub profile is enriched if handle provided
 4. Confirmation email sent with manual review timeline (3-5 business days)
 
-## 🌱 Database Seeders
+## Database Seeders
 
 The platform includes a **smart auto-seeding system** that automatically populates the database with communities.
 
@@ -349,17 +416,17 @@ The platform includes a **smart auto-seeding system** that automatically populat
 
 **Startup logs you'll see:**
 ```
-🚀 Application is running on: http://localhost:4200
-🔍 Checking database seeding status...
-📦 Database is empty. Seeding communities...
-✅ Database seeded successfully
+Application is running on: http://localhost:4200
+Checking database seeding status...
+Database is empty. Seeding communities...
+Database seeded successfully
 ```
 
 Or if already seeded:
 ```
-🚀 Application is running on: http://localhost:4200
-🔍 Checking database seeding status...
-✓ Database already seeded (5 communities found)
+Application is running on: http://localhost:4200
+Checking database seeding status...
+Database already seeded (5 communities found)
 ```
 
 ### Manual Seeder Commands
@@ -408,7 +475,7 @@ The auto-seeding system is implemented directly in the `main.ts` application boo
 
 The same seeding logic is also accessible via CLI commands for manual control when needed.
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Database Seeding Issues
 
@@ -427,7 +494,7 @@ docker-compose exec mongodb mongosh sos-academy --eval "db.communities.countDocu
 
 **Problem**: Seeding fails with MongoDB connection error
 ```
-❌ Auto-seeding failed: MongooseServerSelectionError
+Auto-seeding failed: MongooseServerSelectionError
 ```
 **Solution**: Ensure MongoDB is running and the connection string is correct:
 - Local: `MONGODB_URI=mongodb://localhost:27017/sos-academy`
@@ -567,6 +634,52 @@ Nx Console is an editor extension that enriches your developer experience. It le
 
 [Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
+## 📖 Documentation
+
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
+- [Code of Conduct](CODE_OF_CONDUCT.md) - Community guidelines and standards
+- [Security Policy](SECURITY.md) - How to report security vulnerabilities
+- [Changelog](CHANGELOG.md) - Project version history
+- [Contributors](CONTRIBUTORS.md) - Our amazing contributors
+
+## 👥 Community
+
+Join our community and connect with other developers!
+
+- **Discord**: [Join our Discord server](https://discord.gg/9Wgx7bCh)
+- **Twitter**: [@SOSAcademy_](https://x.com/SOSAcademy_)
+- **GitHub Discussions**: [Start a discussion](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions)
+- **Email**: contact@shinobi-open-source.academy
+
+## 🤝 Contributing
+
+We welcome contributions from developers of all skill levels! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
+
+**Quick Start:**
+1. Read our [Contributing Guide](CONTRIBUTING.md)
+2. Check out [good first issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+3. Join our [Discord](https://discord.gg/9Wgx7bCh) for help and discussions
+
+**Ways to Contribute:**
+- 💻 Code contributions (features, bug fixes, refactoring)
+- 📚 Documentation improvements
+- 🐛 Bug reports and testing
+- 💡 Feature suggestions and feedback
+- 🎨 Design and UX improvements
+- 🌍 Translations and internationalization
+
+See our [Contributors](CONTRIBUTORS.md) to meet the amazing people who have helped build this project!
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Thanks to all our [contributors](CONTRIBUTORS.md)
+- Built with [Next.js](https://nextjs.org/), [NestJS](https://nestjs.com/), and [MongoDB](https://www.mongodb.com/)
+- Powered by [Nx](https://nx.dev/) for efficient monorepo management
+
 ## Useful links
 
 Learn more:
@@ -576,9 +689,10 @@ Learn more:
 - [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-And join the Nx community:
+---
 
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+<div align="center">
+  <sub>Built with ❤️ by the SOS Academy Community</sub>
+  <br>
+  <sub>⭐ Star us on GitHub — it helps!</sub>
+</div>
