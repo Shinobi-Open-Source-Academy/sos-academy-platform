@@ -27,7 +27,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform.git
+   git remote add upstream https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform.git
    ```
 4. **Install dependencies**:
    ```bash
@@ -47,7 +47,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 ### Reporting Bugs
 
-**Before creating a bug report**, please check the [existing issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues) to avoid duplicates.
+**Before creating a bug report**, please check the [existing issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues) to avoid duplicates.
 
 **When creating a bug report**, include:
 - A clear, descriptive title
@@ -321,8 +321,8 @@ Issues are categorized with labels:
 ### Getting Help
 
 - Check existing [documentation](README.md)
-- Search [closed issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aclosed)
-- Ask in [GitHub Discussions](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions)
+- Search [closed issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aclosed)
+- Ask in [GitHub Discussions](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions)
 - Join our [Discord community](https://discord.gg/9Wgx7bCh)
 
 ## 🎓 Recognition
@@ -367,4 +367,3 @@ pnpm build             # Build for production
 ---
 
 **Thank you for contributing to SOS Academy! Together, we're building something amazing! 🚀**
-

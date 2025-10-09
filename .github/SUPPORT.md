@@ -8,8 +8,8 @@ Welcome to SOS Academy Platform support! We're here to help you succeed.
 
 1. **Search existing resources**:
    - Check the [Documentation](../README.md)
-   - Search [closed issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aclosed)
-   - Browse [GitHub Discussions](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions)
+   - Search [closed issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aclosed)
+   - Browse [GitHub Discussions](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions)
    - Review the [Troubleshooting section](../README.md#troubleshooting)
 
 2. **Try to solve it yourself**:
@@ -23,11 +23,11 @@ Welcome to SOS Academy Platform support! We're here to help you succeed.
 #### 💬 GitHub Discussions (Recommended)
 **Best for**: General questions, discussions, and community support
 
-- [Q&A](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions/categories/q-a) - Ask questions
-- [Ideas](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions/categories/ideas) - Share feature ideas
-- [Show and Tell](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions/categories/show-and-tell) - Share what you've built
+- [Q&A](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions/categories/q-a) - Ask questions
+- [Ideas](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions/categories/ideas) - Share feature ideas
+- [Show and Tell](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions/categories/show-and-tell) - Share what you've built
 
-[Start a Discussion →](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions/new)
+[Start a Discussion →](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions/new)
 
 #### 💭 Discord Community
 **Best for**: Real-time chat, quick questions, and community networking
@@ -48,7 +48,7 @@ Join our Discord server for:
   - ✨ [Feature Requests](.github/ISSUE_TEMPLATE/feature_request.yml)
   - 📚 [Documentation](.github/ISSUE_TEMPLATE/documentation.yml)
 
-[Create an Issue →](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues/new/choose)
+[Create an Issue →](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues/new/choose)
 
 **Important**: Please don't use issues for general questions. Use Discussions or Discord instead.
 
@@ -80,7 +80,7 @@ Join our Discord server for:
 
 Found a bug? Here's how to report it:
 
-1. **Check if it's already reported**: Search [existing issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues)
+1. **Check if it's already reported**: Search [existing issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues)
 
 2. **Create a bug report**: Use our [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.yml)
 
@@ -95,11 +95,11 @@ Found a bug? Here's how to report it:
 
 Have an idea? We'd love to hear it!
 
-1. **Check existing requests**: Search [issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues) and [discussions](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions)
+1. **Check existing requests**: Search [issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues) and [discussions](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions)
 
 2. **Create a feature request**: Use our [Feature Request template](.github/ISSUE_TEMPLATE/feature_request.yml)
 
-3. **Discuss first**: For major features, start a [discussion](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions/new?category=ideas) first
+3. **Discuss first**: For major features, start a [discussion](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions/new?category=ideas) first
 
 ## 🔒 Security Issues
 
@@ -108,7 +108,7 @@ Have an idea? We'd love to hear it!
 Please report security issues responsibly:
 
 1. **Email**: security@shinobi-open-source.academy
-2. **GitHub Security**: [Create a security advisory](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/security/advisories/new)
+2. **GitHub Security**: [Create a security advisory](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/security/advisories/new)
 
 See our [Security Policy](../SECURITY.md) for more details.
 
@@ -118,14 +118,14 @@ Stay connected and get the latest updates:
 
 - **Twitter**: [@SOSAcademy_](https://x.com/SOSAcademy_)
 - **Discord**: [Join our server](https://discord.gg/9Wgx7bCh)
-- **GitHub**: [Follow for updates](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy)
+- **GitHub**: [Follow for updates](https://github.com/Shinobi-Open-Source-Academy)
 
 ## 🤝 Contributing
 
 Want to contribute? That's awesome!
 
 - Read our [Contributing Guide](../CONTRIBUTING.md)
-- Check [good first issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- Check [good first issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - Join our [Discord](https://discord.gg/9Wgx7bCh) for guidance
 
 ## ⏰ Response Times

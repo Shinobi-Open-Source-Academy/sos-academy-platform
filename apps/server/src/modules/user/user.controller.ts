@@ -9,12 +9,24 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { UserRole, UserStatus } from '@sos-academy/shared';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetUsersQueryDto } from './dto/get-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
@@ -186,16 +198,45 @@ export class UserController {
   @Get('admin/pending-mentors')
   @ApiOperation({ summary: 'Get pending mentor applications' })
   @ApiResponse({ status: 200, description: 'Pending mentors retrieved successfully' })
-  async getPendingMentors() {
+  async getPendingMentors(): Promise<UserResponseDto[]> {
     const users = await this.userService.getPendingMentors();
-    return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
+    // biome-ignore lint/suspicious/noExplicitAny: mongoose document typing complexity
+    const dtos: UserResponseDto[] = users.map((user: any) => new UserResponseDto(user));
+    return dtos;
   }
 
   @Get('admin/pending-members')
   @ApiOperation({ summary: 'Get pending member registrations' })
   @ApiResponse({ status: 200, description: 'Pending members retrieved successfully' })
-  async getPendingMembers() {
+  async getPendingMembers(): Promise<UserResponseDto[]> {
     const users = await this.userService.getPendingMembers();
-    return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
+    // biome-ignore lint/suspicious/noExplicitAny: mongoose document typing complexity
+    const dtos: UserResponseDto[] = users.map((user: any) => new UserResponseDto(user));
+    return dtos;
+  }
+
+  @Get('admin/users')
+  @ApiOperation({ summary: 'Get users with pagination and filters' })
+  @ApiOkResponse({ description: 'Users retrieved successfully', type: [UserResponseDto] })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getUsers(@Query() query: GetUsersQueryDto) {
+    const { role, status, search, community, page, limit } = query;
+    const result = await this.userService.getUsers({
+      role: role as UserRole,
+      status: status as UserStatus,
+      search,
+      community,
+      page: page ?? 1,
+      limit: limit ?? 20,
+    });
+
+    const userDtos: UserResponseDto[] = result.users.map(
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      (user: any) => new UserResponseDto(user)
+    );
+    return {
+      users: userDtos,
+      pagination: result.pagination,
+    };
   }
 }

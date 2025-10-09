@@ -11,7 +11,7 @@ The SOS Academy team takes security seriously. We appreciate your efforts to res
 Instead, please report them via one of the following methods:
 
 1. **GitHub Security Advisories** (Preferred)
-   - Go to the [Security tab](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/security/advisories/new)
+   - Go to the [Security tab](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/security/advisories/new)
    - Click "Report a vulnerability"
    - Fill out the form with detailed information
 

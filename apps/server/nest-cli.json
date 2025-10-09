@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "tsConfigPath": "tsconfig.app.json",
+    "assets": [
+      "assets/**/*",
+      {
+        "include": "modules/email/templates/**/*.hbs",
+        "outDir": "dist"
+      }
+    ]
+  }
+}

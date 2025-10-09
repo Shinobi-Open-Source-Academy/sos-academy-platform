@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated, logout } from '../../lib/auth';
+import { isAuthenticated } from '../../lib/auth';
+import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,65 +83,41 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-white">SOS Admin</h1>
-        </div>
-        <nav className="mt-6">
-          <Link
-            href="/"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/applications/mentors"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Mentor Applications
-          </Link>
-          <Link
-            href="/applications/members"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Member Registrations
-          </Link>
-          <Link
-            href="/events"
-            className="block px-6 py-3 text-white bg-gray-700 border-l-4 border-blue-500"
-          >
-            Events
-          </Link>
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full text-left px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white mt-4"
-          >
-            Logout
-          </button>
-        </nav>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 flex">
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-8">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Events ({events.length})</h2>
-          <Link
-            href="/events/new"
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-          >
-            + Create Event
-          </Link>
+          <div>
+            <h2 className="text-3xl font-bold text-white">Events</h2>
+            <p className="text-gray-400 mt-1">Manage community events and meetings</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={fetchEvents}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <span>🔄</span>
+              Refresh
+            </button>
+            <Link
+              href="/events/new"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <span>+</span>
+              Create Event
+            </Link>
+          </div>
         </div>
 
         {events.length === 0 ? (
-          <div className="bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
+          <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-lg border border-gray-700/50 text-center">
             <p className="text-gray-400">No events created yet</p>
             <Link
               href="/events/new"
-              className="inline-block mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+              className="inline-block mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Create First Event
             </Link>
@@ -148,7 +125,10 @@ export default function EventsPage() {
         ) : (
           <div className="space-y-4">
             {events.map((event) => (
-              <div key={event._id} className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div
+                key={event._id}
+                className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg border border-gray-700/50 hover:border-gray-600/50 transition-colors"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-white">{event.title}</h3>
@@ -199,14 +179,14 @@ export default function EventsPage() {
                     <button
                       type="button"
                       onClick={() => getInviteLink(event._id)}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
                     >
                       📅 Calendar Link
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(event._id)}
-                      className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700"
+                      className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700"
                     >
                       Delete
                     </button>

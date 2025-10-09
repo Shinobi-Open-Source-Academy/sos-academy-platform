@@ -69,7 +69,7 @@ export class User {
   @Prop({ required: false })
   profilePicture: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false, select: false })
   password: string;
 
   @Prop({

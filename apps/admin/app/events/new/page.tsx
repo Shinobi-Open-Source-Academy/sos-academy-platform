@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../../lib/api-client';
-import { isAuthenticated, logout } from '../../../lib/auth';
+import { isAuthenticated } from '../../../lib/auth';
+import Sidebar from '../../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,45 +83,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-white">SOS Admin</h1>
-        </div>
-        <nav className="mt-6">
-          <Link
-            href="/"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/applications/mentors"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Mentor Applications
-          </Link>
-          <Link
-            href="/applications/members"
-            className="block px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            Member Registrations
-          </Link>
-          <Link
-            href="/events"
-            className="block px-6 py-3 text-white bg-gray-700 border-l-4 border-blue-500"
-          >
-            Events
-          </Link>
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full text-left px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white mt-4"
-          >
-            Logout
-          </button>
-        </nav>
-      </div>
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-8">

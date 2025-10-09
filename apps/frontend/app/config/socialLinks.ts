@@ -12,7 +12,7 @@ export interface SocialLink {
 export const SOCIAL_LINKS: SocialLink[] = [
   {
     name: 'GitHub',
-    url: 'https://github.com/Shinobi-Open-Source-Academy-SOS-Academy',
+    url: 'https://github.com/Shinobi-Open-Source-Academy',
     icon: GithubIcon,
   },
   {

@@ -230,7 +230,7 @@ export class EmailService {
       name,
       date: new Date().toLocaleDateString(),
       currentYear: new Date().getFullYear(),
-      applicationReviewPeriod: '5-7 business days',
+      applicationReviewPeriod: '1-5 business days',
     };
 
     await this.sendTemplatedEmail(

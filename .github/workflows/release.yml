@@ -80,7 +80,7 @@ jobs:
 
           # Update the comparison links at the bottom
           echo "" >> CHANGELOG.md
-          echo "[${VERSION}]: https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/releases/tag/v${VERSION}" >> CHANGELOG.md
+          echo "[${VERSION}]: https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/releases/tag/v${VERSION}" >> CHANGELOG.md
 
       - name: Commit CHANGELOG.md
         uses: stefanzweifel/git-auto-commit-action@v5

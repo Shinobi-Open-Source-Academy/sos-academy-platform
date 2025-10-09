@@ -4,7 +4,7 @@
 
 🚀 **Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
 
-[![CI](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/actions/workflows/ci.yml)
+[![CI](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Code of Conduct](https://img.shields.io/badge/Code%20of-Conduct-blue.svg)](CODE_OF_CONDUCT.md)
@@ -648,7 +648,7 @@ Join our community and connect with other developers!
 
 - **Discord**: [Join our Discord server](https://discord.gg/9Wgx7bCh)
 - **Twitter**: [@SOSAcademy_](https://x.com/SOSAcademy_)
-- **GitHub Discussions**: [Start a discussion](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/discussions)
+- **GitHub Discussions**: [Start a discussion](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/discussions)
 - **Email**: contact@shinobi-open-source.academy
 
 ## 🤝 Contributing
@@ -657,7 +657,7 @@ We welcome contributions from developers of all skill levels! Whether you're fix
 
 **Quick Start:**
 1. Read our [Contributing Guide](CONTRIBUTING.md)
-2. Check out [good first issues](https://github.com/Shinobi-Open-Source-Academy-SOS-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+2. Check out [good first issues](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 3. Join our [Discord](https://discord.gg/9Wgx7bCh) for help and discussions
 
 **Ways to Contribute:**

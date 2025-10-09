@@ -103,6 +103,11 @@ async function autoSeedDatabase(app): Promise<void> {
     } else {
       logger.log(`Database already seeded (${status.totalCommunities} communities found)`);
     }
+
+    // Always try to seed admin user if it doesn't exist
+    logger.log('Checking admin user status...');
+    await seederService.seedAdmin();
+    logger.log('Admin user check completed');
   } catch (error) {
     logger.error('Auto-seeding failed:', error);
     logger.warn('Application will continue without seeding');
