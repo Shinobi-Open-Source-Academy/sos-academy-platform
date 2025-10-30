@@ -27,6 +27,7 @@ export default function MentorCard({ name, role, image, bio, expertise, social }
           src={image}
           alt={name}
           fill
+          loading="lazy"
           className="object-cover"
           style={{
             transform: isHovered ? 'scale(1.05)' : 'scale(1)',

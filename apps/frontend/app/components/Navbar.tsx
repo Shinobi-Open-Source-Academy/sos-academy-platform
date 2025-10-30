@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import SubscriptionModal from './SubscriptionModal';
 import CloseIcon from './icons/CloseIcon';
 import MenuIcon from './icons/MenuIcon';
@@ -13,6 +13,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('');
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -54,8 +55,26 @@ export default function Navbar() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Throttled scroll handler - limits execution to once every 100ms
+    const throttledHandleScroll = () => {
+      if (scrollTimeoutRef.current) {
+        return;
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        handleScroll();
+        scrollTimeoutRef.current = null;
+      }, 100);
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Set active link immediately on page load for non-home pages
@@ -72,14 +91,14 @@ export default function Navbar() {
     }
   }, []);
 
-  const links = [
+  const links = useMemo(() => [
     { href: '/#about', label: 'About' },
     { href: '/#communities', label: 'Communities' },
     { href: '/#projects', label: 'Projects' },
     { href: '/#mentors', label: 'Mentors' },
     { href: '/documentation', label: 'Docs' },
     { href: '/blog', label: 'Blog' },
-  ];
+  ], []);
 
   return (
     <header

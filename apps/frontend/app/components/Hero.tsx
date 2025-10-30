@@ -17,6 +17,7 @@ export default function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
+  const mouseMoveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [dots, setDots] = useState<
     Array<{
       width: number;
@@ -57,8 +58,26 @@ export default function Hero() {
       setMousePosition({ x, y });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    // Throttled mouse move handler - limits execution to once every 50ms
+    const throttledHandleMouseMove = (e: MouseEvent) => {
+      if (mouseMoveTimeoutRef.current) {
+        return;
+      }
+
+      mouseMoveTimeoutRef.current = setTimeout(() => {
+        handleMouseMove(e);
+        mouseMoveTimeoutRef.current = null;
+      }, 50);
+    };
+
+    window.addEventListener('mousemove', throttledHandleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', throttledHandleMouseMove);
+      if (mouseMoveTimeoutRef.current) {
+        clearTimeout(mouseMoveTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import SectionHeading from './ui/SectionHeading';
 
 interface ProjectProps {
@@ -74,6 +74,7 @@ const ProjectCard = ({
           src={image}
           alt={title}
           fill
+          loading="lazy"
           className="object-cover transition-transform duration-500"
           style={{
             transform: isHovered ? 'scale(1.08)' : 'scale(1)',
@@ -160,7 +161,7 @@ export default function Projects() {
     };
   }, []);
 
-  const projects: ProjectProps[] = [
+  const projects: ProjectProps[] = useMemo(() => [
     {
       title: 'Rust Logger',
       description:
@@ -209,7 +210,7 @@ export default function Projects() {
       tags: ['Python', 'Django', 'Recommendation System', 'Advanced'],
       url: 'https://github.com/example/contribution-matcher',
     },
-  ];
+  ], []);
 
   return (
     <section

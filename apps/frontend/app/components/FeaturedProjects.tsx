@@ -85,6 +85,7 @@ const FeaturedProjectCard = ({
           src={image}
           alt={title}
           fill
+          loading="lazy"
           className="object-cover transition-transform duration-500"
           style={{
             transform: isHovered ? 'scale(1.08)' : 'scale(1)',

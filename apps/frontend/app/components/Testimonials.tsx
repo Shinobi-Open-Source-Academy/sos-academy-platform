@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaLinkedin, FaQuoteLeft, FaStar, FaTwitter } from 'react-icons/fa';
 import SectionHeading from './ui/SectionHeading';
 
@@ -98,6 +98,7 @@ const TestimonialCard = ({
             src={image}
             alt={author}
             fill
+            loading="lazy"
             className="object-cover"
             style={{
               transform: isHovered ? 'scale(1.08)' : 'scale(1)',
@@ -172,7 +173,7 @@ export default function Testimonials() {
     };
   }, []);
 
-  const testimonials: TestimonialProps[] = [
+  const testimonials: TestimonialProps[] = useMemo(() => [
     {
       content:
         "Joining Shinobi Academy transformed my career. The structured learning path and supportive community helped me contribute to my first open-source project within weeks. I've grown more in 3 months here than in a year of self-study.",
@@ -247,7 +248,7 @@ export default function Testimonials() {
         twitter: 'https://twitter.com/emmabuilds',
       },
     },
-  ];
+  ], []);
 
   return (
     <section

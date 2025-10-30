@@ -38,45 +38,65 @@ export default function HeroHeading({
     }
 
     let currentIndex = 0;
+    let typingInterval: NodeJS.Timeout | null = null;
+    let restartTimeout1: NodeJS.Timeout | null = null;
+    let restartTimeout2: NodeJS.Timeout | null = null;
+    let restartTypingInterval: NodeJS.Timeout | null = null;
+
     setTypedText(''); // Reset text
 
     // Delay before typing starts
     const initialDelay = setTimeout(() => {
       // Start typing
-      const typingInterval = setInterval(() => {
+      typingInterval = setInterval(() => {
         if (currentIndex < mainText.length) {
           setTypedText(mainText.substring(0, currentIndex + 1));
           currentIndex++;
         } else {
-          clearInterval(typingInterval);
+          if (typingInterval) {
+            clearInterval(typingInterval);
+          }
 
           // Optional: Add blinking cursor effect after typing
           // or restart the animation after a pause
-          setTimeout(() => {
+          restartTimeout1 = setTimeout(() => {
             setTypedText('');
             currentIndex = 0;
 
             // Wait a bit before restarting
-            setTimeout(() => {
-              const restartTyping = setInterval(() => {
+            restartTimeout2 = setTimeout(() => {
+              restartTypingInterval = setInterval(() => {
                 if (currentIndex < mainText.length) {
                   setTypedText(mainText.substring(0, currentIndex + 1));
                   currentIndex++;
                 } else {
-                  clearInterval(restartTyping);
+                  if (restartTypingInterval) {
+                    clearInterval(restartTypingInterval);
+                  }
                 }
               }, typingSpeed);
             }, typingPauseDelay);
           }, typingRestartDelay);
         }
       }, typingSpeed);
-
-      return () => {
-        clearInterval(typingInterval);
-      };
     }, typingStartDelay);
 
-    return () => clearTimeout(initialDelay);
+    // Cleanup all timers
+    return () => {
+      clearTimeout(initialDelay);
+      if (typingInterval) {
+        clearInterval(typingInterval);
+      }
+      if (restartTimeout1) {
+        clearTimeout(restartTimeout1);
+      }
+      if (restartTimeout2) {
+        clearTimeout(restartTimeout2);
+      }
+      if (restartTypingInterval) {
+        clearInterval(restartTypingInterval);
+      }
+    };
   }, [isLoaded, mainText, typingSpeed, typingStartDelay, typingRestartDelay, typingPauseDelay]);
 
   return (
