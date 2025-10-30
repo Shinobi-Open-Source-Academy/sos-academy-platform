@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaLinkedin, FaQuoteLeft, FaStar, FaTwitter } from 'react-icons/fa';
 import SectionHeading from './ui/SectionHeading';
 
@@ -98,6 +98,7 @@ const TestimonialCard = ({
             src={image}
             alt={author}
             fill
+            loading="lazy"
             className="object-cover"
             style={{
               transform: isHovered ? 'scale(1.08)' : 'scale(1)',
@@ -172,82 +173,85 @@ export default function Testimonials() {
     };
   }, []);
 
-  const testimonials: TestimonialProps[] = [
-    {
-      content:
-        "Joining Shinobi Academy transformed my career. The structured learning path and supportive community helped me contribute to my first open-source project within weeks. I've grown more in 3 months here than in a year of self-study.",
-      author: 'Sarah Chen',
-      position: 'Junior Developer',
-      company: 'TechStart',
-      image: '/images/testimonial1.jpg',
-      rating: 5,
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/sarah-chen',
-        twitter: 'https://twitter.com/sarahcodes',
+  const testimonials: TestimonialProps[] = useMemo(
+    () => [
+      {
+        content:
+          "Joining Shinobi Academy transformed my career. The structured learning path and supportive community helped me contribute to my first open-source project within weeks. I've grown more in 3 months here than in a year of self-study.",
+        author: 'Sarah Chen',
+        position: 'Junior Developer',
+        company: 'TechStart',
+        image: '/images/testimonial1.jpg',
+        rating: 5,
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/sarah-chen',
+          twitter: 'https://twitter.com/sarahcodes',
+        },
       },
-    },
-    {
-      content:
-        "As a senior developer, I was looking for ways to give back to the community. Shinobi's mentorship program provided the perfect framework to share my knowledge while keeping me engaged with cutting-edge technologies.",
-      author: 'Michael Rodriguez',
-      position: 'Senior Engineer',
-      company: 'CloudScale',
-      image: '/images/testimonial2.jpg',
-      rating: 5,
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/michaelrodriguez',
+      {
+        content:
+          "As a senior developer, I was looking for ways to give back to the community. Shinobi's mentorship program provided the perfect framework to share my knowledge while keeping me engaged with cutting-edge technologies.",
+        author: 'Michael Rodriguez',
+        position: 'Senior Engineer',
+        company: 'CloudScale',
+        image: '/images/testimonial2.jpg',
+        rating: 5,
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/michaelrodriguez',
+        },
       },
-    },
-    {
-      content:
-        'The hands-on project experience at Shinobi Academy is unmatched. I collaborated with developers across different timezones on real-world projects that actually matter. This practical experience was key to landing my dream job.',
-      author: 'Jordan Taylor',
-      position: 'Full Stack Developer',
-      company: 'InnovateX',
-      image: '/images/testimonial3.jpg',
-      rating: 4,
-      socialLinks: {
-        twitter: 'https://twitter.com/jordantcodes',
+      {
+        content:
+          'The hands-on project experience at Shinobi Academy is unmatched. I collaborated with developers across different timezones on real-world projects that actually matter. This practical experience was key to landing my dream job.',
+        author: 'Jordan Taylor',
+        position: 'Full Stack Developer',
+        company: 'InnovateX',
+        image: '/images/testimonial3.jpg',
+        rating: 4,
+        socialLinks: {
+          twitter: 'https://twitter.com/jordantcodes',
+        },
       },
-    },
-    {
-      content:
-        "Transitioning from a non-tech background was intimidating, but Shinobi's step-by-step guidance and inclusive community made it approachable. The focus on both technical skills and collaboration practices prepared me for the real world.",
-      author: 'Priya Patel',
-      position: 'Backend Developer',
-      company: 'DataFlow',
-      image: '/images/testimonial4.jpg',
-      rating: 5,
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/priyapatel',
-        twitter: 'https://twitter.com/priyacodes',
+      {
+        content:
+          "Transitioning from a non-tech background was intimidating, but Shinobi's step-by-step guidance and inclusive community made it approachable. The focus on both technical skills and collaboration practices prepared me for the real world.",
+        author: 'Priya Patel',
+        position: 'Backend Developer',
+        company: 'DataFlow',
+        image: '/images/testimonial4.jpg',
+        rating: 5,
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/priyapatel',
+          twitter: 'https://twitter.com/priyacodes',
+        },
       },
-    },
-    {
-      content:
-        "I've tried numerous coding platforms, but Shinobi stands out for its emphasis on production-quality code and industry best practices. The code reviews from experienced mentors significantly accelerated my growth as a developer.",
-      author: 'David Kim',
-      position: 'Software Architect',
-      company: 'TechNova',
-      image: '/images/testimonial5.jpg',
-      rating: 5,
-      socialLinks: {
-        linkedin: 'https://linkedin.com/in/davidkim',
+      {
+        content:
+          "I've tried numerous coding platforms, but Shinobi stands out for its emphasis on production-quality code and industry best practices. The code reviews from experienced mentors significantly accelerated my growth as a developer.",
+        author: 'David Kim',
+        position: 'Software Architect',
+        company: 'TechNova',
+        image: '/images/testimonial5.jpg',
+        rating: 5,
+        socialLinks: {
+          linkedin: 'https://linkedin.com/in/davidkim',
+        },
       },
-    },
-    {
-      content:
-        "The weekly calls and pair programming sessions at Shinobi created accountability and kept me motivated. The community's focus on quality over quantity helped me develop a professional mindset that employers value.",
-      author: 'Emma Wilson',
-      position: 'DevOps Engineer',
-      company: 'InfraStack',
-      image: '/images/testimonial6.jpg',
-      rating: 4,
-      socialLinks: {
-        twitter: 'https://twitter.com/emmabuilds',
+      {
+        content:
+          "The weekly calls and pair programming sessions at Shinobi created accountability and kept me motivated. The community's focus on quality over quantity helped me develop a professional mindset that employers value.",
+        author: 'Emma Wilson',
+        position: 'DevOps Engineer',
+        company: 'InfraStack',
+        image: '/images/testimonial6.jpg',
+        rating: 4,
+        socialLinks: {
+          twitter: 'https://twitter.com/emmabuilds',
+        },
       },
-    },
-  ];
+    ],
+    []
+  );
 
   return (
     <section

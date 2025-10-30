@@ -221,6 +221,7 @@ export default function CodeBackground() {
   const [snippets, setSnippets] = useState<CodeSnippet[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Short delay to allow page transition
@@ -266,13 +267,25 @@ export default function CodeBackground() {
     // Generate initial snippets
     generateSnippets();
 
-    // Handle resize
+    // Debounced resize handler - waits 250ms after last resize to regenerate
     const handleResize = () => {
-      generateSnippets();
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+
+      resizeTimeoutRef.current = setTimeout(() => {
+        generateSnippets();
+      }, 250);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
   }, []);
 
   return (
