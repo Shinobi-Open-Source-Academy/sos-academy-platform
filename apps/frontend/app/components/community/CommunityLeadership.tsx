@@ -93,7 +93,13 @@ function KageCard({ kage }: KageProps) {
   return (
     <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
       <div className="relative h-32 w-32 md:h-40 md:w-40 flex-shrink-0">
-        <Image src={kage.image} alt={kage.name} fill loading="lazy" className="object-cover rounded-lg" />
+        <Image
+          src={kage.image}
+          alt={kage.name}
+          fill
+          loading="lazy"
+          className="object-cover rounded-lg"
+        />
         <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm font-bold text-white">
           K
         </div>
@@ -160,7 +166,13 @@ function MentorCard({ mentor }: MentorProps) {
   return (
     <div className="flex gap-4 items-center">
       <div className="relative h-16 w-16 flex-shrink-0">
-        <Image src={mentor.image} alt={mentor.name} fill loading="lazy" className="object-cover rounded-full" />
+        <Image
+          src={mentor.image}
+          alt={mentor.name}
+          fill
+          loading="lazy"
+          className="object-cover rounded-full"
+        />
       </div>
       <div className="flex-1">
         <h4 className="text-lg font-bold text-white">{mentor.name}</h4>

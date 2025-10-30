@@ -119,7 +119,13 @@ function MemberCard({ member }: { member: CommunityMember }) {
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-4 hover:border-gray-600 transition-all duration-300 group">
       <div className="flex items-center gap-3">
         <div className="relative h-14 w-14 flex-shrink-0">
-          <Image src={member.avatar} alt={member.name} fill loading="lazy" className="object-cover rounded-full" />
+          <Image
+            src={member.avatar}
+            alt={member.name}
+            fill
+            loading="lazy"
+            className="object-cover rounded-full"
+          />
           <div
             className={`absolute -top-1 -right-1 w-5 h-5 ${levelColor} rounded-full flex items-center justify-center text-[10px] font-bold text-white`}
             title={`${levelLabel} rank`}

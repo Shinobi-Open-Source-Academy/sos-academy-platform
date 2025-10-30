@@ -91,14 +91,17 @@ export default function Navbar() {
     }
   }, []);
 
-  const links = useMemo(() => [
-    { href: '/#about', label: 'About' },
-    { href: '/#communities', label: 'Communities' },
-    { href: '/#projects', label: 'Projects' },
-    { href: '/#mentors', label: 'Mentors' },
-    { href: '/documentation', label: 'Docs' },
-    { href: '/blog', label: 'Blog' },
-  ], []);
+  const links = useMemo(
+    () => [
+      { href: '/#about', label: 'About' },
+      { href: '/#communities', label: 'Communities' },
+      { href: '/#projects', label: 'Projects' },
+      { href: '/#mentors', label: 'Mentors' },
+      { href: '/documentation', label: 'Docs' },
+      { href: '/blog', label: 'Blog' },
+    ],
+    []
+  );
 
   return (
     <header

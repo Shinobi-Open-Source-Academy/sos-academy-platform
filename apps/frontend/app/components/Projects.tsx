@@ -161,56 +161,59 @@ export default function Projects() {
     };
   }, []);
 
-  const projects: ProjectProps[] = useMemo(() => [
-    {
-      title: 'Rust Logger',
-      description:
-        'A lightweight, configurable logging library for Rust applications with multiple output formats and log level filtering.',
-      image: '/images/project1.jpg',
-      tags: ['Rust', 'CLI', 'Logging', 'Beginner-Friendly'],
-      url: 'https://github.com/example/rust-logger',
-    },
-    {
-      title: 'GoMicro',
-      description:
-        'A microservices framework in Go that simplifies service discovery, communication, and deployment for distributed systems.',
-      image: '/images/project2.jpg',
-      tags: ['Go', 'Microservices', 'Docker', 'Intermediate'],
-      url: 'https://github.com/example/gomicro',
-    },
-    {
-      title: 'TypeStruct',
-      description:
-        'TypeScript utility library providing strongly-typed data structures with comprehensive validation and transformation capabilities.',
-      image: '/images/project3.jpg',
-      tags: ['TypeScript', 'Data Structures', 'Validation', 'Advanced'],
-      url: 'https://github.com/example/typestruct',
-    },
-    {
-      title: 'Community Dashboard',
-      description:
-        'An open-source dashboard for tracking contributions, maintaining project health, and recognizing community members.',
-      image: '/images/project4.jpg',
-      tags: ['React', 'Node.js', 'GitHub API', 'Intermediate'],
-      url: 'https://github.com/example/community-dashboard',
-    },
-    {
-      title: 'Learning Path Generator',
-      description:
-        'Tool that creates personalized learning paths for developers based on their experience level and learning goals.',
-      image: '/images/project5.jpg',
-      tags: ['JavaScript', 'Machine Learning', 'Education', 'Beginner-Friendly'],
-      url: 'https://github.com/example/learning-path-generator',
-    },
-    {
-      title: 'Contribution Matcher',
-      description:
-        'Matches developers with open-source projects based on their skills, interests, and project requirements.',
-      image: '/images/project6.jpg',
-      tags: ['Python', 'Django', 'Recommendation System', 'Advanced'],
-      url: 'https://github.com/example/contribution-matcher',
-    },
-  ], []);
+  const projects: ProjectProps[] = useMemo(
+    () => [
+      {
+        title: 'Rust Logger',
+        description:
+          'A lightweight, configurable logging library for Rust applications with multiple output formats and log level filtering.',
+        image: '/images/project1.jpg',
+        tags: ['Rust', 'CLI', 'Logging', 'Beginner-Friendly'],
+        url: 'https://github.com/example/rust-logger',
+      },
+      {
+        title: 'GoMicro',
+        description:
+          'A microservices framework in Go that simplifies service discovery, communication, and deployment for distributed systems.',
+        image: '/images/project2.jpg',
+        tags: ['Go', 'Microservices', 'Docker', 'Intermediate'],
+        url: 'https://github.com/example/gomicro',
+      },
+      {
+        title: 'TypeStruct',
+        description:
+          'TypeScript utility library providing strongly-typed data structures with comprehensive validation and transformation capabilities.',
+        image: '/images/project3.jpg',
+        tags: ['TypeScript', 'Data Structures', 'Validation', 'Advanced'],
+        url: 'https://github.com/example/typestruct',
+      },
+      {
+        title: 'Community Dashboard',
+        description:
+          'An open-source dashboard for tracking contributions, maintaining project health, and recognizing community members.',
+        image: '/images/project4.jpg',
+        tags: ['React', 'Node.js', 'GitHub API', 'Intermediate'],
+        url: 'https://github.com/example/community-dashboard',
+      },
+      {
+        title: 'Learning Path Generator',
+        description:
+          'Tool that creates personalized learning paths for developers based on their experience level and learning goals.',
+        image: '/images/project5.jpg',
+        tags: ['JavaScript', 'Machine Learning', 'Education', 'Beginner-Friendly'],
+        url: 'https://github.com/example/learning-path-generator',
+      },
+      {
+        title: 'Contribution Matcher',
+        description:
+          'Matches developers with open-source projects based on their skills, interests, and project requirements.',
+        image: '/images/project6.jpg',
+        tags: ['Python', 'Django', 'Recommendation System', 'Advanced'],
+        url: 'https://github.com/example/contribution-matcher',
+      },
+    ],
+    []
+  );
 
   return (
     <section
