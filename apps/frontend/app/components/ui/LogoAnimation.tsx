@@ -36,17 +36,17 @@ export default function LogoAnimation({
       }}
     >
       {/* Pulsing light behind the logo */}
-      <div className="absolute -z-10 w-72 h-72 bg-[#304FFE]/20 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
+      <div className="absolute -z-10 w-72 h-72 bg-[#304FFE]/20 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
 
       {/* Multiple glowing circles */}
-      <div className="absolute -z-10 w-56 h-56 border-2 border-[#304FFE]/40 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow"></div>
+      <div className="absolute -z-10 w-56 h-56 border-2 border-[#304FFE]/40 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow" />
       <div
         className="absolute -z-10 w-64 h-64 border border-[#304FFE]/20 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow"
         style={{
           animationDirection: 'reverse',
           animationDuration: '25s',
         }}
-      ></div>
+      />
 
       <Image
         src={src}

@@ -75,7 +75,7 @@ export class CalendarService {
 
     // Format dates for Google Calendar (YYYYMMDDTHHmmssZ)
     const formatGoogleDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      return `${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`;
     };
 
     const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.location || event.meetingLink || '')}`;

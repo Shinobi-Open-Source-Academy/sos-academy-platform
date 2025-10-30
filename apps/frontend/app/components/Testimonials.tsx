@@ -71,7 +71,7 @@ const TestimonialCard = ({
         boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.08)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -z-0"></div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -z-0" />
       <FaQuoteLeft className="text-primary/20 text-5xl absolute top-6 left-6 z-0" />
       <div className="flex items-center mb-5 relative z-10">
         {[...Array(5)].map((_, i) => (
@@ -113,7 +113,7 @@ const TestimonialCard = ({
             {author}
             <div
               className={`ml-2 h-1 w-0 bg-primary rounded-full transition-all duration-300 ${isHovered ? 'w-12' : ''}`}
-            ></div>
+            />
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {position} at {company}
@@ -264,14 +264,14 @@ export default function Testimonials() {
               opacity: isVisible ? 0.7 : 0,
               transition: 'opacity 1.5s ease-out',
             }}
-          ></div>
+          />
           <div
             className="absolute -top-20 right-1/4 transform -translate-x-1/2 w-80 h-80 rounded-full bg-blue-500/5 blur-3xl opacity-60 -z-10"
             style={{
               opacity: isVisible ? 0.6 : 0,
               transition: 'opacity 1.5s ease-out 0.3s',
             }}
-          ></div>
+          />
         </div>
 
         <SectionHeading
@@ -295,7 +295,7 @@ export default function Testimonials() {
           }}
         >
           <div className="w-full max-w-2xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg" />
             <p className="text-gray-600 dark:text-gray-400 mb-6 font-medium">
               Ready to share your own success story with our community?
             </p>

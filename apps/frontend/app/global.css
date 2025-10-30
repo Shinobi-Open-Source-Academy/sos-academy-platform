@@ -3,7 +3,7 @@ html {
   font-family:
     var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
-    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji;
   line-height: 1.5;
   tab-size: 4;
   scroll-behavior: smooth;
@@ -211,15 +211,11 @@ pre {
   color: rgba(255, 255, 255, 1);
   background-color: hsla(162, 47%, 50%, 1);
 }
-.list-item-link:hover > span {
-}
 .list-item-link:hover > span > span {
   color: rgba(243, 244, 246, 1);
 }
 .list-item-link:hover svg:last-child {
   transform: translateX(0.25rem);
-}
-#other-links {
 }
 .button-pill {
   padding: 1.5rem 2rem;

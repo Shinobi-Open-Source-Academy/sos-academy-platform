@@ -24,16 +24,24 @@ RUN corepack enable pnpm && pnpm nx build frontend --prod
 FROM base AS runner
 WORKDIR /app
 
+# Set production environment
 ENV NODE_ENV=production
+# Disable Next.js telemetry for performance
+ENV NEXT_TELEMETRY_DISABLED=1
+# Optimize Node.js memory usage (256MB limit - adjust based on your Render plan)
+ENV NODE_OPTIONS="--max-old-space-size=256"
 
-# Create a non-root user
+# Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the built application
+# Copy the standalone build (minimal footprint)
 COPY --from=builder /app/apps/frontend/.next/standalone ./
 COPY --from=builder /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
+
+# Set proper ownership
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
@@ -42,5 +50,9 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application
+# Health check for better container management
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 1
+
+# Start the application with optimized Node.js settings
 CMD ["node", "apps/frontend/server.js"]

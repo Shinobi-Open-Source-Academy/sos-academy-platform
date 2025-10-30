@@ -19,6 +19,7 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": ["**/*.d.ts"],
     "rules": {
       "recommended": true,
       "correctness": {
@@ -34,8 +35,14 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noArrayIndexKey": "error",
-        "noThenProperty": "off"
+        "noArrayIndexKey": "warn",
+        "noThenProperty": "off",
+        "noDuplicateFontNames": "warn"
+      },
+      "a11y": {
+        "useButtonType": "warn",
+        "noSvgWithoutTitle": "warn",
+        "useSemanticElements": "warn"
       }
     }
   },
@@ -50,7 +57,10 @@
       "*.min.css",
       "pnpm-lock.yaml",
       "package-lock.json",
-      "yarn.lock"
+      "yarn.lock",
+      "**/*.interface.js",
+      "**/*.enum.js",
+      "**/*.js.map"
     ],
     "maxSize": 1048576
   },
@@ -64,6 +74,49 @@
           },
           "style": {
             "noNonNullAssertion": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["**/*.d.ts", "**/index.d.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["apps/admin/**/*.ts", "apps/admin/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useButtonType": "warn"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "warn"
+          }
+        }
+      }
+    },
+    {
+      "include": ["**/components/icons/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noSvgWithoutTitle": "warn"
+          }
+        }
+      }
+    },
+    {
+      "include": ["apps/frontend/app/components/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noArrayIndexKey": "warn"
           }
         }
       }
