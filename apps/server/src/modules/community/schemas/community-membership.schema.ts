@@ -14,7 +14,7 @@ export enum CommunityRole {
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      delete ret.__v;
+      ret.__v = undefined;
       return ret;
     },
   },

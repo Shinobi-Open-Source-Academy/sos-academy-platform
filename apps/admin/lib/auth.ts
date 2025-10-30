@@ -13,7 +13,9 @@ export const setAuthenticated = (value: boolean) => {
 };
 
 export const isAuthenticated = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    return false;
+  }
   return localStorage.getItem(AUTH_KEY) === 'true';
 };
 

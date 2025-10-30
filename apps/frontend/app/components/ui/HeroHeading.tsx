@@ -33,7 +33,9 @@ export default function HeroHeading({
 
   // Typing effect for main text
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded) {
+      return;
+    }
 
     let currentIndex = 0;
     setTypedText(''); // Reset text
@@ -88,11 +90,11 @@ export default function HeroHeading({
           className={`${
             typedText.length < mainText.length ? 'inline-block' : 'hidden'
           } w-0.5 h-[80%] bg-[#5E72E4] ml-[1px] absolute right-0 top-[10%] animate-blink`}
-        ></span>
+        />
       </span>{' '}
       <span className="whitespace-normal sm:whitespace-nowrap relative inline-block">
         {secondaryText}
-        <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
+        <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100" />
       </span>
     </h1>
   );

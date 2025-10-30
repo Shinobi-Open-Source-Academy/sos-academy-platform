@@ -31,7 +31,9 @@ export default function CompanyMarquee({
 
   // Calculate container width for animation
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) {
+      return;
+    }
 
     const updateWidth = () => {
       if (containerRef.current) {
@@ -44,7 +46,7 @@ export default function CompanyMarquee({
     window.addEventListener('resize', updateWidth);
 
     return () => window.removeEventListener('resize', updateWidth);
-  }, [duplicatedCompanies]);
+  }, []);
 
   return (
     <div

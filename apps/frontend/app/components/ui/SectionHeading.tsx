@@ -53,7 +53,7 @@ export default function SectionHeading({
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'scaleX(1)' : 'scaleX(0.3)',
-            transition: `opacity 0.5s ease-out, transform 0.5s ease-out`,
+            transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
           }}
         />
       </div>
@@ -63,7 +63,7 @@ export default function SectionHeading({
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-          transition: `opacity 0.8s ease-out, transform 0.8s ease-out`,
+          transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
         }}
       >
         {title1}

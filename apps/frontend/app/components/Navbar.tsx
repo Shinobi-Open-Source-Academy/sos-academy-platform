@@ -107,7 +107,7 @@ export default function Navbar() {
               className="drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]"
               style={{ width: 'auto', height: 'auto' }}
             />
-            <div className="absolute -inset-1 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute -inset-1 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
           <span className="text-xl font-bold text-white tracking-tight">SOS Academy</span>
         </Link>

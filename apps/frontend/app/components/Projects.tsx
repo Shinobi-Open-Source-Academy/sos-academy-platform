@@ -90,7 +90,7 @@ const ProjectCard = ({
             className={`ml-2 h-1 w-0 bg-primary rounded-full transition-all duration-300 ${
               isHovered ? 'w-12' : ''
             }`}
-          ></div>
+          />
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -128,7 +128,7 @@ const ProjectCard = ({
               strokeLinejoin="round"
               strokeWidth="2"
               d="M14 5l7 7m0 0l-7 7m7-7H3"
-            ></path>
+            />
           </svg>
         </a>
       </div>
@@ -226,7 +226,7 @@ export default function Projects() {
               opacity: isVisible ? 0.7 : 0,
               transition: 'opacity 1.5s ease-out',
             }}
-          ></div>
+          />
         </div>
 
         <SectionHeading
@@ -250,7 +250,7 @@ export default function Projects() {
           }}
         >
           <div className="w-full max-w-2xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg" />
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               Ready to contribute? Join our community to work on these and other exciting
               open-source projects. We help match you with projects that align with your skills and

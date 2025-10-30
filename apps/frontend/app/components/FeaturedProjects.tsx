@@ -112,7 +112,7 @@ const FeaturedProjectCard = ({
             className={`ml-2 h-1 w-0 bg-primary rounded-full transition-all duration-300 ${
               isHovered ? 'w-12' : ''
             }`}
-          ></div>
+          />
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{description}</p>
 
@@ -125,7 +125,7 @@ const FeaturedProjectCard = ({
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
             <span className="font-semibold">{githubStars}</span>
           </div>
@@ -136,7 +136,7 @@ const FeaturedProjectCard = ({
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
             </svg>
             <span className="font-semibold">{contributors}</span>
           </div>
@@ -182,7 +182,7 @@ const FeaturedProjectCard = ({
               strokeLinejoin="round"
               strokeWidth="2"
               d="M14 5l7 7m0 0l-7 7m7-7H3"
-            ></path>
+            />
           </svg>
         </a>
       </div>
@@ -229,7 +229,7 @@ export default function FeaturedProjects() {
               opacity: isVisible ? 0.7 : 0,
               transition: 'opacity 1.5s ease-out',
             }}
-          ></div>
+          />
         </div>
 
         <SectionHeading
@@ -253,18 +253,21 @@ export default function FeaturedProjects() {
           }}
         >
           <div className="w-full max-w-2xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80 rounded-t-lg" />
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               Join our community to work on these and other exciting open-source projects.
               We&apos;ll help you connect with maintainers, understand project requirements, and
               make your first contributions.
             </p>
             <button
-              onClick={() => (window.location.href = '/documentation')}
+              type="button"
+              onClick={() => {
+                window.location.href = '/documentation';
+              }}
               className="relative overflow-hidden px-6 py-3 rounded-lg font-medium text-white bg-primary transition-all duration-300 ease-in-out transform group hover:scale-105 hover:shadow-xl cursor-pointer"
             >
               <span className="relative z-10">Get Started</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out blur-sm z-0" />
             </button>
           </div>
         </div>

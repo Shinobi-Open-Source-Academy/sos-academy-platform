@@ -230,7 +230,9 @@ export default function CodeBackground() {
 
   useEffect(() => {
     const generateSnippets = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current) {
+        return;
+      }
 
       const container = containerRef.current;
       const containerWidth = container.clientWidth;

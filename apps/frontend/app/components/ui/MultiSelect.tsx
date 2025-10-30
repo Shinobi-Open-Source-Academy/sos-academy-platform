@@ -60,7 +60,10 @@ export default function MultiSelect({
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        htmlFor="multi-select-input"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -68,12 +71,21 @@ export default function MultiSelect({
       <div className="relative" ref={dropdownRef}>
         {/* Selected items display */}
         <div
+          id="multi-select-input"
+          role="button"
+          tabIndex={0}
           className={`min-h-[44px] w-full px-3 py-2 border rounded-lg cursor-pointer transition-colors ${
             error
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
               : 'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
           } focus:outline-none focus:ring-2 bg-white dark:bg-gray-800`}
           onClick={() => setIsOpen(!isOpen)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsOpen(!isOpen);
+            }
+          }}
         >
           {selectedOptions.length > 0 ? (
             <div className="flex flex-wrap gap-1">
@@ -123,10 +135,18 @@ export default function MultiSelect({
                 filteredOptions.map((option) => (
                   <div
                     key={option.id}
+                    role="button"
+                    tabIndex={0}
                     className={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                       selectedValues.includes(option.id) ? 'bg-primary/5' : ''
                     }`}
                     onClick={() => handleToggle(option.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggle(option.id);
+                      }
+                    }}
                   >
                     <div className={`w-3 h-3 rounded-full ${option.color}`} />
                     <div className="flex-1">

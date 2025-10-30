@@ -9,7 +9,7 @@ export type CalendarEventDocument = CalendarEvent & Document;
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      delete ret.__v;
+      ret.__v = undefined;
       return ret;
     },
   },

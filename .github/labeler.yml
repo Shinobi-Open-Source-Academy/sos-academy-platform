@@ -1,68 +1,88 @@
 # Automatically label PRs based on changed files
+# Format for actions/labeler@v5
 
 # Frontend related changes
 'area: frontend':
-  - 'apps/frontend/**/*'
+  - changed-files:
+    - any-glob-to-any-file: 'apps/frontend/**/*'
 
 # Backend related changes
 'area: backend':
-  - 'apps/server/**/*'
+  - changed-files:
+    - any-glob-to-any-file: 'apps/server/**/*'
 
 # Documentation changes
 'documentation':
-  - '**/*.md'
-  - 'docs/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
 
 # Configuration changes
 'config':
-  - '**/*.json'
-  - '**/*.yml'
-  - '**/*.yaml'
-  - '**/*.config.js'
-  - '**/*.config.ts'
-  - '.github/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.json'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.config.js'
+      - '**/*.config.ts'
+      - '.github/**/*'
 
 # Testing changes
 'testing':
-  - '**/*.spec.ts'
-  - '**/*.spec.tsx'
-  - '**/*.test.ts'
-  - '**/*.test.tsx'
-  - '**/specs/**/*'
-  - 'jest.config.*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.spec.ts'
+      - '**/*.spec.tsx'
+      - '**/*.test.ts'
+      - '**/*.test.tsx'
+      - '**/specs/**/*'
+      - 'jest.config.*'
 
 # Dependencies
 'dependencies':
-  - 'package.json'
-  - 'pnpm-lock.yaml'
-  - '**/package.json'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '**/package.json'
 
 # DevOps and Infrastructure
 'devops':
-  - 'docker-compose.yml'
-  - '**/Dockerfile'
-  - '.github/workflows/**/*'
-  - '.dockerignore'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docker-compose.yml'
+      - '**/Dockerfile'
+      - '.github/workflows/**/*'
+      - '.dockerignore'
 
 # Database and Seeders
 'database':
-  - '**/seeders/**/*'
-  - '**/seed*.ts'
-  - '**/seed*.js'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/seeders/**/*'
+      - '**/seed*.ts'
+      - '**/seed*.js'
 
 # UI/Styling
 'ui/ux':
-  - '**/*.css'
-  - '**/*.scss'
-  - '**/tailwind.config.*'
-  - '**/postcss.config.*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.css'
+      - '**/*.scss'
+      - '**/tailwind.config.*'
+      - '**/postcss.config.*'
 
 # TypeScript/Types
 'typescript':
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/tsconfig*.json'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/tsconfig*.json'
 
 # Shared/Library
 'shared':
-  - 'libs/**/*'
+  - changed-files:
+    - any-glob-to-any-file: 'libs/**/*'
