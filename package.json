@@ -63,7 +63,7 @@
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "jest-environment-node": "^29.7.0",
+    "jest-environment-node": "^30.2.0",
     "lint-staged": "^15.2.10",
     "nx": "21.0.3",
     "postcss": "^8.5.6",
