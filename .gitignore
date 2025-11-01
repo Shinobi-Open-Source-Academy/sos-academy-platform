@@ -5,6 +5,13 @@ dist
 tmp
 out-tsc
 
+# compiled library files
+libs/**/*.js
+libs/**/*.js.map
+libs/**/*.d.ts
+!libs/**/*.test.js
+!libs/**/*.spec.js
+
 # dependencies
 node_modules
 

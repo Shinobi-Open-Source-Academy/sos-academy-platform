@@ -112,16 +112,6 @@
       }
     },
     {
-      "include": ["apps/frontend/app/components/**/*.tsx"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noArrayIndexKey": "warn"
-          }
-        }
-      }
-    },
-    {
       "include": [".github/workflows/**/*.yml", ".github/workflows/**/*.yaml"],
       "formatter": {
         "enabled": false

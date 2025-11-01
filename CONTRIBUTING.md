@@ -239,12 +239,12 @@ pnpm check:fix
 
 ```
 apps/
-├── frontend/          # Next.js application
+├── admin/            # Admin Panel (Next.js)
 │   ├── app/          # App router pages
 │   ├── components/   # React components
 │   ├── lib/          # Utilities and hooks
 │   └── public/       # Static assets
-└── server/           # NestJS application
+└── server/           # NestJS Backend
     ├── src/
     │   ├── modules/  # Feature modules
     │   ├── common/   # Shared utilities
@@ -347,9 +347,10 @@ pnpm install
 cp .env.example .env
 
 # Development
-pnpm start              # Start both backend and frontend
-pnpm start:backend      # Backend only
-pnpm start:frontend     # Frontend only
+pnpm dev                # Start backend server
+pnpm dev:backend        # Backend only
+pnpm dev:admin          # Admin panel only
+pnpm dev:admin:full     # Backend + admin
 
 # Code Quality
 pnpm format            # Format code
@@ -361,7 +362,8 @@ pnpm test              # Run tests
 pnpm test:watch        # Watch mode
 
 # Build
-pnpm build             # Build for production
+pnpm build             # Build backend
+pnpm build:all         # Build backend + admin
 ```
 
 ---

@@ -19,12 +19,7 @@
       {
         "name": "next"
       }
-    ],
-    "types": ["jest", "node"],
-    "paths": {
-      "@/*": ["./*"]
-    },
-    "baseUrl": "."
+    ]
   },
   "include": [
     "**/*.js",
