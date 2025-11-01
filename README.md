@@ -53,10 +53,11 @@ pnpm setup:admin-env && pnpm dev:admin
 
 ## 🏗️ Architecture
 
-- **Frontend**: Next.js 15 + React 19 + TypeScript + Tailwind CSS
+- **Frontend**: Coming Soon (Next.js 15 + React 19 + TypeScript + Tailwind CSS)
 - **Backend**: NestJS + MongoDB + Mongoose
 - **Email**: SendGrid integration with Handlebars templates
 - **Monorepo**: Nx workspace for efficient development
+- **Admin Panel**: Next.js-based admin dashboard for platform management
 
 ## 🚀 Quick Start
 
@@ -139,15 +140,6 @@ NEXT_PUBLIC_API_URL=http://localhost:4200/api
 BASE_SERVER_URL=http://localhost:4200
 ```
 
-#### Frontend Configuration
-
-Create `apps/frontend/.env.local`:
-
-```env
-# API URL for backend communication
-NEXT_PUBLIC_API_URL=http://localhost:4200/api
-```
-
 ### Development
 
 #### Quick Start (Recommended)
@@ -159,80 +151,52 @@ pnpm install
 # Start MongoDB (if running locally)
 mongod
 
-# Start both backend and frontend at once
+# Start backend server
 pnpm start
 ```
 
-This will start both services in parallel:
+This will start the backend:
 - Backend: http://localhost:4200
-- Frontend: http://localhost:3000
+- API Documentation: http://localhost:4200/api/docs
 
-#### Individual Services
+#### Admin Panel
 
 ```sh
-# Start backend only
-pnpm start:backend
+# Setup admin environment
+pnpm setup:admin-env
 
-# Start frontend only
-pnpm start:frontend
+# Start admin panel (separate terminal)
+pnpm dev:admin
 ```
+
+Admin panel will be available at:
+- Admin: http://localhost:3001
 
 **Note**: The backend automatically checks and seeds the database on startup if it's empty. You can also manually seed using:
 ```sh
 npx nx run server:seed
 ```
 
-#### Option 2: Docker (Recommended for Production)
-
-**Prerequisites for Docker:**
-- Docker and Docker Compose installed
-- `.env` file with required variables (especially `SENDGRID_API_KEY`, `JWT_SECRET`, `MONGODB_URI`)
-
-```sh
-# Copy environment template
-cp .env.example .env
-
-# Edit .env with your actual values
-# IMPORTANT: Update MONGODB_URI to use Docker service name
-# MONGODB_URI=mongodb://mongodb:27017/sos-academy
-nano .env
-
-# Build and start all services
-docker-compose up --build
-
-# Or run in detached mode
-docker-compose up --build -d
-
-# View logs
-docker-compose logs -f
-```
-
-**Important Docker Configuration:**
-- The `MONGODB_URI` should use the Docker service name: `mongodb://mongodb:27017/sos-academy`
-- Frontend will be accessible at: http://localhost:3000
-- Backend API at: http://localhost:4200
-- API Documentation at: http://localhost:4200/api/docs
-- MongoDB will persist data in a Docker volume
-- **Database auto-seeds on first startup** - no manual seeding required!
-
-The application will be available at:
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4200
-- API Documentation: http://localhost:4200/api/docs
-
 ### Available Scripts
 
 ```sh
 # Development
-pnpm start              # Start both backend and frontend
-pnpm start:backend      # Start backend only
-pnpm start:frontend     # Start frontend only
+pnpm dev                # Start backend server
+pnpm dev:backend        # Start backend only
+pnpm dev:admin          # Start admin panel
+pnpm dev:admin:full     # Start backend + admin
 
 # Build
-pnpm build              # Build both projects
+pnpm build              # Build backend
 pnpm build:backend      # Build backend only
-pnpm build:frontend     # Build frontend only
+pnpm build:admin        # Build admin panel
+pnpm build:all          # Build backend + admin
+
+# Start Production
+pnpm start              # Start backend server
+pnpm start:backend      # Start backend only
+pnpm start:admin        # Start admin panel
+pnpm start:all          # Start backend + admin
 
 # Code Quality
 pnpm format             # Format all code
@@ -261,56 +225,21 @@ APP_URL=https://api.yourdomain.com
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/sos-academy
 SENDGRID_API_KEY=your_production_sendgrid_key
 JWT_SECRET=your_secure_production_secret
-CORS_ORIGIN=https://yourdomain.com
+CORS_ORIGIN=https://yourdomain.com,https://admin.yourdomain.com
 ```
 
-**Frontend:**
+**Admin Panel:**
 ```env
+NODE_ENV=production
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api
 ```
 
 **Important Notes:**
-- `HOST=0.0.0.0` allows the server to accept connections from any IP (required in containerized/cloud environments)
+- `HOST=0.0.0.0` allows the server to accept connections from any IP (required in cloud environments)
 - `APP_URL` should be your public-facing URL (used in logs and responses)
 - If `APP_URL` is not set, the system will auto-detect using `HOST` and `PORT`
 - Always use HTTPS URLs in production for security
-
-### Docker Commands
-
-```sh
-# Start services
-docker-compose up
-
-# Start in detached mode
-docker-compose up -d
-
-# Stop services
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Rebuild services
-docker-compose up --build
-
-# Seed database (after services are running)
-docker-compose exec backend node seed-docker.js seed
-
-# Clear database
-docker-compose exec backend node seed-docker.js clear
-
-# Reset database (clear + seed)
-docker-compose exec backend node seed-docker.js reset
-
-# Check seeding status
-docker-compose exec backend node seed-docker.js status
-
-# Access backend shell
-docker-compose exec backend sh
-
-# Access MongoDB shell
-docker-compose exec mongodb mongosh sos-academy
-```
+- Add both frontend and admin domains to `CORS_ORIGIN` (comma-separated)
 
 ### Code Formatting
 
@@ -489,7 +418,7 @@ Application starts but no seeding logs appear
 curl http://localhost:4200/api/seeder/status
 
 # Or check MongoDB directly
-docker-compose exec mongodb mongosh sos-academy --eval "db.communities.countDocuments()"
+mongosh sos-academy --eval "db.communities.countDocuments()"
 ```
 
 **Problem**: Seeding fails with MongoDB connection error
@@ -497,8 +426,9 @@ docker-compose exec mongodb mongosh sos-academy --eval "db.communities.countDocu
 Auto-seeding failed: MongooseServerSelectionError
 ```
 **Solution**: Ensure MongoDB is running and the connection string is correct:
-- Local: `MONGODB_URI=mongodb://localhost:27017/sos-academy`
-- Docker: `MONGODB_URI=mongodb://mongodb:27017/sos-academy`
+```env
+MONGODB_URI=mongodb://localhost:27017/sos-academy
+```
 
 **Problem**: Want to re-seed the database
 ```
@@ -506,36 +436,34 @@ Database is already seeded, but I want fresh data
 ```
 **Solution**: Clear and re-seed:
 ```sh
-# Local
 npx nx run server:seed:reset
-
-# Docker
-docker-compose exec backend node seed-docker.js reset
 ```
 
-### Docker Issues
+### Common Issues
 
 **Problem**: Backend can't connect to MongoDB
 ```
 MongooseError: The `uri` parameter to `openUri()` must be a string
 ```
 **Solution**: Make sure your `.env` file has the correct `MONGODB_URI`:
-- For Docker: `MONGODB_URI=mongodb://mongodb:27017/sos-academy`
-- For local: `MONGODB_URI=mongodb://localhost:27017/sos-academy`
+```env
+MONGODB_URI=mongodb://localhost:27017/sos-academy
+```
 
-**Problem**: Email sending fails in Docker
+**Problem**: Email sending fails
 ```
 Error: SENDGRID_API_KEY environment variable is required
 ```
 **Solution**: Add `SENDGRID_API_KEY` to your `.env` file with a valid SendGrid API key.
 
-**Problem**: Frontend shows "Connection refused" errors
+**Problem**: Admin Panel shows "Connection refused" errors
 ```
 Error: connect ECONNREFUSED ::1:4200
 ```
-**Solution**: Make sure the `NEXT_PUBLIC_API_URL` in `.env` points to the correct backend URL:
-- For Docker: `http://localhost:4200/api` (NOT `http://backend:4200/api`)
-- The frontend runs in the browser, so it needs the external URL
+**Solution**: Make sure the `NEXT_PUBLIC_API_URL` in admin's `.env.local` points to the correct backend URL:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4200/api
+```
 
 **Problem**: pnpm-lock.yaml is out of date
 ```
@@ -545,8 +473,6 @@ ERR_PNPM_LOCKFILE_CONFIG_MISMATCH
 ```sh
 pnpm install
 ```
-
-### Local Development Issues
 
 **Problem**: Port already in use
 ```
