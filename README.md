@@ -2,7 +2,7 @@
 
 <div align="center">
 
-🚀 **Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
+**Shinobi Open-Source Academy** - Empowering the Next Generation of Open-Source Warriors
 
 [![CI](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -18,7 +18,7 @@
 
 A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
 
-## 🎯 MVP Features
+## MVP Features
 
 - **User Subscription**: Join communities with email and community selection
 - **Mentor Applications**: Apply to become a mentor with streamlined process
@@ -30,7 +30,7 @@ A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring
 - **API Documentation**: Full Swagger/OpenAPI documentation
 - **Admin Panel**: Full-featured admin dashboard for platform management
 
-## 🔐 Admin Panel
+## Admin Panel
 
 A dedicated admin dashboard for managing the platform:
 
@@ -49,7 +49,7 @@ pnpm setup:admin-env && pnpm dev:admin
 # Login: admin@shinobi-open-source.academy / admin123
 ```
 
-📚 **Full docs:** [apps/admin/README.md](apps/admin/README.md)
+**Full docs:** [apps/admin/README.md](apps/admin/README.md)
 
 ## 🏗️ Architecture
 
@@ -59,7 +59,7 @@ pnpm setup:admin-env && pnpm dev:admin
 - **Monorepo**: Nx workspace for efficient development
 - **Admin Panel**: Next.js-based admin dashboard for platform management
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -600,7 +600,7 @@ See our [Contributors](CONTRIBUTORS.md) to meet the amazing people who have help
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Thanks to all our [contributors](CONTRIBUTORS.md)
 - Built with [Next.js](https://nextjs.org/), [NestJS](https://nestjs.com/), and [MongoDB](https://www.mongodb.com/)

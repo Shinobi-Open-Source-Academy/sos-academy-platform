@@ -5,6 +5,8 @@ export const metadata = {
   description: 'Admin panel for Shinobi Open-Source Academy',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: {
