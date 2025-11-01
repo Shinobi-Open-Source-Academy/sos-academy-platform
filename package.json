@@ -10,7 +10,7 @@
     "dev:frontend": "npx nx dev frontend",
     "dev:admin:full": "concurrently --kill-others-on-fail --prefix-colors \"bgBlue.bold,bgGreen.bold\" \"pnpm:dev:backend\" \"pnpm:dev:admin\"",
     "build:backend": "npx nx build server",
-    "build:admin": "npx nx build admin",
+    "build:admin": "NODE_ENV=production npx nx build admin",
     "build:frontend": "NODE_ENV=production npx nx build frontend",
     "build:shared": "npx nx build shared",
     "build": "npx nx run-many --target=build --all --parallel=3",
