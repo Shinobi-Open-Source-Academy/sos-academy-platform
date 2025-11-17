@@ -1,5 +1,16 @@
+import type { Metadata } from 'next';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description:
+    'Stay updated with the latest insights, tutorials, and stories from the SOS Academy community.',
+  openGraph: {
+    title: 'Blog - SOS Academy',
+    description: 'Latest insights, tutorials, and stories from our community.',
+  },
+};
 
 export default function Blog() {
   return (
