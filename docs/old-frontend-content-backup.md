@@ -177,9 +177,9 @@ This document preserves all content from the old frontend application before mig
 - **Bio:** "Specialist in building and scaling blockchain protocols. Previously led engineering teams at major tech companies."
 - **Expertise:** Rust, Solidity, EVM, Blockchain, Smart Contracts
 - **Social Links:**
-  - GitHub: https://github.com/mayawilliams
-  - LinkedIn: https://linkedin.com/in/mayawilliams
-  - Website: https://davidkatho.com
+  - GitHub: https://github.com/davidkathoh
+  - LinkedIn: https://www.linkedin.com/in/davidkathoh/
+  - Website: https://davidkathoh.com
 
 #### 3. <Missed Ninja />
 - **Role:** A Peaceful Kage

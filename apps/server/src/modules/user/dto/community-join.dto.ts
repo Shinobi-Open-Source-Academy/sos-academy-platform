@@ -12,7 +12,7 @@ export class CommunityJoinDto {
 
   @ApiProperty({
     description: 'User full name (optional)',
-    example: 'John Doe',
+    example: 'Kakule William',
     required: false,
   })
   @IsOptional()
@@ -33,7 +33,7 @@ export class CommunityJoinDto {
 
   @ApiProperty({
     description: 'GitHub username (optional)',
-    example: 'johndoe',
+    example: 'kakulewilliam',
     required: false,
   })
   @IsOptional()
