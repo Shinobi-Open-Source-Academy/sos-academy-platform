@@ -6,7 +6,7 @@ export const SITE_CONFIG = {
   tagline: 'Empowering the Next Generation of Open-Source Warriors',
   description:
     'Learn through practical, collaborative open-source experience. Gain real-world skills and build your portfolio while working on meaningful projects with experienced mentors.',
-  email: 'info@shinobiopensource.academy',
+  email: 'contact@shinobi-open-source.academy',
   urls: {
     github: 'https://github.com/Shinobi-Open-Source-Academy',
     twitter: 'https://x.com/SOSAcademy_',
@@ -28,6 +28,37 @@ export const COMMUNITIES = [
       'The Suna Community is focused on JavaScript and its ecosystem, including modern frameworks like React, Vue, Angular, and Node.js. We work on a variety of web-focused open-source projects, from frontend applications to backend services.',
     meetingDay: 'Tuesday',
     meetingTime: '19:00 UTC',
+    kage: {
+      name: 'Pacifique Linjanja',
+      role: 'Community Kage',
+      image: '/images/mentor3.jpeg',
+      bio: 'Leading the Suna community with expertise in modern JavaScript frameworks and backend development.',
+    },
+    mentors: ['Pacifique Linjanja'],
+    members: 15,
+    projects: [
+      {
+        name: 'Twenty CRM',
+        description: 'Contributing to the open-source CRM platform',
+        url: 'https://github.com/twentyhq/twenty',
+      },
+      {
+        name: 'Cal.com',
+        description: 'Improving scheduling features',
+        url: 'https://github.com/calcom/cal.com',
+      },
+    ],
+    nextMeeting: {
+      date: '2024-11-19',
+      time: '19:00 UTC',
+      topic: 'Building scalable React applications with TypeScript',
+      agenda: [
+        'State management best practices',
+        'TypeScript patterns',
+        'Performance optimization',
+      ],
+    },
+    isActive: true,
   },
   {
     id: 'konoha',
@@ -41,6 +72,37 @@ export const COMMUNITIES = [
       'The Konoha Community is centered around Python and its extensive ecosystem, covering everything from data science and machine learning to web development with frameworks like Django and FastAPI.',
     meetingDay: 'Thursday',
     meetingTime: '18:00 UTC',
+    kage: {
+      name: 'David Katho',
+      role: 'Community Kage',
+      image: '/images/mentor2.jpeg',
+      bio: 'Guiding the Konoha community in Python development and data science excellence.',
+    },
+    mentors: ['David Katho'],
+    members: 12,
+    projects: [
+      {
+        name: 'Data Pipeline Tools',
+        description: 'Building ETL pipelines for data processing',
+        url: '#',
+      },
+      {
+        name: 'ML Training Platform',
+        description: 'Open-source machine learning training infrastructure',
+        url: '#',
+      },
+    ],
+    nextMeeting: {
+      date: '2024-11-21',
+      time: '18:00 UTC',
+      topic: 'Introduction to FastAPI and async Python',
+      agenda: [
+        'Async/await patterns',
+        'Building REST APIs',
+        'Database integration with SQLAlchemy',
+      ],
+    },
+    isActive: true,
   },
   {
     id: 'kiri',
@@ -52,6 +114,7 @@ export const COMMUNITIES = [
       'Build high-performance, concurrent systems and microservices with Go language expertise.',
     meetingDay: 'Wednesday',
     meetingTime: '19:00 UTC',
+    isActive: false,
   },
   {
     id: 'iwa',
@@ -63,6 +126,7 @@ export const COMMUNITIES = [
       'Focus on enterprise-grade applications, Android development, and Java-based open-source projects.',
     meetingDay: 'Friday',
     meetingTime: '18:00 UTC',
+    isActive: false,
   },
   {
     id: 'taki',
@@ -74,6 +138,7 @@ export const COMMUNITIES = [
       'Contribute to elegant, readable codebases and web applications using Ruby and Rails.',
     meetingDay: 'Monday',
     meetingTime: '19:00 UTC',
+    isActive: false,
   },
 ];
 

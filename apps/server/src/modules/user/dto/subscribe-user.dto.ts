@@ -12,7 +12,7 @@ export class SubscribeUserDto {
 
   @ApiProperty({
     description: 'User full name',
-    example: 'John Doe',
+    example: 'Joseph Mukuna',
     required: false,
   })
   @IsOptional()
@@ -32,7 +32,7 @@ export class SubscribeUserDto {
 
   @ApiProperty({
     description: 'GitHub username (optional)',
-    example: 'johndoe',
+    example: 'josephmukuna',
     required: false,
   })
   @IsOptional()

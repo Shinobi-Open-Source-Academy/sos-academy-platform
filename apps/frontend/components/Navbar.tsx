@@ -30,22 +30,25 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
-              <Link
+              <a
                 key={link.name}
-                href={link.href}
+                href={link.href.startsWith('#') ? `/${link.href}` : link.href}
                 className="text-sm text-gray-400 hover:text-white transition-colors"
               >
                 {link.name}
-              </Link>
+              </a>
             ))}
-            <a
-              href={SITE_CONFIG.urls.github}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('openJoinModal'));
+                }
+              }}
               className="px-4 py-2 text-sm bg-white text-black hover:bg-gray-200 transition-colors"
+              type="button"
             >
               Join Academy
-            </a>
+            </button>
           </div>
         </div>
       </div>
