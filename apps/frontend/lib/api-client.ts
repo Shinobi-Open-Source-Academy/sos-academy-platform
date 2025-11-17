@@ -25,7 +25,9 @@ export async function joinCommunity(data: JoinCommunityData) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error('Failed to join community');
+  if (!response.ok) {
+    throw new Error('Failed to join community');
+  }
   return response.json();
 }
 
@@ -35,7 +37,9 @@ export async function applyAsMentor(data: MentorApplicationData) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error('Failed to submit application');
+  if (!response.ok) {
+    throw new Error('Failed to submit application');
+  }
   return response.json();
 }
 
@@ -45,6 +49,8 @@ export async function subscribeNewsletter(data: NewsletterData) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error('Failed to subscribe');
+  if (!response.ok) {
+    throw new Error('Failed to subscribe');
+  }
   return response.json();
 }

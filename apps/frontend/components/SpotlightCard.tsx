@@ -13,7 +13,9 @@ export default function SpotlightCard({ children, className = '' }: SpotlightCar
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current) {
+      return;
+    }
     const rect = cardRef.current.getBoundingClientRect();
     setMousePosition({
       x: e.clientX - rect.left,
