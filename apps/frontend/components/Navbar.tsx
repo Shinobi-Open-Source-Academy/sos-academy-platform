@@ -18,18 +18,13 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-        scrolled ? 'bg-black/80 backdrop-blur-lg border-b border-white/5' : 'bg-transparent'
+        scrolled ? 'bg-black/90 backdrop-blur-lg' : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <img
-              src="/shinobiLogo.png"
-              alt="SOS Academy"
-              className="object-contain"
-              style={{ height: '50px', width: '50px' }}
-            />
+            <img src="/shinobiLogo.png" alt="SOS Academy" className="h-8 w-8 object-contain" />
             <span className="text-base font-semibold text-white">{SITE_CONFIG.name}</span>
           </Link>
 

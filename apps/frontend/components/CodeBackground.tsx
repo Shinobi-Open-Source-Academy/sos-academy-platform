@@ -61,8 +61,8 @@ export default function CodeBackground() {
       ...snippet,
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      speed: 0.2 + Math.random() * 0.3,
-      opacity: 0.1 + Math.random() * 0.15,
+      speed: 0.3 + Math.random() * 0.4,
+      opacity: 0.6 + Math.random() * 0.3,
     }));
 
     let animationId: number;
@@ -74,11 +74,11 @@ export default function CodeBackground() {
         ctx.save();
         ctx.globalAlpha = snippet.opacity;
         ctx.fillStyle = snippet.color;
-        ctx.font = '12px "Fira Code", monospace';
+        ctx.font = '14px "Courier New", monospace';
 
         const lines = snippet.code.split('\n');
         lines.forEach((line, i) => {
-          ctx.fillText(line, snippet.x, snippet.y + i * 16);
+          ctx.fillText(line, snippet.x, snippet.y + i * 18);
         });
 
         ctx.restore();
@@ -101,5 +101,11 @@ export default function CodeBackground() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-40" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0, opacity: 0.6 }}
+    />
+  );
 }

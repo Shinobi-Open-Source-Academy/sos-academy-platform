@@ -1,6 +1,7 @@
 import CodeBackground from '../components/CodeBackground';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
+import SpotlightCard from '../components/SpotlightCard';
 import { COMMUNITIES, COMPANIES, FEATURES, MENTORS, PROJECTS, SITE_CONFIG } from '../lib/data';
 
 export default function Index() {
@@ -16,10 +17,10 @@ export default function Index() {
             OPEN SOURCE ACADEMY
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-            Build and deploy
+            Empowering the Next Generation
             <br />
             <span className="bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent">
-              open-source skills
+              of Open-Source Warriors
             </span>
           </h1>
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -73,13 +74,13 @@ export default function Index() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
             {FEATURES.map((feature) => (
-              <div
+              <SpotlightCard
                 key={feature.title}
                 className="bg-black p-8 border border-white/5 hover:border-white/10 transition-colors"
               >
                 <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -101,7 +102,7 @@ export default function Index() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {COMMUNITIES.map((community) => (
-              <div
+              <SpotlightCard
                 key={community.id}
                 className="border border-white/5 hover:border-white/10 p-6 transition-colors group"
               >
@@ -118,7 +119,7 @@ export default function Index() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{community.name}</h3>
                 <p className="text-sm text-gray-400">{community.description}</p>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
 
@@ -150,32 +151,31 @@ export default function Index() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {PROJECTS.map((project) => (
-              <a
+              <SpotlightCard
                 key={project.id}
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="border border-white/5 hover:border-white/10 p-6 transition-colors group"
               >
-                <h3 className="text-lg font-semibold mb-2 group-hover:text-gray-300">
-                  {project.name}
-                </h3>
-                <p className="text-sm text-gray-400 mb-4">{project.description}</p>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span>{project.stars} stars</span>
-                  <span>{project.contributors} contributors</span>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs px-2 py-1 border border-white/5 text-gray-500"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </a>
+                <a href={project.url} target="_blank" rel="noopener noreferrer" className="block">
+                  <h3 className="text-lg font-semibold mb-2 group-hover:text-gray-300">
+                    {project.name}
+                  </h3>
+                  <p className="text-sm text-gray-400 mb-4">{project.description}</p>
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span>{project.stars} stars</span>
+                    <span>{project.contributors} contributors</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs px-2 py-1 border border-white/5 text-gray-500"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </a>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function Index() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {MENTORS.map((mentor) => (
-              <div
+              <SpotlightCard
                 key={mentor.id}
                 className="border border-white/5 hover:border-white/10 p-6 transition-colors"
               >
@@ -218,7 +218,7 @@ export default function Index() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
 
