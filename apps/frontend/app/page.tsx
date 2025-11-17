@@ -1,5 +1,6 @@
 import CodeBackground from '../components/CodeBackground';
 import Footer from '../components/Footer';
+import HeroGrid from '../components/HeroGrid';
 import Navbar from '../components/Navbar';
 import SpotlightCard from '../components/SpotlightCard';
 import { COMMUNITIES, COMPANIES, FEATURES, MENTORS, PROJECTS, SITE_CONFIG } from '../lib/data';
@@ -12,49 +13,57 @@ export default function Index() {
 
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center space-y-8 pt-16">
-          <div className="inline-block px-3 py-1 text-xs border border-white/10 text-gray-400 mb-4">
-            OPEN SOURCE ACADEMY
-          </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-            Empowering the Next Generation
-            <br />
-            <span className="bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent">
-              of Open-Source Warriors
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            {SITE_CONFIG.description}
-          </p>
-          <div className="flex items-center justify-center gap-4 pt-4">
-            <a
-              href={SITE_CONFIG.urls.discord}
-              className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors text-sm font-medium"
-            >
-              Join Academy
-            </a>
-            <a
-              href="#about"
-              className="px-6 py-3 border border-white/10 hover:border-white/20 transition-colors text-sm font-medium"
-            >
-              Learn More
-            </a>
-          </div>
-
-          {/* Companies */}
-          <div className="pt-16">
-            <p className="text-sm text-gray-500 mb-6">
-              Shipping 15,000+ PRs at forward-thinking companies
+        <HeroGrid>
+          <div className="max-w-4xl mx-auto text-center space-y-8 pt-16">
+            <div className="inline-block px-3 py-1 text-xs border border-white/10 text-gray-400 mb-4">
+              OPEN SOURCE ACADEMY
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+              Empowering the Next Generation
+              <br />
+              <span className="bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent">
+                of Open-Source Warriors
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              {SITE_CONFIG.description}
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-8">
-              {COMPANIES.slice(0, 6).map((company) => (
-                <span key={company.name} className="text-gray-600 text-sm font-medium">
-                  {company.name}
-                </span>
-              ))}
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <a
+                href={SITE_CONFIG.urls.discord}
+                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors text-sm font-medium"
+              >
+                Join Academy
+              </a>
+              <a
+                href="#about"
+                className="px-6 py-3 border border-white/10 hover:border-white/20 transition-colors text-sm font-medium"
+              >
+                Learn More
+              </a>
+            </div>
+
+            {/* Companies */}
+            <div className="pt-16">
+              <p className="text-sm text-gray-500 mb-6">
+                Shipping 15,000+ PRs at forward-thinking companies
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-8">
+                {COMPANIES.slice(0, 6).map((company) => (
+                  <a
+                    key={company.name}
+                    href={company.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-400 text-sm font-medium transition-colors"
+                  >
+                    {company.name}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        </HeroGrid>
       </section>
 
       {/* About Section */}
