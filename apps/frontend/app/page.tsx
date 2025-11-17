@@ -11,6 +11,23 @@ import SpotlightCard from '../components/SpotlightCard';
 import { COMMUNITIES, COMPANIES, FEATURES, MENTORS, PROJECTS, SITE_CONFIG } from '../lib/data';
 
 export default function Index() {
+  // Add JSON-LD structured data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: 'Shinobi Open-Source Academy',
+    alternateName: 'SOS Academy',
+    url: 'https://shinobiopensource.academy',
+    logo: 'https://shinobiopensource.academy/shinobiLogo.png',
+    description: 'Learn through practical, collaborative open-source experience.',
+    email: 'info@shinobiopensource.academy',
+    sameAs: [
+      'https://github.com/Shinobi-Open-Source-Academy',
+      'https://x.com/SOSAcademy_',
+      'https://www.linkedin.com/company/shinobi-open-source-academy-sos-a',
+      'https://discord.gg/9Wgx7bCh',
+    ],
+  };
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [mentorModalOpen, setMentorModalOpen] = useState(false);
 
@@ -27,6 +44,11 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data for SEO
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <CodeBackground />
       <Navbar />
       <JoinModal isOpen={joinModalOpen} onClose={() => setJoinModalOpen(false)} />

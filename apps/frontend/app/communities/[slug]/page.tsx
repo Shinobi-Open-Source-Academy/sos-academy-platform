@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CodeBackground from '../../../components/CodeBackground';
@@ -9,6 +10,36 @@ export function generateStaticParams() {
   return COMMUNITIES.map((community) => ({
     slug: community.id,
   }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const community = COMMUNITIES.find((c) => c.id === slug);
+
+  if (!community) {
+    return {
+      title: 'Community Not Found',
+    };
+  }
+
+  return {
+    title: `${community.name} - ${community.language}`,
+    description: community.longDescription,
+    openGraph: {
+      title: `${community.name} - ${community.language} Community`,
+      description: community.longDescription,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${community.name} - ${community.language}`,
+      description: community.description,
+    },
+  };
 }
 
 export default async function CommunityPage({ params }: { params: Promise<{ slug: string }> }) {
