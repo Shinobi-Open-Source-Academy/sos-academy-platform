@@ -1,94 +1,61 @@
 ## Description
 
-<!-- Provide a clear and concise description of your changes -->
+<!-- Provide a clear and concise description of what this PR does -->
 
 ## Type of Change
 
-<!-- Mark the relevant option with an "x" -->
+<!-- Mark the relevant option(s) with an "x" -->
 
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 Documentation update
-- [ ] 🎨 Style/UI update (no functional changes)
-- [ ] ♻️ Code refactoring (no functional changes)
-- [ ] ⚡ Performance improvement
-- [ ] ✅ Test update
-- [ ] 🔧 Chore (build process, dependencies, etc.)
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+- [ ] Code refactoring
+- [ ] Other (please describe):
 
 ## Related Issue
 
-<!-- Link to the issue this PR addresses -->
+<!-- Link to the issue this PR addresses, if applicable -->
 
 Fixes #(issue number)
 
 ## Changes Made
 
-<!-- List the key changes made in this PR -->
+<!-- List the key changes in bullet points -->
 
 -
 -
 -
 
-## How Has This Been Tested?
+## Testing
 
-<!-- Describe the tests you ran and how to reproduce them -->
+<!-- Describe how you tested these changes -->
 
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] E2E tests
-- [ ] Manual testing
-
-**Test Configuration**:
-- OS:
-- Node Version:
-- Browser (if applicable):
+- [ ] Tested locally
+- [ ] Added/updated tests
+- [ ] All existing tests pass
 
 **Test Steps**:
 1.
 2.
 3.
 
-## Screenshots (if applicable)
+## Screenshots
 
-<!-- Add screenshots to demonstrate the changes -->
+<!-- Add screenshots if your changes affect the UI -->
 
 ## Checklist
 
-<!-- Mark completed items with an "x" -->
-
-- [ ] My code follows the project's coding standards
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings or errors
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published
-- [ ] I have run `pnpm check:fix` and fixed all issues
-- [ ] I have updated the CHANGELOG.md (if applicable)
-- [ ] I have checked my code for any debugging statements or commented-out code
-- [ ] My commits follow the [Conventional Commits](https://www.conventionalcommits.org/) format
-
-## Breaking Changes
-
-<!-- If this PR introduces breaking changes, describe them here -->
-
-- [ ] This PR introduces breaking changes
-- [ ] I have updated the documentation to reflect breaking changes
-- [ ] I have added migration guide (if needed)
+- [ ] Code follows the project's style guidelines
+- [ ] Self-reviewed my own code
+- [ ] Commented code in complex areas
+- [ ] Updated relevant documentation
+- [ ] No new warnings or errors
+- [ ] Ran `pnpm check:fix` and fixed all issues
 
 ## Additional Notes
 
-<!-- Add any additional notes, context, or concerns for reviewers -->
-
-## For Reviewers
-
-<!-- Optional: Specific areas you want reviewers to focus on -->
-
-Please pay special attention to:
--
--
+<!-- Any additional context, concerns, or notes for reviewers -->
 
 ---
 

@@ -7,10 +7,31 @@ export const metadata: Metadata = {
     default: 'SOS Academy - Shinobi Open-Source Academy',
     template: '%s | SOS Academy',
   },
-  description:
-    'Learn through practical, collaborative open-source experience. Gain real-world skills and build your portfolio while working on meaningful projects with experienced mentors. Join our JavaScript, Python, Go, Java, and Ruby communities.',
+  description: `Learn through practical, collaborative open-source experience. \n
+    Gain real-world skills and build your portfolio while working on meaningful projects with experienced mentors. \n
+    Join our JavaScript, Python, Go, Java, and Ruby communities and be paired with expert mentors to support your contribution journey.`,
   keywords: [
+    'shinobi',
+    'open source academy',
+    'sos academy',
+    'shinobi open source academy',
+    'sos open source academy',
+    'shinobi open source',
+    'sos open source',
+    'shinobi open source academy',
+    'sos open source academy',
+    'shinobi open source',
+    'sos open source',
+    'shinobi open source academy',
+    'sos open source academy',
+    'shinobi open source',
+    'sos open source',
+    'shinobi open source academy',
+    'sos open source academy',
     'open source',
+    'open source learning',
+    'open source learning platform',
+    'open source learning platform',
     'academy',
     'coding',
     'mentorship',
@@ -24,13 +45,13 @@ export const metadata: Metadata = {
     'community',
     'developers',
   ],
-  authors: [{ name: 'SOS Academy', url: 'https://shinobiopensource.academy' }],
+  authors: [{ name: 'SOS Academy', url: 'https://shinobi-open-source.academy' }],
   creator: 'SOS Academy',
   publisher: 'SOS Academy',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://shinobiopensource.academy',
+    url: 'https://shinobi-open-source.academy',
     title: 'SOS Academy - Empowering the Next Generation of Open-Source Warriors',
     description:
       'Learn through practical, collaborative open-source experience. Join communities in JavaScript, Python, Go, Java, and Ruby. Work on real projects with experienced mentors.',
@@ -78,7 +99,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href="https://shinobiopensource.academy" />
+        <link rel="canonical" href="https://shinobi-open-source.academy" />
         <meta name="theme-color" content="#000000" />
       </head>
       <body>{children}</body>
