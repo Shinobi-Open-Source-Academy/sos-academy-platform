@@ -37,7 +37,7 @@
   "private": true,
   "devDependencies": {
     "@biomejs/biome": "^2.3.2",
-    "@nestjs/schematics": "^10.0.1",
+    "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^10.0.2",
     "@nx/jest": "22.0.4",
     "@nx/js": "22.0.2",
