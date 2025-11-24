@@ -54,7 +54,7 @@
     "@testing-library/react": "16.1.0",
     "@types/bcrypt": "^5.0.2",
     "@types/jest": "^29.5.12",
-    "@types/node": "18.16.9",
+    "@types/node": "24.10.1",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "autoprefixer": "^10.4.21",
