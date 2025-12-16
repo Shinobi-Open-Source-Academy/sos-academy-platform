@@ -76,7 +76,9 @@
     "webpack-cli": "^5.1.4"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,jsonc,md}": ["biome format --write --no-errors-on-unmatched"]
+    "*.{js,jsx,ts,tsx,json,jsonc,md}": [
+      "biome format --write --no-errors-on-unmatched"
+    ]
   },
   "pnpm": {
     "overrides": {
@@ -105,7 +107,7 @@
     "css-select": "^5.1.0",
     "handlebars": "^4.7.8",
     "mongoose": "^8.14.2",
-    "next": "15.4.7",
+    "next": "15.4.10",
     "nodemailer": "^7.0.7",
     "nth-check": "^2.1.1",
     "react": "19.0.0",
