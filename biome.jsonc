@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -19,7 +19,6 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": ["**/*.d.ts"],
     "rules": {
       "recommended": true,
       "correctness": {
@@ -35,38 +34,14 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noArrayIndexKey": "warn",
-        "noThenProperty": "off",
-        "noDuplicateFontNames": "warn"
-      },
-      "a11y": {
-        "useButtonType": "warn",
-        "noSvgWithoutTitle": "warn",
-        "useSemanticElements": "warn"
+        "noArrayIndexKey": "error",
+        "noThenProperty": "off"
       }
     }
   },
-  "files": {
-    "ignore": [
-      ".nx/**",
-      "dist/**",
-      "node_modules/**",
-      ".next/**",
-      "coverage/**",
-      "*.min.js",
-      "*.min.css",
-      "pnpm-lock.yaml",
-      "package-lock.json",
-      "yarn.lock",
-      "**/*.interface.js",
-      "**/*.enum.js",
-      "**/*.js.map"
-    ],
-    "maxSize": 1048576
-  },
   "overrides": [
     {
-      "include": ["**/*.spec.ts", "**/*.test.ts", "**/__tests__/**/*.ts"],
+      "includes": ["**/*.spec.ts", "**/*.test.ts", "**/__tests__/**/*.ts"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -79,40 +54,7 @@
       }
     },
     {
-      "include": ["**/*.d.ts", "**/index.d.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["apps/admin/**/*.ts", "apps/admin/**/*.tsx"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "useButtonType": "warn"
-          },
-          "suspicious": {
-            "noArrayIndexKey": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": ["**/components/icons/**/*.tsx"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "noSvgWithoutTitle": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": [".github/workflows/**/*.yml", ".github/workflows/**/*.yaml"],
+      "includes": [".github/workflows/**/*.yml", ".github/workflows/**/*.yaml", "pacts/**"],
       "formatter": {
         "enabled": false
       },
@@ -121,19 +63,28 @@
       }
     },
     {
-      "include": ["**/migrations/**/*.ts"],
+      "includes": ["www/**/*"],
       "linter": {
+        "enabled": false
+      },
+      "formatter": {
         "enabled": false
       }
     },
     {
-      "include": ["apps/**/src/**/*.ts", "dev-apps/**/src/**/*.ts", "packages/**/*.ts"],
+      "includes": ["apps/**/src/**/*.ts", "packages/**/*.ts"],
       "linter": {
         "rules": {
           "style": {
             "useImportType": "off"
           }
         }
+      }
+    },
+    {
+      "includes": ["**/*.json", "**/*.jsonc"],
+      "formatter": {
+        "indentWidth": 2
       }
     }
   ],

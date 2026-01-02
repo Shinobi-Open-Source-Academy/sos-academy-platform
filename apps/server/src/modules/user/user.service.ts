@@ -4,12 +4,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import mongoose, { Model, Schema } from 'mongoose';
-import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -22,12 +22,17 @@ import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 
+const GITHUB_API_TIMEOUT = 30000;
+const GITHUB_API_URL = 'https://api.github.com/users';
+const GITHUB_API_VERSION = '2022-11-28';
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly configService: ConfigService
   ) {}
 
   private async hashPassword(password: string): Promise<string> {
@@ -156,26 +161,17 @@ export class UserService {
       communities: communityObjectIds,
     });
 
-    // Enrich with GitHub profile if handle provided
-    if (githubHandle) {
-      try {
-        const githubProfile = await this.fetchGitHubProfile(githubHandle);
-        if (githubProfile) {
-          newUser.githubProfile = githubProfile;
-        }
-      } catch (error) {
-        console.error('Failed to fetch GitHub profile:', error);
-      }
-    }
-
     const savedUser = await newUser.save();
 
-    // Send confirmation email
-    try {
-      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
-    } catch (error) {
-      console.error('Failed to send community join email:', error);
+    // Fetch GitHub profile asynchronously (non-blocking)
+    if (githubHandle) {
+      this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
     }
+
+    // Send confirmation email (non-blocking)
+    this.emailService.sendCommunityJoinConfirmation(email, name, communities).catch((error) => {
+      console.error('Failed to send community join email:', error);
+    });
 
     return savedUser;
   }
@@ -204,26 +200,17 @@ export class UserService {
       source: 'mentor-application',
     });
 
-    // Enrich with GitHub profile if handle provided
-    if (githubHandle) {
-      try {
-        const githubProfile = await this.fetchGitHubProfile(githubHandle);
-        if (githubProfile) {
-          newMentor.githubProfile = githubProfile;
-        }
-      } catch (error) {
-        console.error('Failed to fetch GitHub profile:', error);
-      }
-    }
-
     const savedMentor = await newMentor.save();
 
-    // Send confirmation email
-    try {
-      await this.emailService.sendMentorApplicationConfirmation(email, name);
-    } catch (error) {
-      console.error('Failed to send mentor application email:', error);
+    // Fetch GitHub profile asynchronously (non-blocking)
+    if (githubHandle) {
+      this.enrichUserWithGitHubProfile(savedMentor._id.toString(), githubHandle);
     }
+
+    // Send confirmation email (non-blocking)
+    this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
+      console.error('Failed to send mentor application email:', error);
+    });
 
     return savedMentor;
   }
@@ -293,29 +280,21 @@ export class UserService {
       existingUser.source = 'subscription';
       existingUser.status = UserStatus.PENDING;
 
-      // Enrich with GitHub profile if handle provided
-      if (githubHandle) {
-        try {
-          const githubProfile = await this.fetchGitHubProfile(githubHandle);
-          if (githubProfile) {
-            existingUser.githubProfile = githubProfile;
-          }
-        } catch (error) {
-          console.error('Failed to fetch GitHub profile:', error);
-        }
-      }
-
       const savedUser = await existingUser.save();
 
-      // Send confirmation email
-      try {
-        await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
-      } catch (error) {
-        console.error('Failed to send subscription confirmation email:', error);
+      // Fetch GitHub profile asynchronously (non-blocking)
+      if (githubHandle) {
+        this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
       }
+
+      // Send confirmation email (non-blocking)
+      this.emailService.sendCommunityJoinConfirmation(email, name, communities).catch((error) => {
+        console.error('Failed to send subscription confirmation email:', error);
+      });
 
       return savedUser;
     }
+
     // Create new user
     const newUser = new this.userModel({
       email,
@@ -326,26 +305,17 @@ export class UserService {
       source: 'subscription',
     });
 
-    // Enrich with GitHub profile if handle provided
-    if (githubHandle) {
-      try {
-        const githubProfile = await this.fetchGitHubProfile(githubHandle);
-        if (githubProfile) {
-          newUser.githubProfile = githubProfile;
-        }
-      } catch (error) {
-        console.error('Failed to fetch GitHub profile:', error);
-      }
-    }
-
     const savedUser = await newUser.save();
 
-    // Send confirmation email
-    try {
-      await this.emailService.sendCommunityJoinConfirmation(email, name, communities);
-    } catch (error) {
-      console.error('Failed to send subscription confirmation email:', error);
+    // Fetch GitHub profile asynchronously (non-blocking)
+    if (githubHandle) {
+      this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
     }
+
+    // Send confirmation email (non-blocking)
+    this.emailService.sendCommunityJoinConfirmation(email, name, communities).catch((error) => {
+      console.error('Failed to send subscription confirmation email:', error);
+    });
 
     return savedUser;
   }
@@ -374,26 +344,17 @@ export class UserService {
       source: 'mentor-application',
     });
 
-    // Enrich with GitHub profile if handle provided
-    if (githubHandle) {
-      try {
-        const githubProfile = await this.fetchGitHubProfile(githubHandle);
-        if (githubProfile) {
-          newMentor.githubProfile = githubProfile;
-        }
-      } catch (error) {
-        console.error('Failed to fetch GitHub profile:', error);
-      }
-    }
-
     const savedMentor = await newMentor.save();
 
-    // Send confirmation email
-    try {
-      await this.emailService.sendMentorApplicationConfirmation(email, name);
-    } catch (error) {
-      console.error('Failed to send mentor application email:', error);
+    // Fetch GitHub profile asynchronously (non-blocking)
+    if (githubHandle) {
+      this.enrichUserWithGitHubProfile(savedMentor._id.toString(), githubHandle);
     }
+
+    // Send confirmation email (non-blocking)
+    this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
+      console.error('Failed to send mentor application email:', error);
+    });
 
     return savedMentor;
   }
@@ -420,12 +381,12 @@ export class UserService {
     githubId?: number;
   } | null> {
     try {
-      const token = process.env.GITHUB_TOKEN;
-      const headers = token ? { Authorization: `token ${token}` } : {};
-
-      const response = await axios.get(`https://api.github.com/users/${handle}`, {
-        headers,
-        timeout: 5000,
+      const response = await axios.get(`${GITHUB_API_URL}/${handle}`, {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': GITHUB_API_VERSION,
+        },
+        timeout: GITHUB_API_TIMEOUT,
       });
 
       return {
@@ -449,6 +410,21 @@ export class UserService {
       console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);
       return null;
     }
+  }
+
+  /**
+   * Fetch GitHub profile and update user asynchronously (fire and forget)
+   */
+  private enrichUserWithGitHubProfile(userId: string, githubHandle: string): void {
+    this.fetchGitHubProfile(githubHandle)
+      .then((profile) => {
+        if (profile) {
+          return this.userModel.findByIdAndUpdate(userId, { githubProfile: profile }).exec();
+        }
+      })
+      .catch((error) => {
+        console.error(`Failed to enrich user ${userId} with GitHub profile:`, error.message);
+      });
   }
 
   /**

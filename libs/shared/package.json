@@ -1,9 +1,11 @@
 {
   "name": "@sos-academy/shared",
   "version": "0.0.1",
-  "type": "commonjs",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.lib.json"
+  },
   "dependencies": {},
   "peerDependencies": {}
 }

@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,14 +12,14 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { CommunityModule } from './modules/community/community.module';
 import { ProjectModule } from './modules/project/project.module';
 import { SeederModule } from './modules/seeder/seeder.module';
-// Import modules
+
 import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [() => envConfig],
+      envFilePath: [join(process.cwd(), '../../.env'), join(__dirname, '../../../../.env')],
     }),
     MongooseModule.forRoot(databaseConfig.uri),
     UserModule,

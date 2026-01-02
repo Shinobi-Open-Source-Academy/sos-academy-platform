@@ -1,22 +1,23 @@
 # Email Service
 
-This module provides email functionality for the SOS Academy platform using the SendGrid SDK.
+This module provides email functionality for the SOS Academy platform using the Resend SDK.
 
 ## Configuration
 
-The email service uses the official SendGrid Node.js SDK. You need to set the following environment variables:
+The email service uses the official Resend Node.js SDK. You need to set the following environment variables:
 
 ```env
-SENDGRID_API_KEY=your_sendgrid_api_key_here
+RESEND_API_KEY=re_your_resend_api_key_here
 EMAIL_FROM=no-reply@shinobi-open-source.academy
 ```
 
-### Getting Your SendGrid API Key
+### Getting Your Resend API Key
 
-1. Sign up for a [SendGrid account](https://sendgrid.com)
-2. Enable Two-factor authentication
-3. Create an API key with **Mail Send** > **Full Access** permissions
+1. Sign up for a [Resend account](https://resend.com)
+2. Navigate to [API Keys](https://resend.com/api-keys)
+3. Create a new API key
 4. Set the API key in your environment variables
+5. Verify your domain in the Resend dashboard (required for sending emails)
 
 ## Templates
 
@@ -50,7 +51,7 @@ await this.emailService.sendSimpleEmail('user@example.com', 'Subject', '<h1>Hell
 
 ## Features
 
-- ✅ **SendGrid SDK Integration**: Uses the official `@sendgrid/mail` package
+- ✅ **Resend SDK Integration**: Uses the official `resend` package
 - ✅ **Template Support**: Handlebars templates with fallback support
 - ✅ **Logo Attachments**: Automatic logo attachment for branding
 - ✅ **Error Handling**: Comprehensive error logging and fallback templates
@@ -59,11 +60,12 @@ await this.emailService.sendSimpleEmail('user@example.com', 'Subject', '<h1>Hell
 
 ## Deployment Note
 
-Make sure the `templates` directory (including the `assets` subdirectory) is included in your build. If using NX, you may need to update your build configuration to include these files.
+Make sure the `templates` directory (including the `assets` subdirectory) is included in your build. The webpack configuration should copy these files to the dist directory.
 
 ## Troubleshooting
 
-- **API Key Issues**: Ensure your `SENDGRID_API_KEY` is set correctly
+- **API Key Issues**: Ensure your `RESEND_API_KEY` is set correctly and starts with `re_`
 - **Template Not Found**: The service will automatically fall back to inline templates
-- **Logo Not Showing**: Check that `templates/assets/shinobiLogo.png` exists
-- **Email Not Delivered**: Check your SendGrid dashboard for delivery status
+- **Logo Not Showing**: Check that `templates/assets/logo.png` exists
+- **Email Not Delivered**: Check your Resend dashboard for delivery status and ensure your domain is verified
+- **From Address Issues**: Make sure `EMAIL_FROM` matches a verified domain/email in your Resend account

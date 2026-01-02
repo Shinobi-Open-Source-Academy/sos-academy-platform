@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { apiClient } from '../../lib/api-client';
@@ -41,18 +42,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="max-w-md w-full space-y-8 p-8 bg-gray-800 rounded-lg shadow-xl">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-white">SOS Academy Admin</h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            Sign in to access the admin panel
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] bg-gradient-to-br from-zinc-900/50 to-transparent" />
+        <div className="absolute -bottom-1/2 -left-1/4 w-[600px] h-[600px] bg-gradient-to-tr from-zinc-900/30 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
+
+      <div className="relative w-full max-w-sm mx-4">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <Image
+            src="/shinobiLogo.png"
+            alt="SOS Academy"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <div className="text-left">
+            <h1 className="text-lg font-semibold text-white tracking-tight">SOS Academy</h1>
+            <p className="text-[11px] text-zinc-500 uppercase tracking-widest">Admin Panel</p>
+          </div>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+
+        {/* Login Form */}
+        <div className="card p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-xl font-semibold text-white">Welcome back</h2>
+            <p className="text-sm text-zinc-500 mt-1">Sign in to access the admin panel</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
                 Email
               </label>
               <input
@@ -61,12 +90,14 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input"
                 placeholder="admin@example.com"
+                autoComplete="email"
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
                 Password
               </label>
               <input
@@ -75,26 +106,52 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="••••••••"
+                className="input"
+                placeholder="Enter your password"
+                autoComplete="current-password"
               />
             </div>
-          </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded-md text-sm">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="flex items-center gap-3 p-3 border border-red-500/30 bg-red-500/10">
+                <svg
+                  className="w-4 h-4 text-red-400 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                  />
+                </svg>
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-black animate-spin" />
+                  Signing in...
+                </span>
+              ) : (
+                'Sign in'
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-zinc-600 mt-6">
+          Protected area. Authorized personnel only.
+        </p>
       </div>
     </div>
   );

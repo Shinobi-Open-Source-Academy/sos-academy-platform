@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch --entryFile src/main",
+    "build": "webpack --config webpack.config.js --mode production",
+    "build:dev": "webpack --config webpack.config.js --mode development",
+    "start": "node ../../dist/apps/server/main.js",
+    "lint": "biome lint .",
+    "seed": "ts-node -r tsconfig-paths/register src/seed.ts seed",
+    "seed:clear": "ts-node -r tsconfig-paths/register src/seed.ts clear",
+    "seed:reset": "ts-node -r tsconfig-paths/register src/seed.ts reset",
+    "seed:status": "ts-node -r tsconfig-paths/register src/seed.ts status"
+  },
+  "dependencies": {
+    "@sos-academy/shared": "workspace:*",
+    "resend": "^6.6.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
