@@ -10,8 +10,6 @@ export const developmentEnv = {
   LOG_LEVEL: 'debug',
 
   // Email configuration
-  EMAIL_HOST: 'smtp.sendgrid.net',
-  EMAIL_USER: 'apikey',
-  EMAIL_PASSWORD: 'YOUR_SENDGRID_API_KEY', // Replace with actual key in production
-  EMAIL_FROM: 'no-reply@sos-academy.org',
+  EMAIL_FROM: 'no-reply@shinobi-open-source.academy',
+  RESEND_API_KEY: '', // Required - get from https://resend.com/api-keys
 };

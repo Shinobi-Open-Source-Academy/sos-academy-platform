@@ -31,7 +31,7 @@ export class SeederService {
   private readonly COMMUNITIES_DATA = [
     {
       name: 'JavaScript',
-      slug: 'suna',
+      slug: 'konoha',
       description:
         'Master modern JavaScript and its frameworks while contributing to web-focused open-source projects.',
       tags: ['javascript', 'web', 'frontend', 'nodejs', 'react', 'vue'],
@@ -39,7 +39,7 @@ export class SeederService {
     },
     {
       name: 'Python',
-      slug: 'konoha',
+      slug: 'suna',
       description:
         'Dive into Python development and contribute to data science, automation, and web backend projects.',
       tags: ['python', 'data-science', 'backend', 'django', 'flask', 'fastapi'],
@@ -71,7 +71,7 @@ export class SeederService {
     },
     {
       name: 'Rust',
-      slug: 'rust',
+      slug: 'kumo',
       description:
         'Build memory-safe, high-performance systems and contribute to cutting-edge Rust projects.',
       tags: ['rust', 'systems', 'performance', 'memory-safe', 'backend', 'blockchain'],
@@ -245,7 +245,6 @@ export class SeederService {
       const existingAdmin = await this.userModel.findOne({ email: adminEmail }).lean().exec();
 
       if (existingAdmin) {
-        this.logger.log(`Admin already exists: ${adminEmail}`);
         this.logger.log('Skipping seeding to prevent duplicates.');
 
         return {

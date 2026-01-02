@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-surface-0: #000000;
+    --color-surface-1: #080808;
+    --color-surface-2: #0f0f0f;
+    --color-surface-3: #161616;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-border-hover: rgba(255, 255, 255, 0.12);
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #a1a1aa;
+    --color-text-muted: #52525b;
+    --color-accent: #22c55e;
+    --color-accent-hover: #16a34a;
+  }
+
+  * {
+    @apply antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-black text-white;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-[var(--color-surface-2)] border border-white/[0.06] transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply border-white/[0.1];
+  }
+
+  /* Button base */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium transition-all duration-150 gap-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-emerald-500 text-black hover:bg-emerald-400;
+  }
+
+  .btn-secondary {
+    @apply btn bg-transparent border border-white/10 text-white hover:border-white/20 hover:bg-white/[0.03];
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-zinc-400 hover:text-white hover:bg-white/[0.04];
+  }
+
+  .btn-github {
+    @apply btn bg-[#24292f] text-white hover:bg-[#32383f] border border-white/10;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-3.5 py-2.5 bg-[var(--color-surface-1)] border border-white/[0.06] text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 transition-colors rounded-none;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+
+  .badge-info {
+    @apply badge bg-sky-500/10 text-sky-400 border border-sky-500/20;
+  }
+
+  .badge-neutral {
+    @apply badge bg-zinc-500/10 text-zinc-400 border border-zinc-500/20;
+  }
+
+  /* Monospace text */
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply card p-5 relative overflow-hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    @apply absolute top-0 right-0 w-32 h-32 opacity-[0.03];
+    background: radial-gradient(circle, currentColor 0%, transparent 70%);
+  }
+
+  /* Activity item */
+  .activity-item {
+    @apply flex items-start gap-3 p-4 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors;
+  }
+
+  /* Navigation link */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all;
+  }
+
+  .nav-link-active {
+    @apply text-white bg-white/[0.06] border-l-2 border-emerald-500;
+  }
+
+  /* Event card */
+  .event-card {
+    @apply card p-4 flex items-start gap-4;
+  }
+
+  .event-date {
+    @apply flex flex-col items-center justify-center w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400;
+  }
+}
+
+@layer utilities {
+  /* Fade in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  /* Stagger animation delays */
+  .delay-75 { animation-delay: 75ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-225 { animation-delay: 225ms; }
+  .delay-300 { animation-delay: 300ms; }
+
+  /* Pulse glow */
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Green gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent;
+  }
+}

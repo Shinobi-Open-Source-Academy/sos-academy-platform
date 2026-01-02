@@ -1,106 +1,109 @@
 import * as fs from 'node:fs';
-import { join } from 'node:path';
+import { resolve } from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
-import sgMail from '@sendgrid/mail';
+import { ConfigService } from '@nestjs/config';
 import * as handlebars from 'handlebars';
+import { Resend } from 'resend';
+import { FALLBACK_TEMPLATES } from './templates/constants/email-template-fallback.constant';
 
 export interface EmailTemplateParams {
   [key: string]: string | number | boolean | Date | string[] | undefined;
 }
 
-// Define fallback templates for when files aren't found
-const FALLBACK_TEMPLATES = {
-  'community-join': `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Welcome to SOS Academy!</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .content { background-color: #f8f9fa; padding: 30px; border-radius: 5px; }
-        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Welcome to <strong>Shinobi Open-Source Academy</strong>!</h1>
-        </div>
-        <div class="content">
-          <p>Hello {{name}},</p>
-          <p>Thank you for expressing interest in joining the {{communityName}} community! We're thrilled to have you with us.</p>
-          <p>Your registration has been successfully received on {{date}}. Our team is currently reviewing your application, and we'll be in touch shortly with next steps.</p>
-          <p>If you have any questions, please reach out to us at support@shinobi-open-source.academy.</p>
-          <p>Best regards,<br>The <strong>Shinobi Open-Source Academy</strong> Team</p>
-        </div>
-        <div class="footer">
-          <p>© {{currentYear}} <strong>Shinobi Open-Source Academy</strong>. All rights reserved.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `,
-  'mentor-application': `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Mentor Application Received - SOS Academy</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .content { background-color: #f8f9fa; padding: 30px; border-radius: 5px; }
-        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
-        .timeline { background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Mentor Application Received</h1>
-        </div>
-        <div class="content">
-          <p>Dear {{name}},</p>
-          <p>Thank you for applying to become a mentor at <strong>Shinobi Open-Source Academy</strong>. We've received your application on {{date}} and are excited about your interest in contributing to our community.</p>
-          <div class="timeline">
-            <h3>What Happens Next</h3>
-            <p>Our team will carefully review your application within the next {{applicationReviewPeriod}}.</p>
-          </div>
-          <p>Best regards,<br>The <strong>Shinobi Open-Source Academy</strong> Team</p>
-        </div>
-        <div class="footer">
-          <p>© {{currentYear}} <strong>Shinobi Open-Source Academy</strong>. All rights reserved.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `,
-};
-
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly fromEmail: string;
+  private readonly resend: Resend;
 
-  constructor() {
-    // Initialize SendGrid with API key from environment
-    const apiKey = process.env.SENDGRID_API_KEY;
+  constructor(private readonly configService: ConfigService) {
+    const apiKey = this.configService.get<string>('RESEND_API_KEY');
     if (!apiKey) {
-      throw new Error('SENDGRID_API_KEY environment variable is required');
+      throw new Error('RESEND_API_KEY environment variable is required');
     }
 
-    sgMail.setApiKey(apiKey);
-    this.fromEmail = process.env.EMAIL_FROM || 'no-reply@shinobi-open-source.academy';
+    this.resend = new Resend(apiKey);
+    this.fromEmail =
+      this.configService.get<string>('EMAIL_FROM') || 'no-reply@shinobi-open-source.academy';
 
-    this.logger.log('SendGrid initialized successfully');
+    this.logger.log('Resend initialized successfully');
   }
 
   /**
-   * Send a templated email using SendGrid SDK
+   * Load and compile email template
+   * @param template Template name (without extension)
+   * @param params Template parameters
+   * @param subject Email subject (for fallback)
+   * @returns Compiled HTML string
+   */
+  private loadTemplate(template: string, params: EmailTemplateParams, subject: string): string {
+    const templatePath = resolve(process.cwd(), 'src/modules/email/templates', `${template}.hbs`);
+
+    if (!fs.existsSync(templatePath)) {
+      this.logger.warn(`Template file not found: ${templatePath}, using fallback template`);
+      return this.getFallbackTemplate(template, params, subject);
+    }
+
+    try {
+      const templateContent = fs.readFileSync(templatePath, 'utf8');
+      const compiledTemplate = handlebars.compile(templateContent);
+      return compiledTemplate(params);
+    } catch (error) {
+      this.logger.warn(
+        `Failed to compile template ${template}, using fallback. Error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return this.getFallbackTemplate(template, params, subject);
+    }
+  }
+
+  private getFallbackTemplate(
+    template: string,
+    params: EmailTemplateParams,
+    subject: string
+  ): string {
+    const fallbackTemplate =
+      FALLBACK_TEMPLATES[template] || `<h1>${subject}</h1><p>Hello ${params.name || 'there'}!</p>`;
+    const compiledTemplate = handlebars.compile(fallbackTemplate);
+    return compiledTemplate(params);
+  }
+
+  /**
+   * Prepare logo attachment for inline display
+   * @returns Array of attachments with logo, or empty array if logo not found
+   */
+  private prepareLogoAttachment(): Array<{
+    filename: string;
+    content: string;
+    contentId?: string;
+  }> {
+    const logoPath = resolve(process.cwd(), 'src/modules/email/templates/assets/logo.png');
+
+    if (!fs.existsSync(logoPath)) {
+      this.logger.warn(`Logo file not found: ${logoPath}`);
+      return [];
+    }
+
+    try {
+      const logoBuffer = fs.readFileSync(logoPath);
+      const logoBase64 = logoBuffer.toString('base64');
+
+      return [
+        {
+          filename: 'logo.png',
+          content: logoBase64,
+          contentId: 'logo',
+        },
+      ];
+    } catch (error) {
+      this.logger.error(
+        `Failed to load logo: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return [];
+    }
+  }
+
+  /**
+   * Send a templated email using Resend SDK
    * @param to Recipient email address
    * @param subject Email subject
    * @param template Template name (without extension)
@@ -117,76 +120,30 @@ export class EmailService {
       this.logger.log(`📧 Subject: ${subject}`);
       this.logger.log(`📧 Template: ${template}`);
 
-      // Try to load template from file first
-      let html: string;
-      try {
-        const templatePath = join(__dirname, 'templates', `${template}.hbs`);
-        const templateContent = fs.readFileSync(templatePath, 'utf8');
+      const html = this.loadTemplate(template, params, subject);
+      const attachments = this.prepareLogoAttachment();
 
-        const compiledTemplate = handlebars.compile(templateContent);
-        html = compiledTemplate(params);
-      } catch (_error) {
-        this.logger.warn(`Template file not found for ${template}, using fallback template.`);
-        const fallbackTemplate =
-          FALLBACK_TEMPLATES[template] ||
-          `<h1>${subject}</h1><p>Hello ${params.name || 'there'}!</p>`;
-        const compiledTemplate = handlebars.compile(fallbackTemplate);
-        html = compiledTemplate(params);
-      }
-
-      // Prepare SendGrid message
-      const msg = {
-        to,
+      // Prepare Resend email payload with attachments
+      const emailPayload = {
         from: this.fromEmail,
+        to: [to],
         subject,
         html,
-        trackingSettings: {
-          clickTracking: {
-            enable: false,
-            enableText: false,
-          },
-        },
-        attachments: [],
+        attachments: attachments.length > 0 ? attachments : undefined,
       };
 
-      // Add logo attachment
-      const logoPath = join(
-        process.cwd(),
-        'apps',
-        'server',
-        'src',
-        'modules',
-        'email',
-        'templates',
-        'assets',
-        'logo.png'
-      );
-      if (fs.existsSync(logoPath)) {
-        const logoBuffer = fs.readFileSync(logoPath);
-        const logoBase64 = logoBuffer.toString('base64');
+      // Send email using Resend SDK
+      const { data, error } = await this.resend.emails.send(emailPayload);
 
-        msg.attachments = [
-          {
-            content: logoBase64,
-            filename: 'logo.png',
-            type: 'image/png',
-            disposition: 'inline',
-            content_id: 'logo',
-          },
-        ];
-
-        this.logger.log(`📎 Logo attachment added: ${logoPath}`);
-      } else {
-        this.logger.warn(`⚠️ Logo file not found: ${logoPath}`);
+      if (error) {
+        this.logger.error('Resend API error:', error);
+        throw new Error(`Failed to send email: ${JSON.stringify(error)}`);
       }
 
-      // Send email using SendGrid SDK
-      const response = await sgMail.send(msg);
-
       this.logger.log(`Email sent successfully to: ${to}`);
-      this.logger.log(`SendGrid response status: ${response[0].statusCode}`);
+      this.logger.log(`Resend email ID: ${data?.id || 'N/A'}`);
     } catch (error) {
-      this.logger.error(`❌ Failed to send email to ${to}:`, error);
+      this.logger.error(`Failed to send email to ${to}:`, error);
       throw error;
     }
   }
@@ -248,25 +205,23 @@ export class EmailService {
    * @param html HTML content
    */
   async sendSimpleEmail(to: string, subject: string, html: string): Promise<void> {
-    const msg = {
-      to,
-      from: this.fromEmail,
-      subject,
-      html,
-      trackingSettings: {
-        clickTracking: {
-          enable: false,
-          enableText: false,
-        },
-      },
-    };
-
     try {
-      const response = await sgMail.send(msg);
-      this.logger.log(`✅ Simple email sent successfully to: ${to}`);
-      this.logger.log(`📊 SendGrid response status: ${response[0].statusCode}`);
+      const { data, error } = await this.resend.emails.send({
+        from: this.fromEmail,
+        to: [to],
+        subject,
+        html,
+      });
+
+      if (error) {
+        this.logger.error('Resend API error:', error);
+        throw new Error(`Failed to send email: ${JSON.stringify(error)}`);
+      }
+
+      this.logger.log(`Simple email sent successfully to: ${to}`);
+      this.logger.log(`Resend email ID: ${data?.id || 'N/A'}`);
     } catch (error) {
-      this.logger.error(`❌ Failed to send simple email to ${to}:`, error);
+      this.logger.error(`Failed to send simple email to ${to}:`, error);
       throw error;
     }
   }

@@ -54,3 +54,6 @@ out
 
 .env
 .env.local
+
+## turbo builds
+*.turbo

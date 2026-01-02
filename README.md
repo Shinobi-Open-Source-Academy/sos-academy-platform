@@ -53,10 +53,10 @@ pnpm setup:admin-env && pnpm dev:admin
 
 ## 🏗️ Architecture
 
-- **Frontend**: Coming Soon (Next.js 15 + React 19 + TypeScript + Tailwind CSS)
+- **Website**: Public-facing website (Next.js 15 + React 19 + TypeScript + Tailwind CSS)
 - **Backend**: NestJS + MongoDB + Mongoose
 - **Email**: SendGrid integration with Handlebars templates
-- **Monorepo**: Nx workspace for efficient development
+- **Monorepo**: Turborepo workspace for efficient development
 - **Admin Panel**: Next.js-based admin dashboard for platform management
 
 ## Quick Start
@@ -127,13 +127,13 @@ EMAIL_FROM=no-reply@shinobi-open-source.academy
 GITHUB_TOKEN=your_github_token_here
 
 # =============================================================================
-# FRONTEND CONFIGURATION
+# WEBSITE CONFIGURATION
 # =============================================================================
 
-# Frontend Port
-FRONTEND_PORT=3000
+# Website Port
+WEBSITE_PORT=3000
 
-# Backend API URL (used by frontend to make API calls)
+# Backend API URL (used by website to make API calls)
 NEXT_PUBLIC_API_URL=http://localhost:4200/api
 
 # Base Server URL (internal backend URL)
@@ -183,20 +183,21 @@ npx nx run server:seed
 # Development
 pnpm dev                # Start backend server
 pnpm dev:backend        # Start backend only
+pnpm dev:website        # Start public website
 pnpm dev:admin          # Start admin panel
 pnpm dev:admin:full     # Start backend + admin
 
 # Build
-pnpm build              # Build backend
+pnpm build              # Build all apps
 pnpm build:backend      # Build backend only
+pnpm build:website      # Build public website
 pnpm build:admin        # Build admin panel
-pnpm build:all          # Build backend + admin
 
 # Start Production
 pnpm start              # Start backend server
 pnpm start:backend      # Start backend only
+pnpm start:website      # Start public website
 pnpm start:admin        # Start admin panel
-pnpm start:all          # Start backend + admin
 
 # Code Quality
 pnpm format             # Format all code

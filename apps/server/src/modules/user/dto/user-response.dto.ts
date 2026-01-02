@@ -54,13 +54,17 @@ export class UserResponseDto {
   membershipLevel: MembershipLevel;
 
   @ApiProperty({
-    description: 'Array of community IDs the user belongs to',
-    type: [String],
-    example: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012'],
+    description: 'Array of communities the user belongs to',
+    type: [Object],
+    example: [{ name: 'JavaScript', slug: 'javascript' }],
   })
   @Expose()
-  @Transform(({ value }) => value?.map((id: Types.ObjectId) => id.toString()))
-  communities: string[];
+  @Transform(({ value }) =>
+    value?.map((c: { _id?: Types.ObjectId; name?: string; slug?: string } | Types.ObjectId) =>
+      typeof c === 'object' && 'name' in c ? { name: c.name, slug: c.slug } : { id: c.toString() }
+    )
+  )
+  communities: { name: string; slug: string }[];
 
   @ApiProperty({
     description: 'Array of project IDs the user is involved in',

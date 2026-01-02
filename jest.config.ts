@@ -1,6 +1,5 @@
-import { getJestProjectsAsync } from '@nx/jest';
 import type { Config } from 'jest';
 
-export default async (): Promise<Config> => ({
-  projects: await getJestProjectsAsync(),
+export default (): Config => ({
+  projects: ['<rootDir>/apps/server', '<rootDir>/apps/server-e2e'],
 });

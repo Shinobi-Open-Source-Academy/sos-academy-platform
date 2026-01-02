@@ -1,0 +1,72 @@
+// Define fallback templates for when files aren't found
+export const FALLBACK_TEMPLATES = {
+  'community-join': `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Welcome to SOS Academy!</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .content { background-color: #f8f9fa; padding: 30px; border-radius: 5px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Welcome to <strong>Shinobi Open-Source Academy</strong>!</h1>
+        </div>
+        <div class="content">
+          <p>Hello {{name}},</p>
+          <p>Thank you for expressing interest in joining the {{communityName}} community! We're thrilled to have you with us.</p>
+          <p>Your registration has been successfully received on {{date}}. Our team is currently reviewing your application, and we'll be in touch shortly with next steps.</p>
+          <p>If you have any questions, please reach out to us at contact@shinobi-open-source.academy.</p>
+          <p>Best regards,<br>The <strong>Shinobi Open-Source Academy</strong> Team</p>
+        </div>
+        <div class="footer">
+          <p>© {{currentYear}} <strong>Shinobi Open-Source Academy</strong>. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+  'mentor-application': `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Mentor Application Received - SOS Academy</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .content { background-color: #f8f9fa; padding: 30px; border-radius: 5px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
+        .timeline { background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Mentor Application Received</h1>
+        </div>
+        <div class="content">
+          <p>Dear {{name}},</p>
+          <p>Thank you for applying to become a mentor at <strong>Shinobi Open-Source Academy</strong>. We've received your application on {{date}} and are excited about your interest in contributing to our community.</p>
+          <div class="timeline">
+            <h3>What Happens Next</h3>
+            <p>Our team will carefully review your application within the next {{applicationReviewPeriod}}.</p>
+          </div>
+          <p>Best regards,<br>The <strong>Shinobi Open-Source Academy</strong> Team</p>
+        </div>
+        <div class="footer">
+          <p>© {{currentYear}} <strong>Shinobi Open-Source Academy</strong>. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+};

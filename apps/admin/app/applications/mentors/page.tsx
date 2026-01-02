@@ -136,52 +136,79 @@ export default function MentorsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const colors: Record<string, string> = {
-      ACTIVE: 'bg-green-500/10 text-green-400 border-green-500/20',
-      PENDING: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-      APPLIED_MENTOR: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-      REJECTED: 'bg-red-500/10 text-red-400 border-red-500/20',
+    const styles: Record<string, string> = {
+      ACTIVE: 'badge-success',
+      PENDING: 'badge-warning',
+      APPLIED_MENTOR: 'badge-info',
+      REJECTED: 'badge-danger',
     };
 
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${colors[status] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'}`}
-      >
-        {status.replace('_', ' ')}
-      </span>
-    );
+    return <span className={styles[status] || 'badge-neutral'}>{status.replace('_', ' ')}</span>;
   };
 
   if (loading && mentors.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin" />
+          <span className="text-zinc-400 text-sm">Loading mentors...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="min-h-screen bg-black flex">
       <Sidebar />
 
-      <div className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
+      <div className="flex-1 p-8 overflow-auto">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-white">Mentors</h2>
-            <p className="text-gray-400 mt-1">Manage mentor applications and active mentors</p>
+            <h1 className="text-2xl font-semibold text-white tracking-tight">Mentors</h1>
+            <p className="text-zinc-500 text-sm mt-1">
+              Manage mentor applications and active mentors
+            </p>
           </div>
           <button
             type="button"
             onClick={fetchMentors}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
             Refresh
           </button>
         </div>
 
-        <div className="mb-6 flex gap-4">
-          <div className="flex-1">
+        {/* Filters */}
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1 relative">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
             <input
               type="text"
               placeholder="Search by name, email, or GitHub..."
@@ -190,7 +217,7 @@ export default function MentorsPage() {
                 setSearchTerm(e.target.value);
                 setPagination((prev) => ({ ...prev, page: 1 }));
               }}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input pl-10"
             />
           </div>
           <select
@@ -199,7 +226,7 @@ export default function MentorsPage() {
               setStatusFilter(e.target.value);
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select w-40"
           >
             <option value="all">All Status</option>
             <option value="ACTIVE">Active</option>
@@ -209,105 +236,126 @@ export default function MentorsPage() {
           </select>
         </div>
 
-        <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+        {/* Table */}
+        <div className="table-container">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-700 bg-gray-800/50">
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <tr className="table-header">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Mentor
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     GitHub
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Communities
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Joined
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="px-5 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700">
+              <tbody>
                 {mentors.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                      No mentors found
+                    <td colSpan={6} className="px-5 py-16 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <svg
+                          className="w-8 h-8 text-zinc-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                          />
+                        </svg>
+                        <p className="text-zinc-500 text-sm">No mentors found</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
-                  mentors.map((mentor) => (
-                    <tr key={mentor._id} className="hover:bg-gray-700/30 transition-colors">
-                      <td className="px-6 py-4">
+                  mentors.map((mentor, index) => (
+                    <tr
+                      key={mentor._id}
+                      className="table-row animate-fade-in"
+                      style={{ animationDelay: `${index * 30}ms` }}
+                    >
+                      <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          {mentor.githubProfile?.avatarUrl && (
+                          {mentor.githubProfile?.avatarUrl ? (
                             <img
                               src={mentor.githubProfile.avatarUrl}
                               alt={mentor.name}
-                              className="w-10 h-10 rounded-full"
+                              className="w-9 h-9 object-cover"
                             />
+                          ) : (
+                            <div className="w-9 h-9 bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm font-medium">
+                              {mentor.name.charAt(0).toUpperCase()}
+                            </div>
                           )}
                           <div>
-                            <div className="text-sm font-medium text-white">{mentor.name}</div>
-                            <div className="text-sm text-gray-400">{mentor.email}</div>
+                            <p className="text-sm font-medium text-white">{mentor.name}</p>
+                            <p className="text-xs text-zinc-500 mono">{mentor.email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-4">
                         {mentor.githubProfile ? (
                           <a
                             href={mentor.githubProfile.htmlUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-400 hover:text-blue-300"
+                            className="text-sm text-zinc-400 hover:text-white transition-colors mono"
                           >
                             @{mentor.githubProfile.login}
                           </a>
                         ) : (
-                          <span className="text-sm text-gray-500">-</span>
+                          <span className="text-sm text-zinc-600">-</span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-1">
                           {mentor.communities && mentor.communities.length > 0 ? (
                             mentor.communities.map((community) => (
-                              <span
-                                key={community.slug}
-                                className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400"
-                              >
+                              <span key={community.slug} className="badge-info">
                                 {community.name}
                               </span>
                             ))
                           ) : (
-                            <span className="text-sm text-gray-500">-</span>
+                            <span className="text-sm text-zinc-600">-</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">{getStatusBadge(mentor.status)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
+                      <td className="px-5 py-4">{getStatusBadge(mentor.status)}</td>
+                      <td className="px-5 py-4 text-sm text-zinc-500">
                         {formatDate(mentor.createdAt)}
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2">
                           {(mentor.status === 'PENDING' || mentor.status === 'APPLIED_MENTOR') && (
                             <>
                               <button
                                 type="button"
                                 onClick={() => handleApprove(mentor._id)}
-                                className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                                className="btn-success text-xs px-3 py-1.5"
                               >
                                 Approve
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleReject(mentor._id)}
-                                className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                                className="btn-danger text-xs px-3 py-1.5"
                               >
                                 Reject
                               </button>
@@ -328,29 +376,30 @@ export default function MentorsPage() {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+        {/* Pagination */}
+        <div className="mt-5 flex items-center justify-between">
+          <p className="text-sm text-zinc-500">
             Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
             {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{' '}
             mentors
-          </div>
-          <div className="flex gap-2">
+          </p>
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page === 1}
-              className="px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="px-4 py-2 text-gray-400">
-              Page {pagination.page} of {pagination.pages}
+            <span className="px-3 py-1.5 text-sm text-zinc-500">
+              Page {pagination.page} of {pagination.pages || 1}
             </span>
             <button
               type="button"
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
-              disabled={pagination.page === pagination.pages}
-              className="px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={pagination.page === pagination.pages || pagination.pages === 0}
+              className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Next
             </button>
