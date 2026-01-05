@@ -4,14 +4,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import mongoose, { Model, Schema } from 'mongoose';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
+import { GitHubService } from '../github/github.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,17 +21,13 @@ import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 
-const GITHUB_API_TIMEOUT = 30000;
-const GITHUB_API_URL = 'https://api.github.com/users';
-const GITHUB_API_VERSION = '2022-11-28';
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
     private readonly emailService: EmailService,
-    private readonly configService: ConfigService
+    private readonly githubService: GitHubService
   ) {}
 
   private async hashPassword(password: string): Promise<string> {
@@ -163,9 +158,9 @@ export class UserService {
 
     const savedUser = await newUser.save();
 
-    // Fetch GitHub profile asynchronously (non-blocking)
+    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
-      this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
+      this.enrichUserWithGitHub(savedUser._id.toString(), githubHandle, email);
     }
 
     // Send confirmation email (non-blocking)
@@ -202,9 +197,9 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile asynchronously (non-blocking)
+    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
-      this.enrichUserWithGitHubProfile(savedMentor._id.toString(), githubHandle);
+      this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
     // Send confirmation email (non-blocking)
@@ -282,9 +277,9 @@ export class UserService {
 
       const savedUser = await existingUser.save();
 
-      // Fetch GitHub profile asynchronously (non-blocking)
+      // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
       if (githubHandle) {
-        this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
+        this.enrichUserWithGitHub(savedUser._id.toString(), githubHandle, email);
       }
 
       // Send confirmation email (non-blocking)
@@ -307,9 +302,9 @@ export class UserService {
 
     const savedUser = await newUser.save();
 
-    // Fetch GitHub profile asynchronously (non-blocking)
+    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
-      this.enrichUserWithGitHubProfile(savedUser._id.toString(), githubHandle);
+      this.enrichUserWithGitHub(savedUser._id.toString(), githubHandle, email);
     }
 
     // Send confirmation email (non-blocking)
@@ -346,9 +341,9 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile asynchronously (non-blocking)
+    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
-      this.enrichUserWithGitHubProfile(savedMentor._id.toString(), githubHandle);
+      this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
     // Send confirmation email (non-blocking)
@@ -360,70 +355,20 @@ export class UserService {
   }
 
   /**
-   * Fetch GitHub profile by handle
-   * @param handle GitHub username
+   * Fetch GitHub profile, update user, and send org invitation asynchronously (fire and forget)
    */
-  private async fetchGitHubProfile(handle: string): Promise<{
-    login: string;
-    avatarUrl?: string;
-    htmlUrl?: string;
-    publicRepos?: number;
-    followers?: number;
-    following?: number;
-    createdAt?: Date;
-    lastUpdated: Date;
-    email?: string;
-    bio?: string;
-    location?: string;
-    company?: string;
-    blog?: string;
-    twitterUsername?: string;
-    githubId?: number;
-  } | null> {
-    try {
-      const response = await axios.get(`${GITHUB_API_URL}/${handle}`, {
-        headers: {
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': GITHUB_API_VERSION,
-        },
-        timeout: GITHUB_API_TIMEOUT,
-      });
-
-      return {
-        login: response.data.login,
-        avatarUrl: response.data.avatar_url,
-        htmlUrl: response.data.html_url,
-        publicRepos: response.data.public_repos,
-        followers: response.data.followers,
-        following: response.data.following,
-        createdAt: response.data.created_at ? new Date(response.data.created_at) : undefined,
-        lastUpdated: new Date(),
-        email: response.data.email,
-        bio: response.data.bio,
-        location: response.data.location,
-        company: response.data.company,
-        blog: response.data.blog,
-        twitterUsername: response.data.twitter_username,
-        githubId: response.data.id,
-      };
-    } catch (error) {
-      console.error(`Failed to fetch GitHub profile for ${handle}:`, error.message);
-      return null;
-    }
-  }
-
-  /**
-   * Fetch GitHub profile and update user asynchronously (fire and forget)
-   */
-  private enrichUserWithGitHubProfile(userId: string, githubHandle: string): void {
-    this.fetchGitHubProfile(githubHandle)
+  private enrichUserWithGitHub(userId: string, githubHandle: string, userEmail: string): void {
+    this.githubService
+      .fetchProfileAndInviteToOrg(githubHandle, userEmail)
       .then((profile) => {
         if (profile) {
           return this.userModel.findByIdAndUpdate(userId, { githubProfile: profile }).exec();
         }
       })
       .catch((error) => {
-        console.error(`Failed to enrich user ${userId} with GitHub profile:`, error.message);
+        console.error(
+          `Failed to enrich user ${userId} with GitHub: ${error instanceof Error ? error.message : String(error)}`
+        );
       });
   }
 

@@ -14,6 +14,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
   const [name, setName] = useState('');
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
   const [githubHandle, setGithubHandle] = useState('');
+  const [acceptEventInvitations, setAcceptEventInvitations] = useState(true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +30,13 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
     setError('');
 
     try {
-      await joinCommunity({ email, name, communities: selectedCommunities, githubHandle });
+      await joinCommunity({
+        email,
+        name,
+        communities: selectedCommunities,
+        githubHandle,
+        acceptEventInvitations,
+      });
       setSuccess(true);
       setTimeout(() => {
         onClose();
@@ -47,6 +54,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
     setName('');
     setSelectedCommunities([]);
     setGithubHandle('');
+    setAcceptEventInvitations(true);
     setSuccess(false);
     setError('');
   };
@@ -153,6 +161,21 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
                   placeholder="username"
                   id="githubHandle"
                 />
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={acceptEventInvitations}
+                    onChange={(e) => setAcceptEventInvitations(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 accent-white flex-shrink-0"
+                  />
+                  <span className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-relaxed">
+                    I agree to receive community event invitations, weekly updates, and
+                    announcements via email
+                  </span>
+                </label>
               </div>
 
               {error && (

@@ -51,25 +51,34 @@ const mockMembers = [
 
 export default function CommunityPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<{ community: string } | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
     if (!token || !userStr) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
     try {
       setUser(JSON.parse(userStr));
+      setLoading(false);
     } catch {
-      router.push('/login');
+      localStorage.removeItem('hacker_token');
+      localStorage.removeItem('hacker_user');
+      router.replace('/login');
     }
-    setLoading(false);
-  }, [router]);
+  }, [mounted, router]);
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

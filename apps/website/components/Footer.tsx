@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SITE_CONFIG, NAV_LINKS } from '../lib/data';
+import { NAV_LINKS, SITE_CONFIG } from '../lib/data';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,8 +10,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <img src="/shinobiLogo.png" alt="SOS Academy" className="h-10 w-10" />
-              <span className="text-lg font-semibold text-white">{SITE_CONFIG.fullName}</span>
+              <img src="/shinobiLogo.png" alt="SOS Academy" className="h-[70px] w-[70px]" />
+              {/* <span className="text-lg font-semibold text-white">{SITE_CONFIG.fullName}</span> */}
             </div>
             <p className="text-gray-400 text-sm mb-4 max-w-md">{SITE_CONFIG.tagline}</p>
             <div className="flex items-center gap-4">

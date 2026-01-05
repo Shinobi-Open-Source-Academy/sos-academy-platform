@@ -51,7 +51,9 @@ const getTimezoneOffset = () => {
 export default function CreateEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const [mounted, setMounted] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  // biome-ignore lint/suspicious/noExplicitAny: no needed
   const [communities, setCommunities] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -64,20 +66,49 @@ export default function CreateEventPage() {
     location: '',
     organizer: '',
     community: '',
+    isFeatured: false,
   });
 
   const timezone = useMemo(() => getLocalTimezone(), []);
   const timezoneOffset = useMemo(() => getTimezoneOffset(), []);
 
+  // Calculate end time for preview (must be before early return to follow hooks rules)
+  const endTimePreview = useMemo(() => {
+    if (!formData.date || !formData.time) {
+      return null;
+    }
+    try {
+      const startDateTime = new Date(`${formData.date}T${formData.time}`);
+      const endDateTime = new Date(startDateTime.getTime() + formData.duration * 60 * 1000);
+      return endDateTime.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return null;
+    }
+  }, [formData.date, formData.time, formData.duration]);
+
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) {
       return;
     }
 
+    if (!isAuthenticated()) {
+      router.replace('/login');
+      return;
+    }
+
+    setAuthChecked(true);
+
     const fetchCommunities = async () => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // biome-ignore lint/suspicious/noExplicitAny: no needed
         const response = await apiClient.get<any[]>('/communities');
         setCommunities(response.data || []);
       } catch (error) {
@@ -86,7 +117,18 @@ export default function CreateEventPage() {
     };
 
     fetchCommunities();
-  }, [router]);
+  }, [mounted, router]);
+
+  if (!mounted || !authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin" />
+          <span className="text-zinc-400 text-sm">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,11 +149,12 @@ export default function CreateEventPage() {
         location: formData.location,
         organizer: '000000000000000000000000',
         community: formData.community || undefined,
+        isFeatured: formData.isFeatured,
       };
 
       await apiClient.post('/calendar/events', eventData);
       router.push('/events');
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: not needed
     } catch (error: any) {
       console.error('Failed to create event:', error);
       alert(error.message || 'Failed to create event');
@@ -123,28 +166,13 @@ export default function CreateEventPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'duration' ? Number(value) : value,
+      [name]: type === 'checkbox' ? checked : name === 'duration' ? Number(value) : value,
     }));
   };
-
-  // Calculate end time for preview
-  const endTimePreview = useMemo(() => {
-    if (!formData.date || !formData.time) return null;
-    try {
-      const startDateTime = new Date(`${formData.date}T${formData.time}`);
-      const endDateTime = new Date(startDateTime.getTime() + formData.duration * 60 * 1000);
-      return endDateTime.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    } catch {
-      return null;
-    }
-  }, [formData.date, formData.time, formData.duration]);
 
   return (
     <div className="min-h-screen bg-black flex">
@@ -162,6 +190,7 @@ export default function CreateEventPage() {
                 stroke="currentColor"
                 strokeWidth={1.5}
               >
+                <title>Arrow Left</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -254,6 +283,7 @@ export default function CreateEventPage() {
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
+                              <title>Checkmark</title>
                               <path
                                 fillRule="evenodd"
                                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -287,6 +317,7 @@ export default function CreateEventPage() {
                     stroke="currentColor"
                     strokeWidth={1.5}
                   >
+                    <title>Clock</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -333,7 +364,9 @@ export default function CreateEventPage() {
 
               {/* Duration */}
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-3">Duration</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-3" htmlFor="duration">
+                  Duration
+                </label>
                 <div className="flex gap-2">
                   {DURATIONS.map((dur) => (
                     <label
@@ -371,6 +404,7 @@ export default function CreateEventPage() {
                     stroke="currentColor"
                     strokeWidth={1.5}
                   >
+                    <title>Clock</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -423,6 +457,7 @@ export default function CreateEventPage() {
                     stroke="currentColor"
                     strokeWidth={1.5}
                   >
+                    <title>Link</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -454,6 +489,7 @@ export default function CreateEventPage() {
                     stroke="currentColor"
                     strokeWidth={1.5}
                   >
+                    <title>Location</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -503,6 +539,29 @@ export default function CreateEventPage() {
                 <p className="text-xs text-zinc-600 mt-2">
                   Leave empty to make this event available to all academy members
                 </p>
+              </div>
+
+              {/* Featured Event */}
+              <div className="pt-4 border-t border-white/[0.06]">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={formData.isFeatured}
+                    onChange={handleChange}
+                    className="mt-0.5 w-4 h-4 accent-rose-500"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">
+                      Featured Event
+                    </span>
+                    <p className="text-xs text-zinc-600 mt-1">
+                      Featured events show a countdown timer on the website and are highlighted
+                      prominently. Best for special events like workshops, launches, or major
+                      community gatherings.
+                    </p>
+                  </div>
+                </label>
               </div>
             </div>
 

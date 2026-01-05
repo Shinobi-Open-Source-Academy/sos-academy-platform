@@ -58,23 +58,34 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    // Only run on client after mount
+    if (!mounted) return;
+
     const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
 
     if (!token || !userStr) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
 
     try {
       setUser(JSON.parse(userStr));
+      setLoading(false);
     } catch {
-      router.push('/login');
+      localStorage.removeItem('hacker_token');
+      localStorage.removeItem('hacker_user');
+      router.replace('/login');
     }
-    setLoading(false);
-  }, [router]);
+  }, [mounted, router]);
 
   if (loading) {
     return (

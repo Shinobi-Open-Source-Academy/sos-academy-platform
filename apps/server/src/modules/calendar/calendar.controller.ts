@@ -24,6 +24,13 @@ export class CalendarController {
     return this.calendarService.findAll();
   }
 
+  @Get('events/upcoming')
+  @ApiOperation({ summary: 'Get upcoming events (public)' })
+  @ApiResponse({ status: 200, description: 'List of upcoming events' })
+  async findUpcoming() {
+    return this.calendarService.findUpcoming(5);
+  }
+
   @Get('events/:id')
   @ApiOperation({ summary: 'Get event by ID' })
   @ApiParam({ name: 'id', description: 'Event ID' })

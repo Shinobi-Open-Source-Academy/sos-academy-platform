@@ -48,15 +48,22 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!isAuthenticated()) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
 
     fetchEvents();
-  }, [router]);
+  }, [mounted, router]);
 
   const fetchEvents = async () => {
     try {
@@ -132,7 +139,7 @@ export default function EventsPage() {
     return eventDate.toDateString() === now.toDateString();
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
