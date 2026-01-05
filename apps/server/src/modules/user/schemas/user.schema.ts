@@ -1,26 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
+import { IGitHubProfile, MembershipLevel, UserRole, UserStatus } from '@sos-academy/shared';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type UserDocument = User & Document;
-
-export interface GitHubProfile {
-  login: string;
-  avatarUrl?: string;
-  htmlUrl?: string;
-  publicRepos?: number;
-  followers?: number;
-  following?: number;
-  createdAt?: Date;
-  lastUpdated: Date;
-  email?: string;
-  bio?: string;
-  location?: string;
-  company?: string;
-  blog?: string;
-  twitterUsername?: string;
-  githubId?: number;
-}
 
 export interface GitHubApiResponse {
   login: string;
@@ -170,7 +152,7 @@ export class User {
     required: false,
     _id: false,
   })
-  githubProfile?: GitHubProfile;
+  githubProfile?: IGitHubProfile;
 
   @Prop({ required: false })
   expertise?: string;

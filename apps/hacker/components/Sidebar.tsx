@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface User {
   name: string;
@@ -112,25 +113,25 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Get user from localStorage
-  const getUserFromStorage = (): User | null => {
-    if (typeof window === 'undefined') return null;
+  useEffect(() => {
+    setMounted(true);
     const userStr = localStorage.getItem('hacker_user');
-    if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch {
+        setUser(null);
+      }
     }
-  };
-
-  const user = getUserFromStorage();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('hacker_token');
     localStorage.removeItem('hacker_user');
-    router.push('/login');
+    router.replace('/login');
   };
 
   return (
@@ -194,7 +195,7 @@ export default function Sidebar() {
       </nav>
 
       {/* User section */}
-      {user && (
+      {mounted && user && (
         <div className="p-3 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 p-3 rounded hover:bg-white/[0.02] transition-colors">
             <img

@@ -73,6 +73,9 @@ export class CalendarEvent {
 
   @Prop()
   recurrencePattern: string;
+
+  @Prop({ default: false })
+  isFeatured: boolean;
 }
 
 export const CalendarEventSchema = SchemaFactory.createForClass(CalendarEvent);

@@ -5,9 +5,9 @@ import CodeBackground from '../components/CodeBackground';
 import Footer from '../components/Footer';
 import HeroGrid from '../components/HeroGrid';
 import JoinModal from '../components/JoinModal';
-import MentorModal from '../components/MentorModal';
 import Navbar from '../components/Navbar';
 import SpotlightCard from '../components/SpotlightCard';
+import UpcomingEvents from '../components/UpcomingEvents';
 import { COMMUNITIES, COMPANIES, FEATURES, MENTORS, PROJECTS, SITE_CONFIG } from '../lib/data';
 
 export default function Index() {
@@ -29,16 +29,12 @@ export default function Index() {
     ],
   };
   const [joinModalOpen, setJoinModalOpen] = useState(false);
-  const [mentorModalOpen, setMentorModalOpen] = useState(false);
 
   useEffect(() => {
     const handleOpenJoin = () => setJoinModalOpen(true);
-    const handleOpenMentor = () => setMentorModalOpen(true);
     window.addEventListener('openJoinModal', handleOpenJoin);
-    window.addEventListener('openMentorModal', handleOpenMentor);
     return () => {
       window.removeEventListener('openJoinModal', handleOpenJoin);
-      window.removeEventListener('openMentorModal', handleOpenMentor);
     };
   }, []);
 
@@ -52,7 +48,6 @@ export default function Index() {
       <CodeBackground />
       <Navbar />
       <JoinModal isOpen={joinModalOpen} onClose={() => setJoinModalOpen(false)} />
-      <MentorModal isOpen={mentorModalOpen} onClose={() => setMentorModalOpen(false)} />
 
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -180,16 +175,7 @@ export default function Index() {
             ))}
           </div>
 
-          <div className="mt-8 p-6 border border-white/5 bg-white/[0.02]">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <h3 className="text-sm font-semibold">Weekly Community Calls</h3>
-            </div>
-            <p className="text-sm text-gray-400">
-              Each community hosts weekly calls where members discuss projects and get guidance from
-              mentors.
-            </p>
-          </div>
+          <UpcomingEvents />
         </div>
       </section>
 
@@ -348,13 +334,12 @@ export default function Index() {
           </div>
 
           <div className="text-center mt-8">
-            <button
-              onClick={() => setMentorModalOpen(true)}
+            <a
+              href="/mentors#apply"
               className="inline-block px-6 py-3 border border-white/10 hover:border-white/20 transition-colors text-sm font-medium"
-              type="button"
             >
               Become a Mentor
-            </button>
+            </a>
           </div>
         </div>
       </section>

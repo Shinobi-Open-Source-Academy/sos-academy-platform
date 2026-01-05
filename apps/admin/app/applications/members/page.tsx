@@ -46,15 +46,22 @@ export default function MembersPage() {
     isOpen: false,
     member: null,
   });
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!isAuthenticated()) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
 
     fetchMembers();
-  }, [router]);
+  }, [mounted, router]);
 
   useEffect(() => {
     fetchCommunities();
@@ -132,7 +139,7 @@ export default function MembersPage() {
     return <span className={styles[status] || 'badge-neutral'}>{status}</span>;
   };
 
-  if (loading && members.length === 0) {
+  if (!mounted || (loading && members.length === 0)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">

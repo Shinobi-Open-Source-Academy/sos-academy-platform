@@ -26,6 +26,26 @@ export class CalendarService {
       .exec();
   }
 
+  /**
+   * Get upcoming events (public endpoint for website)
+   * Returns the next 5 upcoming events sorted by start time
+   */
+  async findUpcoming(limit = 5): Promise<CalendarEvent[]> {
+    const now = new Date();
+    return this.calendarEventModel
+      .find({
+        isActive: true,
+        startTime: { $gte: now },
+      })
+      .populate('community', 'name slug')
+      .sort({ startTime: 1 })
+      .limit(limit)
+      .select(
+        'title description startTime endTime eventType meetingLink location community isFeatured'
+      )
+      .exec();
+  }
+
   async findOne(id: string): Promise<CalendarEvent> {
     const event = await this.calendarEventModel
       .findById(id)

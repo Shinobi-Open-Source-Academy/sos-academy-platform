@@ -65,4 +65,8 @@ export class CreateCalendarEventDto {
   @IsOptional()
   @IsString()
   recurrencePattern?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
 }

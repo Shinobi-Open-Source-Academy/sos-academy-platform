@@ -9,19 +9,26 @@ const timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'
 
 export default function BookMentorPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [topic, setTopic] = useState('');
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const token = localStorage.getItem('hacker_token');
     if (!token) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
     setLoading(false);
-  }, [router]);
+  }, [mounted, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +37,7 @@ export default function BookMentorPage() {
     router.push('/mentors');
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

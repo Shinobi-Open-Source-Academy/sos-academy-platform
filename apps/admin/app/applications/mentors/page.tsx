@@ -47,15 +47,22 @@ export default function MentorsPage() {
     isOpen: false,
     mentor: null,
   });
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!isAuthenticated()) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
 
     fetchMentors();
-  }, [router]);
+  }, [mounted, router]);
 
   const fetchMentors = async () => {
     setLoading(true);
@@ -146,7 +153,7 @@ export default function MentorsPage() {
     return <span className={styles[status] || 'badge-neutral'}>{status.replace('_', ' ')}</span>;
   };
 
-  if (loading && mentors.length === 0) {
+  if (!mounted || (loading && mentors.length === 0)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">

@@ -5,6 +5,7 @@ interface JoinCommunityData {
   name?: string;
   communities: string[];
   githubHandle?: string;
+  acceptEventInvitations?: boolean;
 }
 
 interface MentorApplicationData {
@@ -53,4 +54,33 @@ export async function subscribeNewsletter(data: NewsletterData) {
     throw new Error('Failed to subscribe');
   }
   return response.json();
+}
+
+export interface UpcomingEvent {
+  _id: string;
+  title: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  meetingLink?: string;
+  location?: string;
+  community?: { name: string; slug: string };
+  isFeatured?: boolean;
+}
+
+export async function getUpcomingEvents(): Promise<UpcomingEvent[]> {
+  try {
+    const response = await fetch(`${API_URL}/calendar/events/upcoming`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return [];
+    }
+    return response.json();
+  } catch {
+    return [];
+  }
 }

@@ -47,15 +47,22 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!isAuthenticated()) {
-      router.push('/login');
+      router.replace('/login');
       return;
     }
 
     fetchStats();
-  }, [router]);
+  }, [mounted, router]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -69,7 +76,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
