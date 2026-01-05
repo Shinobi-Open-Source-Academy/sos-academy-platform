@@ -5,9 +5,10 @@ import { useRef, useState } from 'react';
 interface SpotlightCardProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export default function SpotlightCard({ children, className = '' }: SpotlightCardProps) {
+export default function SpotlightCard({ children, className = '', style }: SpotlightCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -30,6 +31,7 @@ export default function SpotlightCard({ children, className = '' }: SpotlightCar
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`relative overflow-hidden ${className}`}
+      style={style}
     >
       <div
         className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
