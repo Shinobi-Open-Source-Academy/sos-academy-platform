@@ -3,7 +3,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = (env, argv) => {
+module.exports = (_, argv) => {
   const isProduction = argv.mode === 'production';
   const isWatch = process.argv.includes('--watch') || process.env.NEST_WATCH === 'true';
 
@@ -21,12 +21,7 @@ module.exports = (env, argv) => {
       path: outputPath,
       filename: outputFilename,
     },
-    externals: [
-      nodeExternals({
-        // Include native modules and optional dependencies
-        allowlist: isWatch ? [] : undefined,
-      }),
-    ],
+    externals: [nodeExternals()],
     module: {
       rules: [
         {
@@ -74,5 +69,32 @@ module.exports = (env, argv) => {
       minimize: isProduction,
     },
     devtool: isProduction ? false : 'source-map',
+    ignoreWarnings: [
+      // NestJS and Express use dynamic requires that are safe
+      {
+        module: /@nestjs\/common\/utils\/load-package\.util\.js/,
+        message: /Critical dependency/,
+      },
+      {
+        module: /@nestjs\/core\/helpers\/load-adapter\.js/,
+        message: /Critical dependency/,
+      },
+      {
+        module: /@nestjs\/core\/helpers\/optional-require\.js/,
+        message: /Critical dependency/,
+      },
+      {
+        module: /express\/lib\/view\.js/,
+        message: /Critical dependency/,
+      },
+      {
+        module: /handlebars\/lib\/index\.js/,
+        message: /require\.extensions/,
+      },
+      {
+        module: /mongodb\/lib\/deps\.js/,
+        message: /Module not found/,
+      },
+    ],
   };
 };
