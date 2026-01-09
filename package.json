@@ -17,7 +17,7 @@
     "build:hacker": "turbo run build --filter=hacker",
     "build:shared": "turbo run build --filter=@sos-academy/shared",
     "start": "turbo run start",
-    "start:backend": "turbo run start --filter=server",
+    "start:backend": "turbo run dev --filter=server",
     "start:admin": "turbo run start --filter=admin",
     "start:website": "turbo run start --filter=website",
     "start:hacker": "turbo run start --filter=hacker",
