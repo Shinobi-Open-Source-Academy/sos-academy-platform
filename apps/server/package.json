@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "nest start --watch --entryFile src/main",
+    "vercel-build": "cd ../.. && pnpm run build:server",
     "build": "webpack --config webpack.config.js --mode production",
     "build:dev": "webpack --config webpack.config.js --mode development",
-    "start": "node ../../dist/apps/server/main.js",
+    "start": "nest start --entryFile src/main",
     "lint": "biome lint .",
     "seed": "ts-node -r tsconfig-paths/register src/seed.ts seed",
     "seed:clear": "ts-node -r tsconfig-paths/register src/seed.ts clear",
@@ -15,9 +16,10 @@
   },
   "dependencies": {
     "@sos-academy/shared": "workspace:*",
-    "resend": "^6.6.0"
+    "resend": "^6.6.0",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3"
+    "@types/express": "^4.17.21"
   }
 }
