@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nest start --watch --entryFile src/main",
+    "dev": "npx nest start --watch --entryFile src/main",
     "vercel-build": "cd ../.. && pnpm run build:server",
     "build": "webpack --config webpack.config.js --mode production",
     "build:dev": "webpack --config webpack.config.js --mode development",
-    "start": "nest start --entryFile src/main",
+    "start": "npx nest start --entryFile src/main",
     "lint": "biome lint .",
     "seed": "ts-node -r tsconfig-paths/register src/seed.ts seed",
     "seed:clear": "ts-node -r tsconfig-paths/register src/seed.ts clear",
