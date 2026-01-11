@@ -1,0 +1,53 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs (we build fresh in Docker)
+dist
+**/dist
+.next
+**/.next
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment files (secrets should be passed via Cloud Run)
+.env
+.env.*
+!.env.example
+
+# Test files
+coverage
+**/*.spec.ts
+**/*.test.ts
+jest.config.*
+
+# Turbo cache
+.turbo
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+*.md
+!README.md
+
+# Other apps (not needed for server)
+apps/admin
+apps/website
+apps/hacker
+apps/server-e2e
