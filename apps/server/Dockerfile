@@ -42,8 +42,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/server/package.json apps/server/
 COPY libs/shared/package.json libs/shared/
 
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+# Install production dependencies only (ignore-scripts skips husky which is a devDep)
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # Copy built artifacts from builder stage
 COPY --from=builder /app/dist/apps/server ./dist/apps/server
