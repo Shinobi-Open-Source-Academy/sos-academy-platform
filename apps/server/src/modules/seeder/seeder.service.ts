@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
 import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';

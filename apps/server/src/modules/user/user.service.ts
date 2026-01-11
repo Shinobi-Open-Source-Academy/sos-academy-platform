@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import mongoose, { Model, Schema } from 'mongoose';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
