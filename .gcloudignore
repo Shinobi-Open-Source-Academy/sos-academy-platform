@@ -1,0 +1,22 @@
+# Ignore node_modules - we install fresh
+node_modules/
+
+# Ignore build outputs
+dist/
+.next/
+.turbo/
+
+# Ignore IDE
+.idea/
+.vscode/
+
+# Ignore git
+.git/
+
+# DO NOT ignore these (needed for build):
+# - pnpm-lock.yaml
+# - package.json
+# - pnpm-workspace.yaml
+# - tsconfig.base.json
+# - apps/
+# - libs/
