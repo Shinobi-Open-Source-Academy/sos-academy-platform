@@ -14,7 +14,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
   const [name, setName] = useState('');
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
   const [githubHandle, setGithubHandle] = useState('');
-  const [acceptEventInvitations, setAcceptEventInvitations] = useState(true);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -35,7 +35,6 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
         name,
         communities: selectedCommunities,
         githubHandle,
-        acceptEventInvitations,
       });
       setSuccess(true);
       setTimeout(() => {
@@ -54,7 +53,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
     setName('');
     setSelectedCommunities([]);
     setGithubHandle('');
-    setAcceptEventInvitations(true);
+    setAcceptTerms(false);
     setSuccess(false);
     setError('');
   };
@@ -167,8 +166,8 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
-                    checked={acceptEventInvitations}
-                    onChange={(e) => setAcceptEventInvitations(e.target.checked)}
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
                     className="w-4 h-4 mt-0.5 accent-white flex-shrink-0"
                   />
                   <span className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-relaxed">
@@ -186,7 +185,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !acceptTerms}
                 className="w-full px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Joining...' : 'Join Academy'}

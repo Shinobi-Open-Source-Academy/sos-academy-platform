@@ -5,7 +5,6 @@ interface JoinCommunityData {
   name?: string;
   communities: string[];
   githubHandle?: string;
-  acceptEventInvitations?: boolean;
 }
 
 interface MentorApplicationData {
