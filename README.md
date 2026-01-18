@@ -174,7 +174,7 @@ Admin panel will be available at:
 
 **Note**: The backend automatically checks and seeds the database on startup if it's empty. You can also manually seed using:
 ```sh
-npx nx run server:seed
+npx nx run server:seed 
 ```
 
 ### Available Scripts
