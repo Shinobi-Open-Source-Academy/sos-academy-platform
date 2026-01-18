@@ -66,7 +66,7 @@ module.exports = (_, argv) => {
       }),
     ],
     optimization: {
-      minimize: isProduction,
+      minimize: false,
     },
     devtool: isProduction ? false : 'source-map',
     ignoreWarnings: [
