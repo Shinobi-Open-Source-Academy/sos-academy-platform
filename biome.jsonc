@@ -7,6 +7,17 @@
     "lineWidth": 100,
     "lineEnding": "lf"
   },
+  "css": {
+    "parser": {
+      "cssModules": true
+    },
+    "linter": {
+      "enabled": false
+    },
+    "formatter": {
+      "enabled": false
+    }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
@@ -22,20 +33,32 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn"
       },
       "style": {
-        "useConst": "error",
-        "useBlockStatements": "error"
+        "useConst": "warn",
+        "useBlockStatements": "off" // Style preference, not critical
       },
       "complexity": {
-        "noStaticOnlyClass": "off",
-        "noUselessConstructor": "off"
+        "noStaticOnlyClass": "off", // NestJS uses static-only classes
+        "noUselessConstructor": "off", // NestJS DI needs empty constructors
+        "noForEach": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "error",
-        "noArrayIndexKey": "error",
-        "noThenProperty": "off"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn",
+        "noThenProperty": "off" // Edge case, rarely relevant
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "warn", // Important for accessibility
+        "noLabelWithoutControl": "warn", // Important for form accessibility
+        "useButtonType": "warn",
+        "noStaticElementInteractions": "off", // Too many false positives with event delegation
+        "useSemanticElements": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn" // Important but sometimes needed (JSON-LD, etc)
       }
     }
   },

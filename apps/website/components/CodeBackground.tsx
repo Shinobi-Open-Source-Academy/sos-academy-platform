@@ -69,7 +69,6 @@ export default function CodeBackground() {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // biome-ignore lint/complexity/noForEach: <explanation>
       snippets.forEach((snippet) => {
         ctx.save();
         ctx.globalAlpha = snippet.opacity;

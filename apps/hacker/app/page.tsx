@@ -175,7 +175,7 @@ export default function DashboardPage() {
                             stroke="currentColor"
                             strokeWidth={1.5}
                           >
-                            ]<title>Pull Request</title>
+                            <title>Pull Request</title>
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"

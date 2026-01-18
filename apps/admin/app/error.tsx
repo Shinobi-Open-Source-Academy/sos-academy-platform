@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Next.js error page convention
 export default function Error({
   reset,
 }: {
