@@ -231,7 +231,7 @@ export class UserController {
     });
 
     const userDtos: UserResponseDto[] = result.users.map(
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: user object from DB
       (user: any) => new UserResponseDto(user)
     );
     return {

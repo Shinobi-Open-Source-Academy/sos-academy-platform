@@ -1,75 +1,22 @@
 name: 📚 Documentation
 description: Suggest improvements to documentation
 title: "[DOCS] "
-labels: ["documentation", "needs-triage"]
+labels: ["documentation"]
 assignees: []
 
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for helping improve our documentation! Clear docs make the project accessible to everyone.
-
-  - type: dropdown
-    id: doc-type
-    attributes:
-      label: Documentation Type
-      description: What type of documentation needs improvement?
-      options:
-        - README
-        - API Documentation
-        - Code Comments
-        - Contributing Guide
-        - Setup/Installation Guide
-        - Architecture/Design Docs
-        - Tutorial/How-To Guide
-        - Other
-    validations:
-      required: true
-
-  - type: textarea
-    id: location
-    attributes:
-      label: Location
-      description: Where is the documentation issue located?
-      placeholder: |
-        - File: README.md
-        - Section: Quick Start
-        - Line: 42
-    validations:
-      required: true
-
   - type: textarea
     id: problem
     attributes:
-      label: What's Wrong?
-      description: Describe what's missing, unclear, or incorrect
-      placeholder: The current documentation is unclear because...
+      label: What needs improvement?
+      description: What's missing, unclear, or incorrect?
+      placeholder: The docs for X are unclear because...
     validations:
       required: true
 
   - type: textarea
     id: suggestion
     attributes:
-      label: Suggested Improvement
+      label: Suggested change (optional)
       description: How would you improve it?
-      placeholder: I suggest we...
-    validations:
-      required: true
-
-  - type: textarea
-    id: additional-context
-    attributes:
-      label: Additional Context
-      description: Add any other context, screenshots, or examples
-
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Checklist
-      description: Please confirm the following
-      options:
-        - label: I have checked that this documentation issue hasn't been reported before
-          required: true
-        - label: I am willing to submit a PR to fix this if guidance is provided
-          required: false
+      placeholder: I suggest...

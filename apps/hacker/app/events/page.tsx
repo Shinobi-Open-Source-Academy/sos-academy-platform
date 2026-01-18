@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ComingSoon } from '../../components/ComingSoon';
 import Sidebar from '../../components/Sidebar';
 
 const mockEvents = [
@@ -62,7 +63,9 @@ export default function EventsPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     const token = localStorage.getItem('hacker_token');
     if (!token) {
@@ -95,36 +98,37 @@ export default function EventsPage() {
             <p className="text-zinc-500 text-sm mt-1">Upcoming community events and meetings</p>
           </div>
 
-          <div className="space-y-3 animate-fade-in delay-150">
-            {mockEvents.map((event) => {
-              const { month, day } = formatDate(event.date);
-              return (
-                <div key={event.id} className="card p-5 flex items-center gap-5">
-                  <div className="event-date">
-                    <span className="text-xs font-medium">{month}</span>
-                    <span className="text-xl font-semibold">{day}</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-white font-medium">{event.title}</h3>
-                      {event.attending && (
-                        <span className="badge badge-success text-[10px]">Attending</span>
-                      )}
+          <ComingSoon>
+            <div className="space-y-3 animate-fade-in delay-150">
+              {mockEvents.map((event) => {
+                const { month, day } = formatDate(event.date);
+                return (
+                  <div key={event.id} className="card p-5 flex items-center gap-5">
+                    <div className="event-date">
+                      <span className="text-xs font-medium">{month}</span>
+                      <span className="text-xl font-semibold">{day}</span>
                     </div>
-                    <p className="text-xs text-zinc-500">
-                      {event.time} · {event.community} · {event.type}
-                    </p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-white font-medium">{event.title}</h3>
+                        {event.attending && (
+                          <span className="badge badge-success text-[10px]">Attending</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-500">
+                        {event.time} · {event.community} · {event.type}
+                      </p>
+                    </div>
+                    <span
+                      className={event.attending ? 'btn-secondary text-xs' : 'btn-primary text-xs'}
+                    >
+                      {event.attending ? 'Cancel RSVP' : 'RSVP'}
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    className={event.attending ? 'btn-secondary text-xs' : 'btn-primary text-xs'}
-                  >
-                    {event.attending ? 'Cancel RSVP' : 'RSVP'}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </ComingSoon>
         </div>
       </main>
     </div>

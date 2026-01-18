@@ -2,8 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ComingSoon } from '../../components/ComingSoon';
 import Sidebar from '../../components/Sidebar';
 
+/**
+ * Mock members data
+ * TODO: Replace with actual data from the API when it's available (WIP)
+ */
 const mockMembers = [
   {
     id: 1,
@@ -60,7 +65,9 @@ export default function CommunityPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
@@ -97,46 +104,52 @@ export default function CommunityPage() {
           </div>
 
           {/* Community stats */}
-          <div className="grid grid-cols-3 gap-4 mb-8 animate-fade-in delay-75">
-            <div className="stat-card">
-              <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Members</p>
-              <p className="text-2xl font-semibold text-white">24</p>
+          <ComingSoon className="mb-8">
+            <div className="grid grid-cols-3 gap-4 animate-fade-in delay-75">
+              <div className="stat-card">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Members</p>
+                <p className="text-2xl font-semibold text-white">24</p>
+              </div>
+              <div className="stat-card">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Mentors</p>
+                <p className="text-2xl font-semibold text-emerald-400">3</p>
+              </div>
+              <div className="stat-card">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">
+                  Active Projects
+                </p>
+                <p className="text-2xl font-semibold text-white">5</p>
+              </div>
             </div>
-            <div className="stat-card">
-              <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Mentors</p>
-              <p className="text-2xl font-semibold text-emerald-400">3</p>
-            </div>
-            <div className="stat-card">
-              <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Active Projects</p>
-              <p className="text-2xl font-semibold text-white">5</p>
-            </div>
-          </div>
+          </ComingSoon>
 
           {/* Members list */}
           <div className="animate-fade-in delay-150">
             <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-4">
               Members
             </h2>
-            <div className="grid md:grid-cols-2 gap-3">
-              {mockMembers.map((member) => (
-                <div key={member.id} className="card p-4 flex items-center gap-4">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-10 h-10 rounded-full border border-white/10"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white font-medium">{member.name}</p>
-                    <p className="text-xs text-zinc-500">{member.contributions} contributions</p>
+            <ComingSoon>
+              <div className="grid md:grid-cols-2 gap-3">
+                {mockMembers.map((member) => (
+                  <div key={member.id} className="card p-4 flex items-center gap-4">
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="w-10 h-10 rounded-full border border-white/10"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium">{member.name}</p>
+                      <p className="text-xs text-zinc-500">{member.contributions} contributions</p>
+                    </div>
+                    <span
+                      className={`badge text-[10px] ${member.role === 'Mentor' ? 'badge-success' : 'badge-neutral'}`}
+                    >
+                      {member.role}
+                    </span>
                   </div>
-                  <span
-                    className={`badge text-[10px] ${member.role === 'Mentor' ? 'badge-success' : 'badge-neutral'}`}
-                  >
-                    {member.role}
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </ComingSoon>
           </div>
         </div>
       </main>

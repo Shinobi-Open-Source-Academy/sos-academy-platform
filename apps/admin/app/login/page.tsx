@@ -33,7 +33,7 @@ export default function LoginPage() {
         setAuthenticated(true);
         router.push('/');
       }
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: catch block error type
     } catch (err: any) {
       setError(err.message || 'Invalid credentials');
     } finally {
