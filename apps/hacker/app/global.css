@@ -180,4 +180,23 @@
   .text-gradient {
     @apply bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent;
   }
+
+  /* Under development blur effect */
+  .blur-dev {
+    @apply relative pointer-events-none select-none;
+    filter: blur(4px);
+    opacity: 0.6;
+  }
+
+  .blur-dev-wrapper {
+    @apply relative;
+  }
+
+  .blur-dev-overlay {
+    @apply absolute inset-0 flex items-center justify-center z-10;
+  }
+
+  .blur-dev-badge {
+    @apply px-3 py-1.5 text-xs font-medium bg-zinc-900/90 border border-white/10 text-zinc-400 tracking-wider uppercase backdrop-blur-sm;
+  }
 }

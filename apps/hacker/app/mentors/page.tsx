@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ComingSoon } from '../../components/ComingSoon';
 import Sidebar from '../../components/Sidebar';
 
 const mockMentors = [
@@ -45,7 +45,9 @@ export default function MentorsPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     const token = localStorage.getItem('hacker_token');
     if (!token) {
@@ -75,44 +77,47 @@ export default function MentorsPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4 animate-fade-in delay-150">
-            {mockMentors.map((mentor) => (
-              <div key={mentor.id} className="card p-5">
-                <div className="flex items-start gap-4">
-                  <img
-                    src={mentor.avatar}
-                    alt={mentor.name}
-                    className="w-12 h-12 rounded-full border border-white/10"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-white font-medium">{mentor.name}</h3>
-                      <span
-                        className={`w-2 h-2 rounded-full ${mentor.available ? 'bg-emerald-500' : 'bg-zinc-600'}`}
-                      />
+          <ComingSoon>
+            <div className="grid md:grid-cols-2 gap-4 animate-fade-in delay-150">
+              {mockMentors.map((mentor) => (
+                <div key={mentor.id} className="card p-5">
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={mentor.avatar}
+                      alt={mentor.name}
+                      className="w-12 h-12 rounded-full border border-white/10"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-white font-medium">{mentor.name}</h3>
+                        <span
+                          className={`w-2 h-2 rounded-full ${mentor.available ? 'bg-emerald-500' : 'bg-zinc-600'}`}
+                        />
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-0.5">{mentor.role}</p>
+                      <p className="text-xs text-emerald-400 mt-0.5">
+                        {mentor.community} Community
+                      </p>
                     </div>
-                    <p className="text-xs text-zinc-500 mt-0.5">{mentor.role}</p>
-                    <p className="text-xs text-emerald-400 mt-0.5">{mentor.community} Community</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-4">
+                    {mentor.expertise.map((skill) => (
+                      <span key={skill} className="badge badge-neutral text-[10px]">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                    <span
+                      className={`btn w-full justify-center text-xs ${mentor.available ? 'btn-primary' : 'btn-secondary opacity-50 cursor-not-allowed'}`}
+                    >
+                      {mentor.available ? 'Book Session' : 'Unavailable'}
+                    </span>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-4">
-                  {mentor.expertise.map((skill) => (
-                    <span key={skill} className="badge badge-neutral text-[10px]">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-4 pt-4 border-t border-white/[0.06]">
-                  <Link
-                    href={`/mentors/book?mentor=${mentor.id}`}
-                    className={`btn w-full justify-center text-xs ${mentor.available ? 'btn-primary' : 'btn-secondary opacity-50 cursor-not-allowed'}`}
-                  >
-                    {mentor.available ? 'Book Session' : 'Unavailable'}
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ComingSoon>
         </div>
       </main>
     </div>

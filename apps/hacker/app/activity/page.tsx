@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ComingSoon } from '../../components/ComingSoon';
 import Sidebar from '../../components/Sidebar';
 
 const mockActivity = [
@@ -65,7 +66,9 @@ export default function ActivityPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     const token = localStorage.getItem('hacker_token');
     if (!token) {
@@ -95,66 +98,70 @@ export default function ActivityPage() {
             </p>
           </div>
 
-          <div className="card overflow-hidden animate-fade-in delay-150">
-            {mockActivity.map((activity) => (
-              <div key={activity.id} className="activity-item">
-                <div
-                  className={`w-9 h-9 flex items-center justify-center border ${
-                    activity.type === 'pr'
-                      ? 'border-violet-500/30 text-violet-400'
-                      : 'border-emerald-500/30 text-emerald-400'
-                  }`}
-                >
-                  {activity.type === 'pr' ? (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-                      />
-                    </svg>
-                  )}
+          <ComingSoon>
+            <div className="card overflow-hidden animate-fade-in delay-150">
+              {mockActivity.map((activity) => (
+                <div key={activity.id} className="activity-item">
+                  <div
+                    className={`w-9 h-9 flex items-center justify-center border ${
+                      activity.type === 'pr'
+                        ? 'border-violet-500/30 text-violet-400'
+                        : 'border-emerald-500/30 text-emerald-400'
+                    }`}
+                  >
+                    {activity.type === 'pr' ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <title>Pull Request</title>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <title>Issue</title>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white">{activity.title}</p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      <span className="mono">{activity.repo}</span> · {activity.time}
+                    </p>
+                  </div>
+                  <span
+                    className={`badge ${
+                      activity.status === 'merged' || activity.status === 'closed'
+                        ? 'badge-success'
+                        : activity.status === 'review'
+                          ? 'badge-warning'
+                          : 'badge-info'
+                    }`}
+                  >
+                    {activity.status}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white">{activity.title}</p>
-                  <p className="text-xs text-zinc-500 mt-1">
-                    <span className="mono">{activity.repo}</span> · {activity.time}
-                  </p>
-                </div>
-                <span
-                  className={`badge ${
-                    activity.status === 'merged' || activity.status === 'closed'
-                      ? 'badge-success'
-                      : activity.status === 'review'
-                        ? 'badge-warning'
-                        : 'badge-info'
-                  }`}
-                >
-                  {activity.status}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ComingSoon>
         </div>
       </main>
     </div>

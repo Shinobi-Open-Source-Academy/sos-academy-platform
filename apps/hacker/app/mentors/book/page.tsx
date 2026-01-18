@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ComingSoon } from '../../../components/ComingSoon';
 import Sidebar from '../../../components/Sidebar';
 
 const timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
@@ -51,8 +51,9 @@ export default function BookMentorPage() {
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-xl mx-auto">
           <div className="mb-8 animate-fade-in">
-            <Link
-              href="/mentors"
+            <button
+              type="button"
+              onClick={() => router.push('/mentors')}
               className="text-xs text-zinc-500 hover:text-white mb-4 inline-flex items-center gap-1"
             >
               <svg
@@ -69,69 +70,71 @@ export default function BookMentorPage() {
                 />
               </svg>
               Back to mentors
-            </Link>
+            </button>
             <h1 className="text-2xl font-semibold text-white mt-4">Book a Session</h1>
             <p className="text-zinc-500 text-sm mt-1">Schedule a 1-on-1 mentoring session</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="card p-6 space-y-5 animate-fade-in delay-150">
-            <div>
-              <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
-                Select Date
-              </label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="input"
-                required
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
-                Select Time (UTC)
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {timeSlots.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    onClick={() => setSelectedTime(slot)}
-                    className={`py-2 text-sm border transition-colors ${
-                      selectedTime === slot
-                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
-                        : 'border-white/[0.06] text-zinc-400 hover:border-white/[0.12] hover:text-white'
-                    }`}
-                  >
-                    {slot}
-                  </button>
-                ))}
+          <ComingSoon>
+            <form onSubmit={handleSubmit} className="card p-6 space-y-5 animate-fade-in delay-150">
+              <div>
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
+                  Select Date
+                </label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="input"
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
-                What would you like to discuss?
-              </label>
-              <textarea
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                className="input min-h-[100px] resize-none"
-                placeholder="Describe the topic or questions you'd like to cover..."
-                required
-              />
-            </div>
+              <div>
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
+                  Select Time (UTC)
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {timeSlots.map((slot) => (
+                    <button
+                      key={slot}
+                      type="button"
+                      onClick={() => setSelectedTime(slot)}
+                      className={`py-2 text-sm border transition-colors ${
+                        selectedTime === slot
+                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                          : 'border-white/[0.06] text-zinc-400 hover:border-white/[0.12] hover:text-white'
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <button
-              type="submit"
-              className="btn-primary w-full justify-center"
-              disabled={!selectedDate || !selectedTime || !topic}
-            >
-              Request Session
-            </button>
-          </form>
+              <div>
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-2">
+                  What would you like to discuss?
+                </label>
+                <textarea
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  className="input min-h-[100px] resize-none"
+                  placeholder="Describe the topic or questions you'd like to cover..."
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="btn-primary w-full justify-center"
+                disabled={!selectedDate || !selectedTime || !topic}
+              >
+                Request Session
+              </button>
+            </form>
+          </ComingSoon>
         </div>
       </main>
     </div>
