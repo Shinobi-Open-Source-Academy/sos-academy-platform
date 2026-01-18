@@ -18,7 +18,7 @@
 
 A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
 
-## MVP Features
+## MVP Features 
 
 - **User Subscription**: Join communities with email and community selection
 - **Mentor Applications**: Apply to become a mentor with streamlined process
