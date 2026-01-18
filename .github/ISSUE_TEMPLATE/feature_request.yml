@@ -1,99 +1,31 @@
 name: ✨ Feature Request
 description: Suggest a new feature or enhancement
 title: "[FEATURE] "
-labels: ["enhancement", "needs-triage"]
+labels: ["enhancement"]
 assignees: []
 
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for suggesting a new feature! Please fill out the form below to help us understand your idea.
-
   - type: textarea
-    id: problem
+    id: description
     attributes:
-      label: Problem Statement
-      description: What problem does this feature solve? Is your feature request related to a problem?
-      placeholder: I'm frustrated when...
+      label: What would you like?
+      description: Describe the feature or improvement
+      placeholder: I'd like to see...
     validations:
       required: true
 
   - type: textarea
-    id: solution
+    id: why
     attributes:
-      label: Proposed Solution
-      description: Describe the solution you'd like
-      placeholder: I would like to see...
+      label: Why is this useful?
+      description: What problem does it solve or what value does it add?
+      placeholder: This would help because...
     validations:
-      required: true
-
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternatives Considered
-      description: Have you considered any alternative solutions or features?
-      placeholder: I've also thought about...
-
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      description: Which area does this feature relate to?
-      options:
-        - Frontend
-        - Backend
-        - Database
-        - DevOps/Infrastructure
-        - Documentation
-        - Testing
-        - Other
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      description: How important is this feature to you?
-      options:
-        - Nice to have
-        - Important
-        - Critical
-    validations:
-      required: true
-
-  - type: textarea
-    id: use-cases
-    attributes:
-      label: Use Cases
-      description: Describe specific use cases for this feature
-      placeholder: |
-        1. As a user, I want to...
-        2. As a mentor, I need to...
-
-  - type: textarea
-    id: mockups
-    attributes:
-      label: Mockups/Examples
-      description: If applicable, add mockups, wireframes, or examples from other projects
-      placeholder: Drag and drop images here
+      required: false
 
   - type: textarea
     id: additional-context
     attributes:
-      label: Additional Context
-      description: Add any other context or screenshots about the feature request here
-
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Checklist
-      description: Please confirm the following
-      options:
-        - label: I have searched for existing feature requests before creating this one
-          required: true
-        - label: I have provided a clear use case for this feature
-          required: true
-        - label: I am willing to help implement this feature if guidance is provided
-          required: false
+      label: Additional Context (optional)
+      description: Mockups, examples, or references
+      placeholder: Add any other context here...
