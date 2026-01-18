@@ -135,7 +135,7 @@
 
   /* Table styles */
   .table-container {
-    @apply bg-[var(--color-surface-1)] border border-white/[0.06] overflow-hidden;
+    @apply bg-[var(--color-surface-1)] border border-white/[0.06];
   }
 
   .table-header {

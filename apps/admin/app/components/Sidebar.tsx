@@ -8,7 +8,7 @@ import { logout } from '../../lib/auth';
 const navigation = [
   {
     name: 'Dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: (
       <svg
         className="w-4 h-4"
@@ -17,6 +17,7 @@ const navigation = [
         stroke="currentColor"
         strokeWidth={1.5}
       >
+        <title>dash</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -36,6 +37,7 @@ const navigation = [
         stroke="currentColor"
         strokeWidth={1.5}
       >
+        <title>mentors</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -55,6 +57,7 @@ const navigation = [
         stroke="currentColor"
         strokeWidth={1.5}
       >
+        <title>members</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -75,6 +78,7 @@ const navigation = [
         stroke="currentColor"
         strokeWidth={1.5}
       >
+        <title>events</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -92,7 +96,7 @@ export default function Sidebar() {
     <div className="w-56 bg-[#0a0a0a] border-r border-white/[0.06] flex flex-col h-screen sticky top-0">
       {/* Logo */}
       <div className="p-5 border-b border-white/[0.06]">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/dashboard" className="flex items-center gap-3">
           <Image
             src="/shinobiLogo.png"
             alt="SOS Academy"
@@ -149,6 +153,7 @@ export default function Sidebar() {
             stroke="currentColor"
             strokeWidth={1.5}
           >
+            <title>signout</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

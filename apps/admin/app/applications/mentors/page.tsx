@@ -47,6 +47,10 @@ export default function MentorsPage() {
     isOpen: false,
     mentor: null,
   });
+  const [detailsModal, setDetailsModal] = useState<{ isOpen: boolean; mentor: Mentor | null }>({
+    isOpen: false,
+    mentor: null,
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -190,6 +194,7 @@ export default function MentorsPage() {
               stroke="currentColor"
               strokeWidth={1.5}
             >
+              <title>Refresh</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -210,6 +215,7 @@ export default function MentorsPage() {
               stroke="currentColor"
               strokeWidth={1.5}
             >
+              <title>Search</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -281,6 +287,7 @@ export default function MentorsPage() {
                           stroke="currentColor"
                           strokeWidth={1}
                         >
+                          <title>No mentors found</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -370,8 +377,9 @@ export default function MentorsPage() {
                           )}
                           <QuickActionsMenu
                             githubUrl={mentor.githubProfile?.htmlUrl}
+                            email={mentor.email}
                             onDelete={() => setDeleteModal({ isOpen: true, mentor })}
-                            onViewActivity={() => console.log('View activity', mentor._id)}
+                            onViewDetails={() => setDetailsModal({ isOpen: true, mentor })}
                           />
                         </div>
                       </td>
@@ -420,6 +428,154 @@ export default function MentorsPage() {
         onConfirm={handleDelete}
         userName={deleteModal.mentor?.name || ''}
       />
+
+      {/* Application Details Modal */}
+      {detailsModal.isOpen && detailsModal.mentor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#111] border border-white/10 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
+            <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+              <h2 className="text-lg font-semibold text-white">Application Details</h2>
+              <button
+                type="button"
+                onClick={() => setDetailsModal({ isOpen: false, mentor: null })}
+                className="p-1 text-zinc-500 hover:text-white transition-colors"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <title>Close</title>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Header with avatar */}
+              <div className="flex items-center gap-4 pb-4 border-b border-white/[0.06]">
+                {detailsModal.mentor.githubProfile?.avatarUrl ? (
+                  <img
+                    src={detailsModal.mentor.githubProfile.avatarUrl}
+                    alt={detailsModal.mentor.name}
+                    className="w-14 h-14 object-cover"
+                  />
+                ) : (
+                  <div className="w-14 h-14 bg-zinc-800 flex items-center justify-center text-zinc-500 text-xl font-medium">
+                    {detailsModal.mentor.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white">{detailsModal.mentor.name}</h3>
+                  <p className="text-sm text-zinc-400 mono">{detailsModal.mentor.email}</p>
+                </div>
+                {getStatusBadge(detailsModal.mentor.status)}
+              </div>
+
+              {/* GitHub */}
+              <div>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">GitHub</p>
+                {detailsModal.mentor.githubProfile ? (
+                  <a
+                    href={detailsModal.mentor.githubProfile.htmlUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-400 hover:text-blue-300 mono"
+                  >
+                    github.com/{detailsModal.mentor.githubProfile.login}
+                  </a>
+                ) : (
+                  <p className="text-sm text-zinc-600 italic">Not provided</p>
+                )}
+              </div>
+
+              {/* Expertise */}
+              <div>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                  Areas of Expertise
+                </p>
+                {detailsModal.mentor.expertise ? (
+                  <p className="text-sm text-zinc-300">{detailsModal.mentor.expertise}</p>
+                ) : (
+                  <p className="text-sm text-zinc-600 italic">Not provided</p>
+                )}
+              </div>
+
+              {/* Motivation */}
+              <div>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                  Why They Want to Be a Sensei
+                </p>
+                {detailsModal.mentor.motivation ? (
+                  <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                    {detailsModal.mentor.motivation}
+                  </p>
+                ) : (
+                  <p className="text-sm text-zinc-600 italic">Not provided</p>
+                )}
+              </div>
+
+              {/* Communities */}
+              {detailsModal.mentor.communities && detailsModal.mentor.communities.length > 0 && (
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Communities</p>
+                  <div className="flex flex-wrap gap-2">
+                    {detailsModal.mentor.communities.map((community) => (
+                      <span key={community.slug} className="badge-info">
+                        {community.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Applied Date */}
+              <div className="pt-2 border-t border-white/[0.06]">
+                <p className="text-xs text-zinc-600">
+                  Applied on {formatDate(detailsModal.mentor.createdAt)}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-5 border-t border-white/[0.06] flex gap-3">
+              {(detailsModal.mentor.status === 'PENDING' ||
+                detailsModal.mentor.status === 'APPLIED_MENTOR') && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleApprove(detailsModal.mentor!._id);
+                      setDetailsModal({ isOpen: false, mentor: null });
+                    }}
+                    className="btn-success flex-1"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleReject(detailsModal.mentor!._id);
+                      setDetailsModal({ isOpen: false, mentor: null });
+                    }}
+                    className="btn-danger flex-1"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              <a
+                href={`mailto:${detailsModal.mentor.email}`}
+                className="btn-secondary flex-1 text-center"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

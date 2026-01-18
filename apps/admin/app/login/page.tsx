@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiClient } from '../../lib/api-client';
-import { setAuthenticated } from '../../lib/auth';
+import { isAuthenticated, setAuthenticated } from '../../lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +14,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace('/dashboard');
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +38,7 @@ export default function LoginPage() {
 
       if (response.data?.success) {
         setAuthenticated(true);
-        router.push('/');
+        router.push('/dashboard');
       }
       // biome-ignore lint/suspicious/noExplicitAny: catch block error type
     } catch (err: any) {

@@ -521,6 +521,8 @@ export class UserService {
       githubProfile: 1,
       communities: 1,
       createdAt: 1,
+      expertise: 1,
+      motivation: 1,
     };
 
     // Query with lean to avoid class-transformer recursion

@@ -343,8 +343,8 @@ export default function MembersPage() {
                         <div className="flex items-center justify-end">
                           <QuickActionsMenu
                             githubUrl={member.githubProfile?.htmlUrl}
+                            email={member.email}
                             onDelete={() => setDeleteModal({ isOpen: true, member })}
-                            onViewActivity={() => console.log('View activity', member._id)}
                           />
                         </div>
                       </td>

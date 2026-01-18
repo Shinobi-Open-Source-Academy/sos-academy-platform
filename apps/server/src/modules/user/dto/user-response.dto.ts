@@ -133,6 +133,36 @@ export class UserResponseDto {
   @Expose()
   updatedAt: Date;
 
+  @ApiProperty({
+    description: 'Mentor areas of expertise',
+    example: 'React, Node.js, TypeScript, System Design',
+    required: false,
+  })
+  @Expose()
+  expertise?: string;
+
+  @ApiProperty({
+    description: 'Mentor motivation for joining',
+    example: 'I want to help new developers grow in the open-source community.',
+    required: false,
+  })
+  @Expose()
+  motivation?: string;
+
+  @ApiProperty({
+    description: 'GitHub profile information',
+    required: false,
+  })
+  @Expose()
+  githubProfile?: {
+    login: string;
+    avatarUrl?: string;
+    htmlUrl?: string;
+    publicRepos?: number;
+    followers?: number;
+    bio?: string;
+  };
+
   constructor(partial: Partial<UserResponseDto>) {
     Object.assign(this, partial);
   }
