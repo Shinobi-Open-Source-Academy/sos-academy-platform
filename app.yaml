@@ -8,8 +8,6 @@ instance_class: F2
 
 env_variables:
   NODE_ENV: production
-  # Secrets are injected via Cloud Build from Secret Manager
-  # See cloudbuild-appengine.yaml
 
 automatic_scaling:
   min_instances: 0
