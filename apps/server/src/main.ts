@@ -21,13 +21,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // Configure CORS - support multiple origins
-  const corsOrigins = envConfig.cors.origin.split(',').map((origin) => origin.trim());
-  app.enableCors({
-    origin: corsOrigins.length > 1 ? corsOrigins : corsOrigins[0],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+  // allow all origins for now
+  app.enableCors();
 
   // Configure API prefix
   app.setGlobalPrefix('api');
