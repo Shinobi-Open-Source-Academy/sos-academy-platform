@@ -1,22 +1,43 @@
-# Ignore node_modules - we install fresh
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud app deploy. It follows the same syntax as .gitignore.
+
+# Node modules - these are created during Cloud Build and should NOT be uploaded
+# App Engine will run its own install
 node_modules/
+**/node_modules/
+.pnpm-store/
 
-# Ignore build outputs
-dist/
-.next/
+# Build caches
 .turbo/
+**/.turbo/
+*.turbo
+.next/
+**/.next/
 
-# Ignore IDE
-.idea/
-.vscode/
+# Frontend apps (not needed for backend-only deployment)
+apps/admin/
+apps/website/
+apps/hacker/
+apps/server-e2e/
 
-# Ignore git
+# Git
 .git/
 
-# DO NOT ignore these (needed for build):
-# - pnpm-lock.yaml
-# - package.json
-# - pnpm-workspace.yaml
-# - tsconfig.base.json
-# - apps/
-# - libs/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests
+coverage/
+**/*.spec.ts
+**/*.test.ts
+jest.config.*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
