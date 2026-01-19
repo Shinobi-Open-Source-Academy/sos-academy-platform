@@ -301,7 +301,7 @@ export default function MentorsPage() {
                 ) : (
                   mentors.map((mentor, index) => (
                     <tr
-                      key={mentor._id}
+                      key={mentor._id || `mentor-${index}`}
                       className="table-row animate-fade-in"
                       style={{ animationDelay: `${index * 30}ms` }}
                     >
@@ -547,8 +547,10 @@ export default function MentorsPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      handleApprove(detailsModal.mentor!._id);
-                      setDetailsModal({ isOpen: false, mentor: null });
+                      if (detailsModal.mentor) {
+                        handleApprove(detailsModal.mentor._id);
+                        setDetailsModal({ isOpen: false, mentor: null });
+                      }
                     }}
                     className="btn-success flex-1"
                   >
@@ -557,8 +559,10 @@ export default function MentorsPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      handleReject(detailsModal.mentor!._id);
-                      setDetailsModal({ isOpen: false, mentor: null });
+                      if (detailsModal.mentor) {
+                        handleReject(detailsModal.mentor._id);
+                        setDetailsModal({ isOpen: false, mentor: null });
+                      }
                     }}
                     className="btn-danger flex-1"
                   >

@@ -40,7 +40,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
       setTimeout(() => {
         onClose();
         resetForm();
-      }, 2000);
+      }, 5000);
     } catch (_err) {
       setError('Failed to join. Please try again.');
     } finally {

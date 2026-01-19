@@ -174,6 +174,7 @@ export default function MembersPage() {
               stroke="currentColor"
               strokeWidth={1.5}
             >
+              <title>Refresh</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -194,6 +195,7 @@ export default function MembersPage() {
               stroke="currentColor"
               strokeWidth={1.5}
             >
+              <title>Search</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -266,6 +268,7 @@ export default function MembersPage() {
                           stroke="currentColor"
                           strokeWidth={1}
                         >
+                          <title>Empty inbox</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -319,13 +322,13 @@ export default function MembersPage() {
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-1">
                           {member.communities && member.communities.length > 0 ? (
-                            member.communities.map((community, idx) => {
+                            member.communities.map((community) => {
                               const name =
                                 typeof community === 'string' ? community : community.name;
                               const key =
                                 typeof community === 'string' ? community : community.slug;
                               return (
-                                <span key={`${key}-${idx}`} className="badge-info">
+                                <span key={key} className="badge-info">
                                   {name}
                                 </span>
                               );

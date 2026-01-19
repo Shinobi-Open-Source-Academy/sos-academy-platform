@@ -34,7 +34,7 @@ export default function MentorModal({ isOpen, onClose }: MentorModalProps) {
       setTimeout(() => {
         onClose();
         resetForm();
-      }, 2000);
+      }, 5000);
     } catch (_err) {
       setError('Failed to submit application. Please try again.');
     } finally {
