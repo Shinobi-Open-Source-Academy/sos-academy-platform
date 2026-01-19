@@ -1,10 +1,13 @@
 import * as fs from 'node:fs';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as handlebars from 'handlebars';
 import { Resend } from 'resend';
 import { FALLBACK_TEMPLATES } from './templates/constants/email-template-fallback.constant';
+
+// Get the directory where the compiled code lives (works with webpack bundling)
+const TEMPLATES_DIR = join(__dirname, 'modules/email/templates');
 
 export interface EmailTemplateParams {
   [key: string]: string | number | boolean | Date | string[] | undefined;
@@ -37,14 +40,30 @@ export class EmailService {
    * @returns Compiled HTML string
    */
   private loadTemplate(template: string, params: EmailTemplateParams, subject: string): string {
-    const templatePath = resolve(process.cwd(), 'src/modules/email/templates', `${template}.hbs`);
+    // Try multiple paths: production (relative to __dirname) and development (src folder)
+    const possiblePaths = [
+      join(TEMPLATES_DIR, `${template}.hbs`), // Production: dist/apps/server/modules/email/templates/
+      resolve(process.cwd(), 'src/modules/email/templates', `${template}.hbs`), // Dev fallback
+      resolve(process.cwd(), 'apps/server/src/modules/email/templates', `${template}.hbs`), // Monorepo dev
+    ];
 
-    if (!fs.existsSync(templatePath)) {
-      this.logger.warn(`Template file not found: ${templatePath}, using fallback template`);
+    let templatePath: string | null = null;
+    for (const path of possiblePaths) {
+      if (fs.existsSync(path)) {
+        templatePath = path;
+        break;
+      }
+    }
+
+    if (!templatePath) {
+      this.logger.warn(
+        `Template file not found in any of: ${possiblePaths.join(', ')}, using fallback template`
+      );
       return this.getFallbackTemplate(template, params, subject);
     }
 
     try {
+      this.logger.log(`Loading template from: ${templatePath}`);
       const templateContent = fs.readFileSync(templatePath, 'utf8');
       const compiledTemplate = handlebars.compile(templateContent);
       return compiledTemplate(params);
@@ -76,14 +95,28 @@ export class EmailService {
     content: string;
     contentId?: string;
   }> {
-    const logoPath = resolve(process.cwd(), 'src/modules/email/templates/assets/logo.png');
+    // Try multiple paths for logo
+    const possiblePaths = [
+      join(TEMPLATES_DIR, 'assets/logo.png'), // Production
+      resolve(process.cwd(), 'src/modules/email/templates/assets/logo.png'), // Dev fallback
+      resolve(process.cwd(), 'apps/server/src/modules/email/templates/assets/logo.png'), // Monorepo dev
+    ];
 
-    if (!fs.existsSync(logoPath)) {
-      this.logger.warn(`Logo file not found: ${logoPath}`);
+    let logoPath: string | null = null;
+    for (const path of possiblePaths) {
+      if (fs.existsSync(path)) {
+        logoPath = path;
+        break;
+      }
+    }
+
+    if (!logoPath) {
+      this.logger.warn(`Logo file not found in any of: ${possiblePaths.join(', ')}`);
       return [];
     }
 
     try {
+      this.logger.log(`Loading logo from: ${logoPath}`);
       const logoBuffer = fs.readFileSync(logoPath);
       const logoBase64 = logoBuffer.toString('base64');
 
