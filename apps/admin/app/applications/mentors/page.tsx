@@ -301,7 +301,7 @@ export default function MentorsPage() {
                 ) : (
                   mentors.map((mentor, index) => (
                     <tr
-                      key={mentor._id}
+                      key={mentor.id || `mentor-${index}`}
                       className="table-row animate-fade-in"
                       style={{ animationDelay: `${index * 30}ms` }}
                     >
