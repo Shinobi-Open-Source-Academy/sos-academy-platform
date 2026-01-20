@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ComingSoon } from '../components/ComingSoon';
 import Sidebar from '../components/Sidebar';
@@ -55,9 +55,10 @@ const mockStats = {
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
+    'checking'
+  );
   const [mounted, setMounted] = useState(false);
 
   // Handle client-side mounting
@@ -75,21 +76,27 @@ export default function DashboardPage() {
     const userStr = localStorage.getItem('hacker_user');
 
     if (!token || !userStr) {
-      router.replace('/login');
+      setAuthState('unauthenticated');
       return;
     }
 
     try {
       setUser(JSON.parse(userStr));
-      setLoading(false);
+      setAuthState('authenticated');
     } catch {
       localStorage.removeItem('hacker_token');
       localStorage.removeItem('hacker_user');
-      router.replace('/login');
+      setAuthState('unauthenticated');
     }
-  }, [mounted, router]);
+  }, [mounted]);
 
-  if (loading) {
+  // Redirect unauthenticated users
+  if (authState === 'unauthenticated') {
+    redirect('/login');
+  }
+
+  // Show loading while checking auth
+  if (authState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">

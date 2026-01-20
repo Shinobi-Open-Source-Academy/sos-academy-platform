@@ -1,19 +1,31 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { type KeyboardEvent, type MouseEvent, useRef, useState } from 'react';
 
 interface SpotlightCardProps {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
+  tabIndex?: number;
+  role?: string;
 }
 
-export default function SpotlightCard({ children, className = '', style }: SpotlightCardProps) {
+export default function SpotlightCard({
+  children,
+  className = '',
+  style,
+  onClick,
+  onKeyDown,
+  tabIndex,
+  role,
+}: SpotlightCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) {
       return;
     }
@@ -30,6 +42,10 @@ export default function SpotlightCard({ children, className = '', style }: Spotl
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
+      role={onClick ? (role ?? 'button') : role}
       className={`relative overflow-hidden ${className}`}
       style={style}
     >
@@ -40,7 +56,7 @@ export default function SpotlightCard({ children, className = '', style }: Spotl
           background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 255, 255, 0.15), transparent 50%)`,
         }}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 h-full">{children}</div>
     </div>
   );
 }

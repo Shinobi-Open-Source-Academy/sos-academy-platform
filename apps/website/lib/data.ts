@@ -31,7 +31,7 @@ export const COMMUNITIES = [
     kage: {
       name: 'Pacifique Linjanja',
       role: 'Community Kage',
-      image: '/images/mentor3.jpeg',
+      image: '/images/mentor1.jpeg',
       bio: 'Leading the Konoha community with expertise in modern JavaScript frameworks and backend development.',
     },
     mentors: ['Pacifique Linjanja'],
@@ -159,7 +159,7 @@ export const MENTORS = [
     id: 'pacifique',
     name: 'Pacifique Linjanja',
     role: 'Senior Backend Engineer',
-    image: '/images/mentor3.jpeg',
+    image: '/images/mentor1.jpeg',
     bio: "Over 7 years experience in backend development, with a focus on building scalable and maintainable systems. Author of 'Scalable Software Development with NestJS'",
     expertise: ['JavaScript', 'TypeScript', 'Rust', 'Microservices', 'System Design'],
     socials: {
