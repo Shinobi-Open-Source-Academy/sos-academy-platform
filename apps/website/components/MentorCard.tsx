@@ -97,34 +97,38 @@ export default function MentorCard({
 
   return (
     <SpotlightCard
-      className={`border border-white/5 hover:border-white/10 p-6 transition-all duration-300 group ${className}`}
+      className={`border border-white/5 hover:border-white/10 transition-colors h-full group bg-black/50 ${className}`}
     >
-      <div className="flex items-start gap-4">
-        <div className="relative overflow-hidden flex-shrink-0">
-          <img
-            src={image}
-            alt={name}
-            className="w-16 h-16 object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold group-hover:text-white transition-colors">{name}</h3>
-          <p className="text-sm text-gray-500 mb-3">{role}</p>
-          {bio && <p className="text-sm text-gray-400 mb-3 line-clamp-2">{bio}</p>}
+      <div className="absolute inset-y-0 left-0 w-[45%] md:w-[40%] overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-transparent via-black/50 to-black" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-full object-cover object-top opacity-80 group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0"
+        />
+      </div>
+
+      <div className="relative z-20 p-6 pl-[35%] md:pl-[35%] flex flex-col h-full items-start text-left">
+        <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
+        <p className="text-emerald-400 text-sm font-medium mb-3">{role}</p>
+        {bio && <p className="text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">{bio}</p>}
+
+        <div className="mt-auto space-y-4 w-full">
           {expertise.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-2">
               {expertise.slice(0, 3).map((skill) => (
                 <span
                   key={skill}
-                  className="text-xs px-2 py-1 border border-white/5 text-gray-500 group-hover:border-white/10 transition-colors"
+                  className="text-[10px] px-2 py-1 border border-white/10 bg-white/5 text-gray-400 rounded-sm"
                 >
                   {skill}
                 </span>
               ))}
             </div>
           )}
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-3 pt-2 border-t border-white/5">
             {socials.github && (
               <a
                 href={socials.github}

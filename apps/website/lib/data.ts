@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
     github: 'https://github.com/Shinobi-Open-Source-Academy',
     twitter: 'https://x.com/SOSAcademy_',
     linkedin: 'https://www.linkedin.com/company/shinobi-open-source-academy-sos-a/about/',
-    discord: 'https://discord.gg/9Wgx7bCh',
+    discord: 'https://discord.gg/X9PWySkvKM',
   },
 };
 
@@ -165,7 +165,7 @@ export const MENTORS = [
     socials: {
       github: 'https://github.com/pacyL2K19',
       linkedin: 'https://linkedin.com/in/pacifique-linjanja',
-      twitter: 'https://x.com/PacifiqueLinja1',
+      twitter: 'https://x.com/senseiPac_',
       website: 'https://paclinjanja.com',
     },
   },
