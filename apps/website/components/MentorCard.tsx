@@ -1,7 +1,7 @@
 'use client';
 
+import { GitHubIcon, GlobeIcon, LinkedInIcon, TwitterIcon } from './icons';
 import SpotlightCard from './SpotlightCard';
-import { GitHubIcon, LinkedInIcon, TwitterIcon, GlobeIcon } from './icons';
 
 interface MentorSocials {
   github?: string;
@@ -87,32 +87,35 @@ export default function MentorCard({
     );
   }
 
+  // Full variant - original layout with reduced height
   return (
     <SpotlightCard
-      className={`border border-white/5 hover:border-white/10 transition-colors h-full group bg-black/50 ${className}`}
+      className={`border border-white/5 hover:border-white/10 transition-colors h-40 group bg-black/50 ${className}`}
     >
-      <div className="absolute inset-y-0 left-0 w-[45%] md:w-[40%] overflow-hidden">
+      {/* Image on left side */}
+      <div className="absolute inset-y-0 left-0 w-[38%] overflow-hidden">
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-transparent via-black/50 to-black" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover object-top opacity-80 group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0"
+          className="w-full h-full object-cover object-top opacity-80 group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
         />
       </div>
 
-      <div className="relative z-20 p-6 pl-[35%] md:pl-[35%] flex flex-col h-full items-start text-left">
-        <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
-        <p className="text-emerald-400 text-sm font-medium mb-3">{role}</p>
-        {bio && <p className="text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">{bio}</p>}
+      {/* Content on right side */}
+      <div className="relative z-20 h-full p-3 pl-[36%] flex flex-col items-start text-left">
+        <h3 className="text-sm font-bold text-white">{name}</h3>
+        <p className="text-emerald-400 text-[11px] font-medium mb-1">{role}</p>
+        {bio && <p className="text-gray-400 text-[11px] line-clamp-2 leading-snug">{bio}</p>}
 
-        <div className="mt-auto space-y-4 w-full">
+        <div className="mt-auto space-y-1.5 w-full">
           {expertise.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1">
               {expertise.slice(0, 3).map((skill) => (
                 <span
                   key={skill}
-                  className="text-[10px] px-2 py-1 border border-white/10 bg-white/5 text-gray-400 rounded-sm"
+                  className="text-[9px] px-1.5 py-0.5 border border-white/10 bg-white/5 text-gray-400"
                 >
                   {skill}
                 </span>
@@ -120,7 +123,7 @@ export default function MentorCard({
             </div>
           )}
 
-          <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+          <div className="flex items-center gap-2 pt-1.5 border-t border-white/5">
             {socials.github && (
               <a
                 href={socials.github}
@@ -129,7 +132,7 @@ export default function MentorCard({
                 className="text-gray-500 hover:text-white transition-colors"
                 title="GitHub"
               >
-                <GitHubIcon className="w-4 h-4" />
+                <GitHubIcon className="w-3 h-3" />
               </a>
             )}
             {socials.linkedin && (
@@ -140,7 +143,7 @@ export default function MentorCard({
                 className="text-gray-500 hover:text-white transition-colors"
                 title="LinkedIn"
               >
-                <LinkedInIcon className="w-4 h-4" />
+                <LinkedInIcon className="w-3 h-3" />
               </a>
             )}
             {socials.twitter && (
@@ -151,7 +154,7 @@ export default function MentorCard({
                 className="text-gray-500 hover:text-white transition-colors"
                 title="Twitter/X"
               >
-                <TwitterIcon className="w-4 h-4" />
+                <TwitterIcon className="w-3 h-3" />
               </a>
             )}
             {socials.website && (
@@ -162,7 +165,7 @@ export default function MentorCard({
                 className="text-gray-500 hover:text-white transition-colors"
                 title="Website"
               >
-                <GlobeIcon className="w-4 h-4" />
+                <GlobeIcon className="w-3 h-3" />
               </a>
             )}
           </div>

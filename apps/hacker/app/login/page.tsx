@@ -1,13 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
+    'checking'
+  );
 
   // Handle client-side mounting
   useEffect(() => {
@@ -22,14 +24,19 @@ export default function LoginPage() {
 
     const token = localStorage.getItem('hacker_token');
     if (token) {
-      router.replace('/');
+      setAuthState('authenticated');
     } else {
-      setCheckingAuth(false);
+      setAuthState('unauthenticated');
     }
-  }, [mounted, router]);
+  }, [mounted]);
+
+  // Redirect authenticated users to dashboard
+  if (authState === 'authenticated') {
+    redirect('/');
+  }
 
   // Show loading while checking auth
-  if (!mounted || checkingAuth) {
+  if (!mounted || authState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
