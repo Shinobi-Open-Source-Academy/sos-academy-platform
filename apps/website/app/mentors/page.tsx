@@ -118,53 +118,123 @@ export default function MentorsPage() {
       </section>
 
       {/* About SOS Academy - Shinobi Context */}
-      <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-white/[0.02]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">The Way of the Shinobi</h2>
-              <div className="space-y-4 text-gray-400">
+              <div className="inline-block px-3 py-1 text-xs font-mono text-emerald-500 mb-6 border border-emerald-500/20 bg-emerald-500/5 rounded-full">
+                THE PHILOSOPHY
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">
+                The Way of the{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                  Shinobi
+                </span>
+              </h2>
+              <div className="space-y-6 text-lg text-gray-400 leading-relaxed font-light">
                 <p>
-                  <strong className="text-white">SOS Academy</strong> is gamified around the
-                  legendary Shinobi world. Every developer who joins starts as a{' '}
-                  <strong className="text-gray-300">Genin</strong> (beginner ninja) and progresses
-                  through ranks by completing missions and mastering their craft.
+                  <span className="text-emerald-400 font-medium">SOS Academy</span> is more than a
+                  platform; it's a journey gamified around the legendary Shinobi world. Every
+                  developer starts as a <span className="text-white font-medium">Genin</span> and
+                  rises through the ranks by mastering their craft.
                 </p>
                 <p>
-                  As a <strong className="text-white">Sensei</strong>, you'll be the guiding force
-                  behind their journey. You'll assign missions tailored to their skill level, review
-                  their jutsu (code), and help them climb the ranks — from Genin to Chunin, Jonin,
-                  and eventually <strong className="text-gray-300">Sannin</strong> or even{' '}
-                  <strong className="text-gray-300">Kage</strong> (community leader).
+                  We are looking for <span className="text-emerald-400 font-medium">Senseis</span>
+                  —experienced developers willing to guide these aspiring ninjas. Your role is not
+                  just to teach, but to inspire. You assign missions, review code (jutsu), and help
+                  them ascend to <span className="text-white font-medium">Chunin</span>,{' '}
+                  <span className="text-white font-medium">Jonin</span>, and beyond.
                 </p>
                 <p>
-                  Your mission assignments will shape the future of open-source. Every PR merged,
-                  every issue solved, every mentee who levels up — that's your legacy.
+                  Your mentorship shapes the future of open-source. Help us build a generation of
+                  developers who are skilled, collaborative, and ready to protect the code.
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <SpotlightCard className="border border-white/5 p-5 hover:border-white/10 transition-colors">
-                <div className="text-2xl mb-2">🥷</div>
-                <h3 className="font-semibold text-sm mb-1">Genin → Chunin</h3>
-                <p className="text-xs text-gray-500">
-                  Guide beginners through their first contributions
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-emerald-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Genin → Chunin</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Guide beginners through their first meaningful contributions.
                 </p>
               </SpotlightCard>
-              <SpotlightCard className="border border-white/5 p-5 hover:border-white/10 transition-colors">
-                <div className="text-2xl mb-2">⚔️</div>
-                <h3 className="font-semibold text-sm mb-1">Assign Missions</h3>
-                <p className="text-xs text-gray-500">Create challenges that push growth</p>
+              <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-blue-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Assign Missions</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Create challenges that push their limits.
+                </p>
               </SpotlightCard>
-              <SpotlightCard className="border border-white/5 p-5 hover:border-white/10 transition-colors">
-                <div className="text-2xl mb-2">📜</div>
-                <h3 className="font-semibold text-sm mb-1">Code Reviews</h3>
-                <p className="text-xs text-gray-500">Share wisdom through thoughtful feedback</p>
+              <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
+                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-purple-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Code Reviews</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Share wisdom through thoughtful, constructive feedback.
+                </p>
               </SpotlightCard>
-              <SpotlightCard className="border border-white/5 p-5 hover:border-white/10 transition-colors">
-                <div className="text-2xl mb-2">👑</div>
-                <h3 className="font-semibold text-sm mb-1">Shape Kages</h3>
-                <p className="text-xs text-gray-500">Mentor future community leaders</p>
+              <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-amber-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Shape Leaders</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Identified future Kages and community pillars.
+                </p>
               </SpotlightCard>
             </div>
           </div>
@@ -172,21 +242,18 @@ export default function MentorsPage() {
       </section>
 
       {/* Current Mentors Section */}
-      <section
-        id="mentors"
-        className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5"
-      >
+      <section id="mentors" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Senseis</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Our Senseis</h2>
+            <p className="text-gray-400 max-w-xl mx-auto text-lg font-light">
               Meet the experienced developers guiding our communities. Learn from the best in the
               industry.
             </p>
           </div>
 
           {/* Featured Mentors - Full Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {MENTORS.map((mentor, index) => (
               <div
                 key={mentor.id}
@@ -207,17 +274,18 @@ export default function MentorsPage() {
           </div>
 
           {/* More Mentors Coming Soon */}
-          <div className="mt-8 p-6 border border-dashed border-white/10 bg-white/[0.02] text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              <h3 className="text-sm font-semibold">Growing Our Dojo</h3>
+          <div className="p-8 border border-dashed border-white/10 bg-white/[0.02] text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <h3 className="text-base font-semibold text-white">Growing Our Dojo</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-4">
-              We're actively expanding our team of Senseis across all tech stacks.
+            <p className="text-gray-400 max-w-lg mx-auto mb-6 font-light">
+              We're actively looking for passionate developers to join our ranks. If you have the
+              will to teach, we have the students ready to learn.
             </p>
             <button
               onClick={scrollToApply}
-              className="text-sm text-white hover:text-gray-300 transition-colors underline underline-offset-4"
+              className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white transition-all hover:scale-105"
               type="button"
             >
               Join our ranks →
@@ -227,21 +295,21 @@ export default function MentorsPage() {
       </section>
 
       {/* Requirements Section */}
-      <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Look For</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
-              We don't measure experience in years — we measure it in impact. Here's what makes a
-              great Sensei.
+      <section className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Who We Look For</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light">
+              We prize impact and attitude over years on a resume. A true Sensei is defined by their
+              willingness to lift others up.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {REQUIREMENTS.map((req, index) => (
               <SpotlightCard
                 key={req.title}
-                className="border border-white/5 hover:border-white/10 p-6 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out]"
+                className="h-full border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] p-8 transition-all duration-300 group"
                 style={
                   {
                     animationDelay: `${index * 80}ms`,
@@ -249,9 +317,15 @@ export default function MentorsPage() {
                   } as React.CSSProperties
                 }
               >
-                <div className="text-2xl mb-3">{req.icon}</div>
-                <h3 className="text-base font-semibold mb-2">{req.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{req.description}</p>
+                <div className="text-3xl mb-6 bg-white/5 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform duration-300">
+                  {req.icon}
+                </div>
+                <h3 className="text-lg font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+                  {req.title}
+                </h3>
+                <p className="text-sm text-gray-400 leading-relaxed font-light">
+                  {req.description}
+                </p>
               </SpotlightCard>
             ))}
           </div>
