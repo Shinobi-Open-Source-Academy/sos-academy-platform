@@ -182,6 +182,19 @@ export const MENTORS = [
       website: 'https://davidkatho.com',
     },
   },
+  {
+    id: 'didas',
+    name: 'Didas Mbarushimana',
+    role: 'Software Engineer & Open Source Advocate',
+    image: '/images/mentor4.jpeg',
+    bio: 'Full-stack software engineer with experience building scalable web applications and integrating AI-powered features using modern technologies such as React, Next.js, TypeScript, and backend services.',
+    expertise: ['Javascript', 'Python', 'React'],
+    socials: {
+      github: 'https://github.com/DidasMba',
+      linkedin: 'https://www.linkedin.com/in/didasmbarushimana/',
+      // website: 'https://davidkatho.com',
+    },
+  },
 ];
 
 export const PROJECTS = [
