@@ -5,6 +5,7 @@ import { UserModule } from '../user/user.module';
 import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
 import { Booking, BookingSchema } from './schemas/booking.schema';
+import { Availability, AvailabilitySchema } from './schemas/availability.schema';
 
 /**
  * Module for booking functionality
@@ -12,7 +13,10 @@ import { Booking, BookingSchema } from './schemas/booking.schema';
  */
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
+    MongooseModule.forFeature([
+      { name: Booking.name, schema: BookingSchema },
+      { name: Availability.name, schema: AvailabilitySchema },
+    ]),
     UserModule,
     EmailModule,
   ],
