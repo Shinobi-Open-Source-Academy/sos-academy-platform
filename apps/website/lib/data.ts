@@ -161,7 +161,13 @@ export const MENTORS = [
     role: 'Senior Backend Engineer',
     image: '/images/mentor1.jpeg',
     bio: "Over 7 years experience in backend development, with a focus on building scalable and maintainable systems. Author of 'Scalable Software Development with NestJS'",
-    expertise: ['JavaScript', 'TypeScript', 'Rust', 'Microservices', 'System Design'],
+    expertise: [
+      'JavaScript',
+      'TypeScript',
+      'Rust',
+      'Microservices',
+      'System Design',
+    ],
     socials: {
       github: 'https://github.com/pacyL2K19',
       linkedin: 'https://linkedin.com/in/pacifique-linjanja',
@@ -177,8 +183,8 @@ export const MENTORS = [
     bio: 'Specialist in building and scaling blockchain protocols. Previously led engineering teams at major tech companies.',
     expertise: ['Rust', 'Solidity', 'EVM', 'Blockchain', 'Smart Contracts'],
     socials: {
-      github: 'https://github.com/mayawilliams',
-      linkedin: 'https://linkedin.com/in/mayawilliams',
+      github: 'https://github.com/davidkathoh',
+      linkedin: 'https://www.linkedin.com/in/davidkathoh/',
       website: 'https://davidkatho.com',
     },
   },
