@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import './global.css';
 
@@ -94,6 +95,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <Analytics />
       <head>
         <link rel="canonical" href="https://shinobi-open-source.academy" />
         <meta name="theme-color" content="#000000" />

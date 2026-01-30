@@ -96,8 +96,8 @@
     }
   },
   "dependencies": {
-    "@nestjs/cli": "^10.0.2",
     "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs/cli": "^10.0.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.2",
@@ -106,6 +106,7 @@
     "@nestjs/platform-express": "^10.0.2",
     "@nestjs/swagger": "^7.4.2",
     "@sos-academy/shared": "workspace:*",
+    "@vercel/analytics": "^1.6.1",
     "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.12",
