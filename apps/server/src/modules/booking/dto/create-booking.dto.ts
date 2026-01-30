@@ -17,15 +17,6 @@ import {
  */
 export class CreateBookingDto {
   @ApiProperty({
-    description: 'Student user ID (for testing only, remove in production)',
-    example: '507f1f77bcf86cd799439011',
-    required: false,
-  })
-  @IsOptional()
-  @IsMongoId({ message: 'Invalid student ID format' })
-  studentId?: string;
-
-  @ApiProperty({
     description: 'Mentor user ID',
     example: '507f1f77bcf86cd799439011',
   })

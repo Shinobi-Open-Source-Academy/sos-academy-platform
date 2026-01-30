@@ -45,6 +45,7 @@ async function bootstrap() {
     .addTag('communities', 'Community management endpoints')
     .addTag('projects', 'Project management endpoints')
     .addTag('calendar', 'Calendar and event management endpoints')
+    .addTag('bookings', 'Booking and availability management endpoints')
     .addBearerAuth(
       {
         type: 'http',

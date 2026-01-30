@@ -52,15 +52,6 @@ export class UpdateBookingDto {
  */
 export class ApproveBookingDto {
   @ApiProperty({
-    description: 'Mentor ID (for testing only, remove in production)',
-    example: '507f1f77bcf86cd799439011',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  mentorId?: string;
-
-  @ApiProperty({
     description: 'Meeting link for the session',
     example: 'https://meet.google.com/abc-defg-hij',
   })
@@ -82,15 +73,6 @@ export class ApproveBookingDto {
  */
 export class RejectBookingDto {
   @ApiProperty({
-    description: 'Mentor ID (for testing only, remove in production)',
-    example: '507f1f77bcf86cd799439011',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  mentorId?: string;
-
-  @ApiProperty({
     description: 'Reason for rejection',
     example: 'Schedule conflict',
   })
@@ -103,15 +85,6 @@ export class RejectBookingDto {
  * DTO for cancelling a booking
  */
 export class CancelBookingDto {
-  @ApiProperty({
-    description: 'User ID (student or mentor) - for testing only, remove in production',
-    example: '507f1f77bcf86cd799439011',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  userId?: string;
-
   @ApiProperty({
     description: 'Reason for cancellation',
     example: 'Emergency came up, need to reschedule',

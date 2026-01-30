@@ -9,9 +9,13 @@ import {
   Post,
   Put,
   Query,
-  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserRole } from '@sos-academy/shared';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { RolesGuard, Roles } from '../../common/guards/roles.guard';
+import { CurrentUser, AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { ApproveBookingDto, RejectBookingDto, CancelBookingDto } from './dto/update-booking.dto';
@@ -33,6 +37,7 @@ import { BookingStatus } from './interfaces/booking-status.enum';
  */
 @ApiTags('bookings')
 @Controller('bookings')
+@UseGuards(AuthGuard)
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
@@ -53,22 +58,23 @@ export class BookingController {
   @ApiResponse({ status: 400, description: 'Invalid request data' })
   @ApiResponse({ status: 404, description: 'Mentor not found' })
   @ApiResponse({ status: 409, description: 'Time slot conflict' })
-  async createBookingRequest(@Body() createBookingDto: CreateBookingDto, @Req() req: any) {
-    // For testing: accept studentId from body, otherwise get from auth
-    // TODO: Remove studentId from body in production and use only auth
-    const studentId = createBookingDto.studentId || req.user?.id;
-
-    if (!studentId) {
-      throw new BadRequestException('Student ID is required');
+  async createBookingRequest(
+    @Body() createBookingDto: CreateBookingDto,
+    @CurrentUser() user: AuthenticatedUser
+  ) {
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.createBookingRequest(studentId, createBookingDto);
+    return this.bookingService.createBookingRequest(user.id, createBookingDto);
   }
 
   /**
    * Mentor approves a booking request
    */
   @Put(':id/approve')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
     summary: 'Mentor approves a booking request',
     description: 'Changes booking status to APPROVED and adds meeting link',
@@ -85,23 +91,25 @@ export class BookingController {
   async approveBooking(
     @Param('id') id: string,
     @Body() approveDto: ApproveBookingDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // For testing: accept mentorId from body, otherwise get from auth
-    // TODO: Remove mentorId from body in production and use only auth
-    const mentorId = approveDto.mentorId || req.user?.id;
-
-    if (!mentorId) {
-      throw new BadRequestException('Mentor ID is required');
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.approveBooking(id, mentorId, approveDto);
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can approve bookings');
+    }
+
+    return this.bookingService.approveBooking(id, user.id, approveDto);
   }
 
   /**
    * Mentor rejects a booking request
    */
   @Put(':id/reject')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
     summary: 'Mentor rejects a booking request',
     description: 'Changes booking status to REJECTED with reason',
@@ -118,17 +126,17 @@ export class BookingController {
   async rejectBooking(
     @Param('id') id: string,
     @Body() rejectDto: RejectBookingDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // For testing: accept mentorId from body, otherwise get from auth
-    // TODO: Remove mentorId from body in production and use only auth
-    const mentorId = rejectDto.mentorId || req.user?.id;
-
-    if (!mentorId) {
-      throw new BadRequestException('Mentor ID is required');
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.rejectBooking(id, mentorId, rejectDto);
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can reject bookings');
+    }
+
+    return this.bookingService.rejectBooking(id, user.id, rejectDto);
   }
 
   /**
@@ -151,17 +159,13 @@ export class BookingController {
   async cancelBooking(
     @Param('id') id: string,
     @Body() cancelDto: CancelBookingDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // For testing: accept userId from body, otherwise get from auth
-    // TODO: Remove userId from body in production and use only auth
-    const userId = cancelDto.userId || req.user?.id;
-
-    if (!userId) {
-      throw new BadRequestException('User ID is required');
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.cancelBooking(id, userId, cancelDto.cancellationReason);
+    return this.bookingService.cancelBooking(id, user.id, cancelDto.cancellationReason);
   }
 
   /**
@@ -240,14 +244,15 @@ export class BookingController {
   // ============ Availability Management Endpoints ============
 
   /**
-   * Set mentor availability
+   * Set mentor availability (mentors only)
    */
-  @Post('availability/:mentorId')
+  @Post('availability')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
-    summary: 'Set mentor availability schedule',
-    description: 'Creates a new availability schedule for a mentor',
+    summary: 'Set your availability schedule',
+    description: 'Creates a new availability schedule for the authenticated mentor',
   })
-  @ApiParam({ name: 'mentorId', description: 'Mentor user ID' })
   @ApiBody({ type: SetAvailabilityDto })
   @ApiResponse({
     status: 201,
@@ -255,30 +260,32 @@ export class BookingController {
     type: AvailabilityResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid data or user is not a mentor' })
-  @ApiResponse({ status: 404, description: 'Mentor not found' })
   @ApiResponse({ status: 409, description: 'Availability already exists for this mentor' })
   async setAvailability(
-    @Param('mentorId') mentorId: string,
     @Body() availabilityDto: SetAvailabilityDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // TODO: In production, verify mentorId matches authenticated user
-    if (!mentorId) {
-      throw new BadRequestException('Mentor ID is required');
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.setAvailability(mentorId, availabilityDto);
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can set availability');
+    }
+
+    return this.bookingService.setAvailability(user.id, availabilityDto);
   }
 
   /**
-   * Update mentor availability
+   * Update mentor availability (mentors only)
    */
-  @Put('availability/:mentorId')
+  @Put('availability')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
-    summary: 'Update mentor availability schedule',
-    description: 'Updates an existing availability schedule for a mentor',
+    summary: 'Update your availability schedule',
+    description: 'Updates your existing availability schedule',
   })
-  @ApiParam({ name: 'mentorId', description: 'Mentor user ID' })
   @ApiBody({ type: UpdateAvailabilityDto })
   @ApiResponse({
     status: 200,
@@ -287,16 +294,18 @@ export class BookingController {
   })
   @ApiResponse({ status: 404, description: 'Availability not found' })
   async updateAvailability(
-    @Param('mentorId') mentorId: string,
     @Body() availabilityDto: UpdateAvailabilityDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // TODO: In production, verify mentorId matches authenticated user
-    if (!mentorId) {
-      throw new BadRequestException('Mentor ID is required');
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.updateAvailability(mentorId, availabilityDto);
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can update availability');
+    }
+
+    return this.bookingService.updateAvailability(user.id, availabilityDto);
   }
 
   /**
@@ -375,14 +384,15 @@ export class BookingController {
   }
 
   /**
-   * Update a specific day's availability
+   * Update a specific day's availability (mentors only)
    */
-  @Put('availability/:mentorId/day/:dayOfWeek')
+  @Put('availability/day/:dayOfWeek')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
-    summary: 'Update or remove a specific day from weekly schedule',
+    summary: 'Update or remove a specific day from your weekly schedule',
     description: 'Update time slots for a specific day or remove it completely',
   })
-  @ApiParam({ name: 'mentorId', description: 'Mentor user ID' })
   @ApiParam({
     name: 'dayOfWeek',
     description: 'Day of week (0=Sunday, 6=Saturday)',
@@ -396,29 +406,36 @@ export class BookingController {
   })
   @ApiResponse({ status: 404, description: 'Availability not found' })
   async updateDayAvailability(
-    @Param('mentorId') mentorId: string,
     @Param('dayOfWeek') dayOfWeek: string,
     @Body() dto: UpdateDayAvailabilityDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // TODO: In production, verify mentorId matches authenticated user
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
+    }
+
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can update availability');
+    }
+
     const day = parseInt(dayOfWeek, 10);
     if (isNaN(day) || day < 0 || day > 6) {
       throw new BadRequestException('Invalid day of week. Must be 0-6');
     }
 
-    return this.bookingService.updateDayAvailability(mentorId, day, dto.timeSlots);
+    return this.bookingService.updateDayAvailability(user.id, day, dto.timeSlots);
   }
 
   /**
-   * Update or add a date-specific override
+   * Update or add a date-specific override (mentors only)
    */
-  @Put('availability/:mentorId/override/:date')
+  @Put('availability/override/:date')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
-    summary: 'Add or update a date-specific override',
+    summary: 'Add or update a date-specific override for your availability',
     description: 'Override availability for a specific date (e.g., holidays, special schedules)',
   })
-  @ApiParam({ name: 'mentorId', description: 'Mentor user ID' })
   @ApiParam({ name: 'date', description: 'Date in YYYY-MM-DD format' })
   @ApiBody({ type: UpdateDateOverrideDto })
   @ApiResponse({
@@ -428,40 +445,50 @@ export class BookingController {
   })
   @ApiResponse({ status: 404, description: 'Availability not found' })
   async updateDateOverride(
-    @Param('mentorId') mentorId: string,
     @Param('date') dateStr: string,
     @Body() dto: UpdateDateOverrideDto,
-    @Req() req: any
+    @CurrentUser() user: AuthenticatedUser
   ) {
-    // TODO: In production, verify mentorId matches authenticated user
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
+    }
+
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can update availability');
+    }
+
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) {
       throw new BadRequestException('Invalid date format. Use YYYY-MM-DD');
     }
 
-    return this.bookingService.updateDateOverride(mentorId, date, dto.timeSlots, dto.reason);
+    return this.bookingService.updateDateOverride(user.id, date, dto.timeSlots, dto.reason);
   }
 
   /**
-   * Delete/reset mentor availability completely
+   * Delete/reset mentor availability completely (mentors only)
    */
-  @Delete('availability/:mentorId')
+  @Delete('availability')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.MENTOR)
   @ApiOperation({
-    summary: 'Delete mentor availability',
-    description: 'Completely reset/remove all availability settings for a mentor',
+    summary: 'Delete your availability',
+    description: 'Completely reset/remove all your availability settings',
   })
-  @ApiParam({ name: 'mentorId', description: 'Mentor user ID' })
   @ApiResponse({
     status: 200,
     description: 'Availability deleted successfully',
   })
   @ApiResponse({ status: 404, description: 'Availability not found' })
-  async deleteAvailability(@Param('mentorId') mentorId: string, @Req() req: any) {
-    // TODO: In production, verify mentorId matches authenticated user
-    if (!mentorId) {
-      throw new BadRequestException('Mentor ID is required');
+  async deleteAvailability(@CurrentUser() user: AuthenticatedUser) {
+    if (!user || !user.id) {
+      throw new BadRequestException('Authentication required');
     }
 
-    return this.bookingService.deleteAvailability(mentorId);
+    if (user.role !== UserRole.MENTOR) {
+      throw new BadRequestException('Only mentors can delete availability');
+    }
+
+    return this.bookingService.deleteAvailability(user.id);
   }
 }

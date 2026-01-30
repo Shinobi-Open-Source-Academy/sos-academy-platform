@@ -9,11 +9,19 @@ export class BookingResponseDto {
   @ApiProperty()
   id: string;
 
-  @ApiProperty()
-  mentorId: any;
+  @ApiProperty({
+    description: 'Mentor user ID or populated mentor object',
+    example: '507f1f77bcf86cd799439011',
+    type: 'string',
+  })
+  mentorId: string | Record<string, any>;
 
-  @ApiProperty()
-  studentId: any;
+  @ApiProperty({
+    description: 'Student user ID or populated student object',
+    example: '507f1f77bcf86cd799439011',
+    type: 'string',
+  })
+  studentId: string | Record<string, any>;
 
   @ApiProperty()
   requestedDate: Date;
@@ -33,7 +41,11 @@ export class BookingResponseDto {
   @ApiProperty({ required: false })
   description?: string;
 
-  @ApiProperty({ enum: BookingStatus })
+  @ApiProperty({
+    enum: BookingStatus,
+    enumName: 'BookingStatus',
+    description: 'Current status of the booking',
+  })
   status: BookingStatus;
 
   @ApiProperty({ required: false })
