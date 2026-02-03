@@ -1,6 +1,6 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ComingSoon } from '../components/ComingSoon';
 import Sidebar from '../components/Sidebar';
@@ -55,28 +55,20 @@ const mockStats = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
     'checking'
   );
-  const [mounted, setMounted] = useState(false);
 
-  // Handle client-side mounting
+  // Check auth and redirect if not authenticated
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    // Only run on client after mount
-    if (!mounted) {
-      return;
-    }
-
     const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
 
     if (!token || !userStr) {
       setAuthState('unauthenticated');
+      router.replace('/login');
       return;
     }
 
@@ -87,21 +79,19 @@ export default function DashboardPage() {
       localStorage.removeItem('hacker_token');
       localStorage.removeItem('hacker_user');
       setAuthState('unauthenticated');
+      router.replace('/login');
     }
-  }, [mounted]);
+  }, [router]);
 
-  // Redirect unauthenticated users
-  if (authState === 'unauthenticated') {
-    redirect('/login');
-  }
-
-  // Show loading while checking auth
-  if (authState === 'checking') {
+  // Show loading while checking auth or redirecting
+  if (authState === 'checking' || authState === 'unauthenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <span className="text-zinc-400 text-sm">Loading...</span>
+          <span className="text-zinc-400 text-sm">
+            {authState === 'unauthenticated' ? 'Redirecting...' : 'Loading...'}
+          </span>
         </div>
       </div>
     );
