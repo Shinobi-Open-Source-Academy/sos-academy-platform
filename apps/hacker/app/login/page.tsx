@@ -1,47 +1,45 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
     'checking'
   );
 
-  // Handle client-side mounting
+  // Check auth and redirect if authenticated
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Check if already logged in (only on client)
-  useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
     const token = localStorage.getItem('hacker_token');
     if (token) {
       setAuthState('authenticated');
+      router.replace('/');
     } else {
       setAuthState('unauthenticated');
     }
-  }, [mounted]);
+  }, [router]);
 
-  // Redirect authenticated users to dashboard
-  if (authState === 'authenticated') {
-    redirect('/');
-  }
-
-  // Show loading while checking auth
-  if (!mounted || authState === 'checking') {
+  // Show loading only while checking auth
+  if (authState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
           <span className="text-zinc-400 text-sm">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // If authenticated, show loading while redirecting
+  if (authState === 'authenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          <span className="text-zinc-400 text-sm">Redirecting...</span>
         </div>
       </div>
     );
