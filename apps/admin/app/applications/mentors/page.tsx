@@ -785,6 +785,9 @@ export default function MentorsPage() {
                       placeholder="https://github.com/username"
                       className="input w-full"
                     />
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Prefilled from existing GitHub profile. Update if needed.
+                    </p>
                   </div>
                   <div>
                     <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">

@@ -112,15 +112,19 @@ export async function getActiveMentors(): Promise<Mentor[]> {
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 300 }, // Revalidate every 5 minutes
+        cache: 'no-store', // Always fetch fresh data on client-side
       }
     );
     if (!response.ok) {
+      console.error('Failed to fetch mentors:', response.status, response.statusText);
       return [];
     }
     const data = await response.json();
-    return data.users || [];
-  } catch {
+    const mentors = data.users || [];
+    console.log(`Fetched ${mentors.length} active mentors`);
+    return mentors;
+  } catch (error) {
+    console.error('Error fetching mentors:', error);
     return [];
   }
 }

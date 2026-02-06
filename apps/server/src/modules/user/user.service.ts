@@ -580,6 +580,9 @@ export class UserService {
       createdAt: 1,
       expertise: 1,
       motivation: 1,
+      title: 1,
+      description: 1,
+      socialLinks: 1,
     };
 
     // Query with lean to avoid class-transformer recursion

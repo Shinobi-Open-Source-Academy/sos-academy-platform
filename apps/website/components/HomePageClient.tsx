@@ -10,14 +10,12 @@ import Navbar from './Navbar';
 import SpotlightCard from './SpotlightCard';
 import UpcomingEvents from './UpcomingEvents';
 import { COMMUNITIES, COMPANIES, FEATURES, PROJECTS, SITE_CONFIG } from '../lib/data';
-import { Mentor } from '../lib/api-client';
+import { getActiveMentors, getRandomMentors, Mentor } from '../lib/api-client';
 
-interface HomePageClientProps {
-  mentors: Mentor[];
-}
-
-export default function HomePageClient({ mentors }: HomePageClientProps) {
+export default function HomePageClient() {
   const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loadingMentors, setLoadingMentors] = useState(true);
 
   useEffect(() => {
     const handleOpenJoin = () => setJoinModalOpen(true);
@@ -25,6 +23,21 @@ export default function HomePageClient({ mentors }: HomePageClientProps) {
     return () => {
       window.removeEventListener('openJoinModal', handleOpenJoin);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        const allMentors = await getActiveMentors();
+        const randomMentors = getRandomMentors(allMentors, 4);
+        setMentors(randomMentors);
+      } catch (error) {
+        console.error('Failed to fetch mentors:', error);
+      } finally {
+        setLoadingMentors(false);
+      }
+    };
+    fetchMentors();
   }, []);
 
   // Add JSON-LD structured data
@@ -243,7 +256,7 @@ export default function HomePageClient({ mentors }: HomePageClientProps) {
             </p>
           </div>
 
-          <MentorsSection mentors={mentors} />
+          <MentorsSection mentors={mentors} loading={loadingMentors} />
 
           <div className="text-center mt-8">
             <a

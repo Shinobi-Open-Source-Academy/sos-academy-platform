@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CodeBackground from '../../components/CodeBackground';
 import Footer from '../../components/Footer';
 import MentorApplicationForm from '../../components/MentorApplicationForm';
@@ -8,11 +8,7 @@ import MentorsSection from '../../components/MentorsSection';
 import Navbar from '../../components/Navbar';
 import SpotlightCard from '../../components/SpotlightCard';
 import { SITE_CONFIG } from '../../lib/data';
-import { Mentor } from '../../lib/api-client';
-
-interface MentorsClientProps {
-  mentors: Mentor[];
-}
+import { getActiveMentors, getRandomMentors, Mentor } from '../../lib/api-client';
 
 const REQUIREMENTS = [
   {
@@ -53,8 +49,10 @@ const REQUIREMENTS = [
   },
 ];
 
-export default function MentorsClient({ mentors }: MentorsClientProps) {
+export default function MentorsClient() {
   const applyRef = useRef<HTMLDivElement>(null);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loadingMentors, setLoadingMentors] = useState(true);
 
   useEffect(() => {
     // Check if URL has #apply hash and scroll to it
@@ -63,6 +61,21 @@ export default function MentorsClient({ mentors }: MentorsClientProps) {
         applyRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        const allMentors = await getActiveMentors();
+        const randomMentors = getRandomMentors(allMentors, 4);
+        setMentors(randomMentors);
+      } catch (error) {
+        console.error('Failed to fetch mentors:', error);
+      } finally {
+        setLoadingMentors(false);
+      }
+    };
+    fetchMentors();
   }, []);
 
   const scrollToApply = () => {
@@ -259,7 +272,45 @@ export default function MentorsClient({ mentors }: MentorsClientProps) {
 
           {/* Featured Mentors - Full Cards */}
           <div className="mb-12">
-            <MentorsSection mentors={mentors} />
+            {loadingMentors ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="border border-white/5 hover:border-white/10 transition-colors h-40 group bg-black/50 relative overflow-hidden"
+                  >
+                    {/* Image skeleton on left side */}
+                    <div className="absolute inset-y-0 left-0 w-[38%] bg-white/5 animate-pulse" />
+
+                    {/* Content skeleton on right side */}
+                    <div className="relative z-20 h-full p-3 pl-[36%] flex flex-col items-start text-left">
+                      <div className="h-4 w-24 bg-white/5 animate-pulse mb-2 rounded" />
+                      <div className="h-3 w-20 bg-white/5 animate-pulse mb-2 rounded" />
+                      <div className="h-3 w-full bg-white/5 animate-pulse mb-1 rounded" />
+                      <div className="h-3 w-3/4 bg-white/5 animate-pulse mb-4 rounded" />
+
+                      <div className="mt-auto space-y-1.5 w-full">
+                        {/* Expertise tags skeleton */}
+                        <div className="flex flex-wrap gap-1">
+                          <div className="h-4 w-12 bg-white/5 animate-pulse rounded" />
+                          <div className="h-4 w-16 bg-white/5 animate-pulse rounded" />
+                          <div className="h-4 w-14 bg-white/5 animate-pulse rounded" />
+                        </div>
+
+                        {/* Social links skeleton */}
+                        <div className="flex items-center gap-2 pt-1.5 border-t border-white/5">
+                          <div className="h-3 w-3 bg-white/5 animate-pulse rounded" />
+                          <div className="h-3 w-3 bg-white/5 animate-pulse rounded" />
+                          <div className="h-3 w-3 bg-white/5 animate-pulse rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <MentorsSection mentors={mentors} />
+            )}
           </div>
 
           {/* More Mentors Coming Soon */}
