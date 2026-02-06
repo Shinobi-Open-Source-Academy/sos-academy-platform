@@ -294,7 +294,7 @@ export default function MentorsClient() {
           </div>
 
           {/* Filter Section */}
-          <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mb-12 py-4 flex flex-col sm:flex-row items-center justify-end gap-4">
             <span className="text-sm text-gray-400 font-light">Filter by community:</span>
             <div className="relative group">
               <select
@@ -382,11 +382,11 @@ export default function MentorsClient() {
             ) : (
               <>
                 <MentorsSection mentors={displayedMentors} />
-                <div className="text-center mt-8 flex items-center justify-center gap-4">
+                <div className="text-center mt-8">
                   {hasMore && (
                     <button
                       onClick={() => setDisplayedCount((prev) => prev + 4)}
-                      className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm font-medium text-white transition-all hover:scale-105 rounded"
+                      className="text-sm text-gray-400 hover:text-white transition-colors underline"
                       type="button"
                     >
                       See More Mentors ({filteredMentors.length - displayedCount} remaining) →
@@ -395,7 +395,7 @@ export default function MentorsClient() {
                   {displayedCount > 4 && (
                     <button
                       onClick={() => setDisplayedCount(4)}
-                      className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm font-medium text-white transition-all hover:scale-105 rounded"
+                      className="text-sm text-gray-400 hover:text-white transition-colors underline ml-4"
                       type="button"
                     >
                       ← Show Less
@@ -405,7 +405,8 @@ export default function MentorsClient() {
                 {!hasMore && filteredMentors.length > 0 && displayedCount <= 4 && (
                   <div className="text-center mt-6">
                     <p className="text-xs text-gray-500">
-                      Showing all {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 's' : ''}
+                      Showing all {filteredMentors.length} mentor
+                      {filteredMentors.length !== 1 ? 's' : ''}
                     </p>
                   </div>
                 )}
