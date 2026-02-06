@@ -7,8 +7,8 @@ import MentorApplicationForm from '../../components/MentorApplicationForm';
 import MentorsSection from '../../components/MentorsSection';
 import Navbar from '../../components/Navbar';
 import SpotlightCard from '../../components/SpotlightCard';
-import { SITE_CONFIG } from '../../lib/data';
-import { getActiveMentors, getRandomMentors, Mentor } from '../../lib/api-client';
+import { COMMUNITIES, SITE_CONFIG } from '../../lib/data';
+import { getActiveMentors, Mentor } from '../../lib/api-client';
 
 const REQUIREMENTS = [
   {
@@ -51,8 +51,10 @@ const REQUIREMENTS = [
 
 export default function MentorsClient() {
   const applyRef = useRef<HTMLDivElement>(null);
-  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [allMentors, setAllMentors] = useState<Mentor[]>([]);
   const [loadingMentors, setLoadingMentors] = useState(true);
+  const [selectedCommunity, setSelectedCommunity] = useState<string>('all');
+  const [displayedCount, setDisplayedCount] = useState(4);
 
   useEffect(() => {
     // Check if URL has #apply hash and scroll to it
@@ -66,9 +68,8 @@ export default function MentorsClient() {
   useEffect(() => {
     const fetchMentors = async () => {
       try {
-        const allMentors = await getActiveMentors();
-        const randomMentors = getRandomMentors(allMentors, 4);
-        setMentors(randomMentors);
+        const mentors = await getActiveMentors();
+        setAllMentors(mentors);
       } catch (error) {
         console.error('Failed to fetch mentors:', error);
       } finally {
@@ -77,6 +78,28 @@ export default function MentorsClient() {
     };
     fetchMentors();
   }, []);
+
+  // Filter mentors by community
+  const filteredMentors = allMentors.filter((mentor) => {
+    if (selectedCommunity === 'all') return true;
+    const selectedComm = COMMUNITIES.find((c) => c.id === selectedCommunity);
+    if (!selectedComm) return true;
+    // Match by slug or name (slug is like 'konoha', name is like 'Konoha Community')
+    return mentor.communities?.some(
+      (comm) =>
+        comm.slug?.toLowerCase() === selectedComm.id.toLowerCase() ||
+        comm.name.toLowerCase().includes(selectedComm.name.toLowerCase())
+    );
+  });
+
+  // Get displayed mentors (first N)
+  const displayedMentors = filteredMentors.slice(0, displayedCount);
+  const hasMore = filteredMentors.length > displayedCount;
+
+  // Reset displayed count when filter changes
+  useEffect(() => {
+    setDisplayedCount(4);
+  }, [selectedCommunity]);
 
   const scrollToApply = () => {
     applyRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -262,7 +285,7 @@ export default function MentorsClient() {
       {/* Current Mentors Section */}
       <section id="mentors" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Our Senseis</h2>
             <p className="text-gray-400 max-w-xl mx-auto text-lg font-light">
               Meet the experienced developers guiding our communities. Learn from the best in the
@@ -270,8 +293,52 @@ export default function MentorsClient() {
             </p>
           </div>
 
+          {/* Filter Section */}
+          <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <span className="text-sm text-gray-400 font-light">Filter by community:</span>
+            <div className="relative group">
+              <select
+                id="community-filter"
+                value={selectedCommunity}
+                onChange={(e) => setSelectedCommunity(e.target.value)}
+                className="appearance-none bg-black/50 border border-white/10 hover:border-white/20 px-4 py-2.5 pr-10 text-sm text-white rounded focus:outline-none focus:border-white/30 transition-all cursor-pointer min-w-[200px] backdrop-blur-sm"
+              >
+                <option value="all">All Communities</option>
+                {COMMUNITIES.map((community) => (
+                  <option key={community.id} value={community.id}>
+                    {community.name}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+            {selectedCommunity !== 'all' && (
+              <button
+                onClick={() => setSelectedCommunity('all')}
+                className="text-xs text-gray-500 hover:text-white transition-colors underline"
+                type="button"
+              >
+                Clear filter
+              </button>
+            )}
+          </div>
+
           {/* Featured Mentors - Full Cards */}
-          <div className="mb-12">
+          <div className="mb-8">
             {loadingMentors ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto">
                 {[1, 2, 3, 4].map((i) => (
@@ -308,8 +375,41 @@ export default function MentorsClient() {
                   </div>
                 ))}
               </div>
+            ) : displayedMentors.length === 0 ? (
+              <div className="text-center py-12 border border-white/5 bg-white/[0.02] rounded">
+                <p className="text-gray-400">No mentors found for this community.</p>
+              </div>
             ) : (
-              <MentorsSection mentors={mentors} />
+              <>
+                <MentorsSection mentors={displayedMentors} />
+                <div className="text-center mt-8 flex items-center justify-center gap-4">
+                  {hasMore && (
+                    <button
+                      onClick={() => setDisplayedCount((prev) => prev + 4)}
+                      className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm font-medium text-white transition-all hover:scale-105 rounded"
+                      type="button"
+                    >
+                      See More Mentors ({filteredMentors.length - displayedCount} remaining) →
+                    </button>
+                  )}
+                  {displayedCount > 4 && (
+                    <button
+                      onClick={() => setDisplayedCount(4)}
+                      className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm font-medium text-white transition-all hover:scale-105 rounded"
+                      type="button"
+                    >
+                      ← Show Less
+                    </button>
+                  )}
+                </div>
+                {!hasMore && filteredMentors.length > 0 && displayedCount <= 4 && (
+                  <div className="text-center mt-6">
+                    <p className="text-xs text-gray-500">
+                      Showing all {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
