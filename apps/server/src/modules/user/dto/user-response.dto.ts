@@ -163,6 +163,34 @@ export class UserResponseDto {
     bio?: string;
   };
 
+  @ApiProperty({
+    description: 'Mentor title/role for public display',
+    example: 'Senior Backend Engineer',
+    required: false,
+  })
+  @Expose()
+  title?: string;
+
+  @ApiProperty({
+    description: 'Mentor description for public display',
+    example: 'Senior Backend Engineer with 7+ years of experience...',
+    required: false,
+  })
+  @Expose()
+  description?: string;
+
+  @ApiProperty({
+    description: 'Social media and profile links',
+    required: false,
+  })
+  @Expose()
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
+
   constructor(partial: Partial<UserResponseDto>) {
     Object.assign(this, partial);
   }

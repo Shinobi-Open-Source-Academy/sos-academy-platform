@@ -18,6 +18,14 @@ interface Mentor {
   email: string;
   expertise?: string;
   motivation?: string;
+  title?: string;
+  description?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
   githubProfile?: {
     login: string;
     htmlUrl: string;
@@ -69,12 +77,18 @@ export default function MentorsPage() {
     isOpen: false,
     mentor: null,
   });
-  const [detailsSubForm, setDetailsSubForm] = useState<'approve' | 'reject' | null>(null);
+  const [detailsSubForm, setDetailsSubForm] = useState<'approve' | 'reject' | 'edit' | null>(null);
   const [communities, setCommunities] = useState<CommunityOption[]>([]);
   const [approveCustomMessage, setApproveCustomMessage] = useState('');
   const [approveCommunityIds, setApproveCommunityIds] = useState<string[]>([]);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectCommunityId, setRejectCommunityId] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editGithub, setEditGithub] = useState('');
+  const [editLinkedin, setEditLinkedin] = useState('');
+  const [editTwitter, setEditTwitter] = useState('');
+  const [editWebsite, setEditWebsite] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -140,14 +154,20 @@ export default function MentorsPage() {
     }
   };
 
-  const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject') => {
+  const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
     setDetailsModal({ isOpen: true, mentor });
     setDetailsSubForm(subForm ?? null);
     setApproveCustomMessage('');
     setApproveCommunityIds([]);
     setRejectReason('');
     setRejectCommunityId('');
-    if (subForm === 'reject') fetchCommunities();
+    setEditTitle(mentor.title || '');
+    setEditDescription(mentor.description || '');
+    setEditGithub(mentor.socialLinks?.github || '');
+    setEditLinkedin(mentor.socialLinks?.linkedin || '');
+    setEditTwitter(mentor.socialLinks?.twitter || '');
+    setEditWebsite(mentor.socialLinks?.website || '');
+    if (subForm === 'reject' || subForm === 'approve') fetchCommunities();
   };
 
   const closeDetailsModal = () => {
@@ -157,6 +177,12 @@ export default function MentorsPage() {
     setApproveCommunityIds([]);
     setRejectReason('');
     setRejectCommunityId('');
+    setEditTitle('');
+    setEditDescription('');
+    setEditGithub('');
+    setEditLinkedin('');
+    setEditTwitter('');
+    setEditWebsite('');
   };
 
   const handleApprove = async (
@@ -211,6 +237,31 @@ export default function MentorsPage() {
     setApproveCommunityIds((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
     );
+  };
+
+  const handleUpdateMentor = async (id: string) => {
+    setSubmitting(true);
+    try {
+      const socialLinks: Record<string, string> = {};
+      if (editGithub.trim()) socialLinks.github = editGithub.trim();
+      if (editLinkedin.trim()) socialLinks.linkedin = editLinkedin.trim();
+      if (editTwitter.trim()) socialLinks.twitter = editTwitter.trim();
+      if (editWebsite.trim()) socialLinks.website = editWebsite.trim();
+
+      await apiClient.put(`/users/${String(id)}`, {
+        title: editTitle.trim() || undefined,
+        description: editDescription.trim() || undefined,
+        socialLinks: Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
+      });
+      await fetchMentors();
+      closeDetailsModal();
+      toast.success('Mentor updated successfully');
+    } catch (error) {
+      console.error('Failed to update mentor:', error);
+      toast.error('Failed to update mentor');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDelete = async (reason: string) => {
@@ -531,7 +582,9 @@ export default function MentorsPage() {
                   ? 'Approve application'
                   : detailsSubForm === 'reject'
                     ? 'Reject application'
-                    : 'Application Details'}
+                    : detailsSubForm === 'edit'
+                      ? 'Edit mentor'
+                      : 'Application Details'}
               </h2>
               <button
                 type="button"
@@ -685,6 +738,107 @@ export default function MentorsPage() {
                   </button>
                 </div>
               </div>
+            ) : detailsSubForm === 'edit' ? (
+              <div className="p-5 space-y-4">
+                <p className="text-sm text-zinc-400">
+                  Update the mentor's public title, description, and social links. These will be
+                  displayed on the website.
+                </p>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="e.g. Senior Backend Engineer"
+                    maxLength={100}
+                    className="input w-full"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Shown under the mentor's name</p>
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="e.g. Senior Backend Engineer with 7+ years of experience..."
+                    rows={4}
+                    className="input w-full resize-y"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Max 1000 characters</p>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      GitHub URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editGithub}
+                      onChange={(e) => setEditGithub(e.target.value)}
+                      placeholder="https://github.com/username"
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      LinkedIn URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editLinkedin}
+                      onChange={(e) => setEditLinkedin(e.target.value)}
+                      placeholder="https://linkedin.com/in/username"
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Twitter/X URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editTwitter}
+                      onChange={(e) => setEditTwitter(e.target.value)}
+                      placeholder="https://x.com/username"
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editWebsite}
+                      onChange={(e) => setEditWebsite(e.target.value)}
+                      placeholder="https://example.com"
+                      className="input w-full"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDetailsSubForm(null)}
+                    className="btn-secondary flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleUpdateMentor(getMentorId(detailsModal.mentor!))}
+                    className="btn-success flex-1 disabled:opacity-50"
+                  >
+                    {submitting ? 'Saving…' : 'Save changes'}
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
                 <div className="p-5 space-y-4">
@@ -751,6 +905,90 @@ export default function MentorsPage() {
                     )}
                   </div>
 
+                  {/* Title */}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <div>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Title</p>
+                      {detailsModal.mentor.title ? (
+                        <p className="text-sm text-zinc-300">{detailsModal.mentor.title}</p>
+                      ) : (
+                        <p className="text-sm text-zinc-600 italic">Not set</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <div>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                        Description
+                      </p>
+                      {detailsModal.mentor.description ? (
+                        <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                          {detailsModal.mentor.description}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-zinc-600 italic">Not set</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Social Links */}
+                  {detailsModal.mentor.status === 'ACTIVE' &&
+                    detailsModal.mentor.socialLinks &&
+                    (detailsModal.mentor.socialLinks.github ||
+                      detailsModal.mentor.socialLinks.linkedin ||
+                      detailsModal.mentor.socialLinks.twitter ||
+                      detailsModal.mentor.socialLinks.website) && (
+                      <div>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                          Social Links
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {detailsModal.mentor.socialLinks.github && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              GitHub
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.linkedin && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              LinkedIn
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.twitter && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.twitter}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              Twitter
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.website && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              Website
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                   {/* Communities */}
                   {detailsModal.mentor.communities &&
                     detailsModal.mentor.communities.length > 0 && (
@@ -796,6 +1034,15 @@ export default function MentorsPage() {
                         Reject
                       </button>
                     </>
+                  )}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <button
+                      type="button"
+                      onClick={() => setDetailsSubForm('edit')}
+                      className="btn-secondary flex-1"
+                    >
+                      Edit
+                    </button>
                   )}
                   <a
                     href={`mailto:${detailsModal.mentor.email}`}

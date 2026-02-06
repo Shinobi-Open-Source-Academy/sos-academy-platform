@@ -83,3 +83,52 @@ export async function getUpcomingEvents(): Promise<UpcomingEvent[]> {
     return [];
   }
 }
+
+export interface Mentor {
+  id: string;
+  name: string;
+  email: string;
+  expertise?: string;
+  title?: string;
+  description?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
+  githubProfile?: {
+    login: string;
+    htmlUrl: string;
+    avatarUrl?: string;
+  };
+  communities?: { name: string; slug: string }[];
+}
+
+export async function getActiveMentors(): Promise<Mentor[]> {
+  try {
+    const response = await fetch(
+      `${API_URL}/users/admin/users?role=MENTOR&status=ACTIVE&limit=100`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        next: { revalidate: 300 }, // Revalidate every 5 minutes
+      }
+    );
+    if (!response.ok) {
+      return [];
+    }
+    const data = await response.json();
+    return data.users || [];
+  } catch {
+    return [];
+  }
+}
+
+export function getRandomMentors(mentors: Mentor[], count: number = 4): Mentor[] {
+  if (mentors.length <= count) {
+    return mentors;
+  }
+  const shuffled = [...mentors].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
