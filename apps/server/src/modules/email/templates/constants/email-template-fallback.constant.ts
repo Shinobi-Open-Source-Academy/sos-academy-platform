@@ -132,4 +132,39 @@ export const FALLBACK_TEMPLATES = {
     </body>
     </html>
   `,
+  'broadcast': `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>{{subject}} - SOS Academy</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .event-box { background-color: #f7f9fc; border: 1px solid #e9ecef; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .calendar-button { display: inline-block; padding: 10px 20px; background-color: #304ffe; color: #fff; text-decoration: none; border-radius: 6px; margin: 5px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Hello {{recipientName}},</p>
+        <h2>{{subject}}</h2>
+        <div>{{{message}}}</div>
+        {{#if eventTitle}}
+        <div class="event-box">
+          <h3>📅 {{eventTitle}}</h3>
+          {{#if eventStartTime}}<p><strong>When:</strong> {{eventStartTime}}{{#if eventEndTime}} - {{eventEndTime}}{{/if}}</p>{{/if}}
+          {{#if eventDescription}}<p>{{eventDescription}}</p>{{/if}}
+          {{#if googleCalendarLink}}<a href="{{googleCalendarLink}}" class="calendar-button">Add to Google Calendar</a>{{/if}}
+          {{#if outlookCalendarLink}}<a href="{{outlookCalendarLink}}" class="calendar-button">Add to Outlook</a>{{/if}}
+          {{#if eventMeetingLink}}<p><a href="{{eventMeetingLink}}">Join Event →</a></p>{{/if}}
+        </div>
+        {{/if}}
+        <p>Stay connected: <a href="https://github.com/Shinobi-Open-Source-Academy">GitHub</a> | <a href="https://discord.gg/9Wgx7bCh">Discord</a>. Check your email for events.</p>
+        <div class="footer">© {{currentYear}} Shinobi Open-Source Academy.</div>
+      </div>
+    </body>
+    </html>
+  `,
 };

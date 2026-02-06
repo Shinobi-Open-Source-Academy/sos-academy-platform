@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
@@ -73,6 +73,7 @@ export default function MentorsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [communityFilter, setCommunityFilter] = useState<string>('all');
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; mentor: Mentor | null }>({
     isOpen: false,
     mentor: null,
@@ -109,6 +110,8 @@ export default function MentorsPage() {
     }
 
     fetchMentors();
+    fetchCommunities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, router]);
 
   useEffect(() => {
@@ -117,7 +120,17 @@ export default function MentorsPage() {
     }
   }, [detailsSubForm]);
 
-  const fetchMentors = async () => {
+  // Reset to page 1 when filters change (debounce search)
+  useEffect(() => {
+    if (!mounted) return;
+    const timeoutId = setTimeout(() => {
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }, searchTerm ? 500 : 0); // Debounce search by 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, statusFilter, communityFilter, mounted]);
+
+  const fetchMentors = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -134,6 +147,16 @@ export default function MentorsPage() {
         params.append('status', statusFilter);
       }
 
+      if (communityFilter !== 'all') {
+        // Find the community by slug or ID
+        const selectedCommunity = communities.find(
+          (c) => c._id === communityFilter || c.slug === communityFilter
+        );
+        if (selectedCommunity) {
+          params.append('community', selectedCommunity.slug);
+        }
+      }
+
       const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
       if (response.data) {
         setMentors(response.data.users || []);
@@ -145,7 +168,7 @@ export default function MentorsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.page, pagination.limit, searchTerm, statusFilter, communityFilter, communities]);
 
   const fetchCommunities = async () => {
     try {
@@ -157,6 +180,12 @@ export default function MentorsPage() {
       console.error('Failed to fetch communities:', error);
     }
   };
+
+  // Refetch when filters or pagination changes
+  useEffect(() => {
+    if (!mounted) return;
+    fetchMentors();
+  }, [mounted, fetchMentors]);
 
   const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
     setDetailsModal({ isOpen: true, mentor });
@@ -373,7 +402,6 @@ export default function MentorsPage() {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setPagination((prev) => ({ ...prev, page: 1 }));
               }}
               className="input pl-10"
             />
@@ -382,7 +410,6 @@ export default function MentorsPage() {
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
-              setPagination((prev) => ({ ...prev, page: 1 }));
             }}
             className="select w-40"
           >
@@ -391,6 +418,20 @@ export default function MentorsPage() {
             <option value="PENDING">Pending</option>
             <option value="APPLIED_MENTOR">Applied</option>
             <option value="REJECTED">Rejected</option>
+          </select>
+          <select
+            value={communityFilter}
+            onChange={(e) => {
+              setCommunityFilter(e.target.value);
+            }}
+            className="select w-48"
+          >
+            <option value="all">All Communities</option>
+            {communities.map((community) => (
+              <option key={community._id} value={community._id}>
+                {community.name}
+              </option>
+            ))}
           </select>
         </div>
 
