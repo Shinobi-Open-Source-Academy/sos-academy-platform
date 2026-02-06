@@ -24,11 +24,13 @@ import {
 } from '@nestjs/swagger';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersQueryDto } from './dto/get-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
+import { RejectMentorDto } from './dto/reject-mentor.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -158,22 +160,24 @@ export class UserController {
   }
 
   @Put(':id/approve')
-  @ApiOperation({ summary: 'Approve user application' })
+  @ApiOperation({ summary: 'Approve mentor application' })
   @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiBody({ type: ApproveMentorDto, required: false })
   @ApiResponse({ status: 200, description: 'User approved successfully', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async approveUser(@Param('id') id: string) {
-    const user = await this.userService.approveUser(id);
+  async approveUser(@Param('id') id: string, @Body() body?: ApproveMentorDto) {
+    const user = await this.userService.approveUser(id, body ?? {});
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
 
   @Put(':id/reject')
-  @ApiOperation({ summary: 'Reject user application' })
+  @ApiOperation({ summary: 'Reject mentor application' })
   @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiBody({ type: RejectMentorDto })
   @ApiResponse({ status: 200, description: 'User rejected successfully', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async rejectUser(@Param('id') id: string) {
-    const user = await this.userService.rejectUser(id);
+  async rejectUser(@Param('id') id: string, @Body() body: RejectMentorDto) {
+    const user = await this.userService.rejectUser(id, body);
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
 

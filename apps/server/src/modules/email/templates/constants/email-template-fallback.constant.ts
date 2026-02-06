@@ -83,4 +83,53 @@ export const FALLBACK_TEMPLATES = {
     </body>
     </html>
   `,
+  'mentor-approved': `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Mentor Application Approved - SOS Academy</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
+        .social-links a { color: #304ffe; margin: 0 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Dear {{name}},</p>
+        <p>Your mentor application has been approved. Welcome to Shinobi Open-Source Academy!</p>
+        {{#if customMessage}}<p>{{customMessage}}</p>{{/if}}
+        {{#if communityNames}}<p>Communities: {{communityNames}}</p>{{/if}}
+        <p>Stay connected: <a href="https://github.com/Shinobi-Open-Source-Academy">GitHub</a> | <a href="https://discord.gg/9Wgx7bCh">Discord</a>. Check your email for events.</p>
+        <div class="footer">© {{currentYear}} Shinobi Open-Source Academy.</div>
+      </div>
+    </body>
+    </html>
+  `,
+  'mentor-rejected': `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Mentor Application Update - SOS Academy</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
+        .social-links a { color: #304ffe; margin: 0 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Dear {{name}},</p>
+        <p>Thank you for applying. We have decided not to move forward at this time.</p>
+        <p><strong>Feedback:</strong> {{reason}}</p>
+        <p>Stay connected: <a href="https://github.com/Shinobi-Open-Source-Academy">GitHub</a> | <a href="https://discord.gg/9Wgx7bCh">Discord</a>. Check your email for events.</p>
+        <div class="footer">© {{currentYear}} Shinobi Open-Source Academy.</div>
+      </div>
+    </body>
+    </html>
+  `,
 };

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
 import Sidebar from '../../components/Sidebar';
@@ -153,11 +154,12 @@ export default function CreateEventPage() {
       };
 
       await apiClient.post('/calendar/events', eventData);
+      toast.success('Event created successfully');
       router.push('/events');
       // biome-ignore lint/suspicious/noExplicitAny: not needed
     } catch (error: any) {
       console.error('Failed to create event:', error);
-      alert(error.message || 'Failed to create event');
+      toast.error(error.message || 'Failed to create event');
     } finally {
       setLoading(false);
     }

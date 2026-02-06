@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
 import DeleteModal from '../../components/DeleteModal';
@@ -100,6 +101,7 @@ export default function MembersPage() {
       }
     } catch (error) {
       console.error('Failed to fetch members:', error);
+      toast.error('Failed to load members');
     } finally {
       setLoading(false);
     }
@@ -115,9 +117,10 @@ export default function MembersPage() {
       await apiClient.delete(`/users/${deleteModal.member._id}`);
       setDeleteModal({ isOpen: false, member: null });
       await fetchMembers();
+      toast.success('Member deleted successfully');
     } catch (error) {
       console.error('Failed to delete member:', error);
-      alert('Failed to delete member');
+      toast.error('Failed to delete member');
     }
   };
 
