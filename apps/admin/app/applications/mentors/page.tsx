@@ -40,7 +40,11 @@ interface Mentor {
 function getMentorId(mentor: Mentor): string {
   const id = mentor.id ?? mentor._id;
   if (typeof id === 'string') return id;
-  if (id != null && typeof id === 'object' && typeof (id as { toString?: () => string }).toString === 'function') {
+  if (
+    id != null &&
+    typeof id === 'object' &&
+    typeof (id as { toString?: () => string }).toString === 'function'
+  ) {
     return (id as { toString: () => string }).toString();
   }
   return '';
@@ -163,7 +167,8 @@ export default function MentorsPage() {
     setRejectCommunityId('');
     setEditTitle(mentor.title || '');
     setEditDescription(mentor.description || '');
-    setEditGithub(mentor.socialLinks?.github || '');
+    // Prefill GitHub from socialLinks or githubProfile.htmlUrl
+    setEditGithub(mentor.socialLinks?.github || mentor.githubProfile?.htmlUrl || '');
     setEditLinkedin(mentor.socialLinks?.linkedin || '');
     setEditTwitter(mentor.socialLinks?.twitter || '');
     setEditWebsite(mentor.socialLinks?.website || '');
@@ -206,10 +211,7 @@ export default function MentorsPage() {
     }
   };
 
-  const handleReject = async (
-    id: string,
-    payload?: { reason: string; communityId?: string }
-  ) => {
+  const handleReject = async (id: string, payload?: { reason: string; communityId?: string }) => {
     if (payload && !payload.reason?.trim()) {
       toast.error('Please provide a reason for rejection');
       return;
@@ -856,7 +858,9 @@ export default function MentorsPage() {
                       </div>
                     )}
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white">{detailsModal.mentor.name}</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        {detailsModal.mentor.name}
+                      </h3>
                       <p className="text-sm text-zinc-400 mono">{detailsModal.mentor.email}</p>
                     </div>
                     {getStatusBadge(detailsModal.mentor.status)}
