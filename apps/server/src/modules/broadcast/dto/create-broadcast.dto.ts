@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsArray, IsDateString, ValidateIf } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsArray,
+  IsDateString,
+  ValidateIf,
+} from 'class-validator';
 
 export enum BroadcastRecipientType {
   ALL_USERS = 'ALL_USERS',
@@ -101,7 +109,8 @@ export class CreateBroadcastDto {
   eventDescription?: string;
 
   @ApiProperty({
-    description: 'Schedule send date/time (ISO 8601 format, optional. If not provided, sends immediately)',
+    description:
+      'Schedule send date/time (ISO 8601 format, optional. If not provided, sends immediately)',
     required: false,
   })
   @IsOptional()

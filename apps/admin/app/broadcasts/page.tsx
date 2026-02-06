@@ -146,7 +146,10 @@ export default function BroadcastsPage() {
         payload.scheduledAt = scheduledAt;
       }
 
-      const response = await apiClient.post<{ sent: number; scheduled: boolean; id: string }>('/broadcast', payload);
+      const response = await apiClient.post<{ sent: number; scheduled: boolean; id: string }>(
+        '/broadcast',
+        payload
+      );
       toast.success(`Broadcast sent to ${response.data?.sent || 0} recipients`);
       resetForm();
       setShowForm(false);
@@ -242,7 +245,9 @@ export default function BroadcastsPage() {
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-2xl font-semibold text-white tracking-tight">Broadcasts</h1>
-            <p className="text-zinc-500 text-sm mt-1">Send messages and event notifications to users</p>
+            <p className="text-zinc-500 text-sm mt-1">
+              Send messages and event notifications to users
+            </p>
           </div>
           <button onClick={() => setShowForm(!showForm)} className="btn-primary">
             {showForm ? 'Cancel' : '+ New Broadcast'}
@@ -383,7 +388,9 @@ export default function BroadcastsPage() {
               </div>
             )}
 
-            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e9ecef' }}>
+            <div
+              style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e9ecef' }}
+            >
               <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Event Details (Optional)</h3>
 
               <div style={{ marginBottom: '1rem' }}>
@@ -399,7 +406,14 @@ export default function BroadcastsPage() {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '1rem',
+                  marginBottom: '1rem',
+                }}
+              >
                 <div>
                   <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
                     Start Time
@@ -451,7 +465,9 @@ export default function BroadcastsPage() {
               </div>
             </div>
 
-            <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #e9ecef' }}>
+            <div
+              style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #e9ecef' }}
+            >
               <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
                 Schedule Send (Optional)
               </label>
@@ -481,8 +497,9 @@ export default function BroadcastsPage() {
           <>
             <div className="card p-6 mb-6">
               <p className="text-zinc-400 text-sm">
-                Use broadcasts to send important messages, reminders, and event notifications to selected groups of
-                users. Recipients will receive emails with calendar links if event details are provided.
+                Use broadcasts to send important messages, reminders, and event notifications to
+                selected groups of users. Recipients will receive emails with calendar links if
+                event details are provided.
               </p>
             </div>
 
@@ -493,18 +510,27 @@ export default function BroadcastsPage() {
               </div>
               {broadcasts.length === 0 ? (
                 <div className="p-8 text-center">
-                  <p className="text-zinc-500 text-sm">No broadcasts yet. Create your first broadcast above.</p>
+                  <p className="text-zinc-500 text-sm">
+                    No broadcasts yet. Create your first broadcast above.
+                  </p>
                 </div>
               ) : (
                 <div className="divide-y divide-white/[0.06]">
                   {broadcasts.map((broadcast) => (
-                    <div key={broadcast._id} className="p-6 hover:bg-white/[0.02] transition-colors">
+                    <div
+                      key={broadcast._id}
+                      className="p-6 hover:bg-white/[0.02] transition-colors"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-base font-semibold text-white">{broadcast.subject}</h3>
+                            <h3 className="text-base font-semibold text-white">
+                              {broadcast.subject}
+                            </h3>
                             {broadcast.eventTitle && (
-                              <span className="badge-info text-xs">Event: {broadcast.eventTitle}</span>
+                              <span className="badge-info text-xs">
+                                Event: {broadcast.eventTitle}
+                              </span>
                             )}
                           </div>
                           <p
@@ -523,7 +549,11 @@ export default function BroadcastsPage() {
                             <span>•</span>
                             <span>Sent: {broadcast.sentCount} recipients</span>
                             <span>•</span>
-                            <span>{broadcast.sentAt ? formatDate(broadcast.sentAt) : formatDate(broadcast.createdAt)}</span>
+                            <span>
+                              {broadcast.sentAt
+                                ? formatDate(broadcast.sentAt)
+                                : formatDate(broadcast.createdAt)}
+                            </span>
                             {broadcast.completed && (
                               <>
                                 <span>•</span>

@@ -123,9 +123,12 @@ export default function MentorsPage() {
   // Reset to page 1 when filters change (debounce search)
   useEffect(() => {
     if (!mounted) return;
-    const timeoutId = setTimeout(() => {
-      setPagination((prev) => ({ ...prev, page: 1 }));
-    }, searchTerm ? 500 : 0); // Debounce search by 500ms
+    const timeoutId = setTimeout(
+      () => {
+        setPagination((prev) => ({ ...prev, page: 1 }));
+      },
+      searchTerm ? 500 : 0
+    ); // Debounce search by 500ms
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm, statusFilter, communityFilter, mounted]);

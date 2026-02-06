@@ -19,7 +19,9 @@ export class BroadcastService {
     private readonly emailService: EmailService
   ) {}
 
-  async createBroadcast(dto: CreateBroadcastDto): Promise<{ sent: number; scheduled: boolean; id: string }> {
+  async createBroadcast(
+    dto: CreateBroadcastDto
+  ): Promise<{ sent: number; scheduled: boolean; id: string }> {
     const recipients = await this.getRecipients(dto);
     const scheduled = !!dto.scheduledAt && new Date(dto.scheduledAt) > new Date();
 
@@ -68,12 +70,7 @@ export class BroadcastService {
   }
 
   async getBroadcasts(limit: number = 50): Promise<Broadcast[]> {
-    return this.broadcastModel
-      .find()
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean()
-      .exec();
+    return this.broadcastModel.find().sort({ createdAt: -1 }).limit(limit).lean().exec();
   }
 
   async getBroadcastById(id: string): Promise<Broadcast | null> {
@@ -138,13 +135,20 @@ export class BroadcastService {
   private async getRecipients(dto: CreateBroadcastDto): Promise<User[]> {
     switch (dto.recipientType) {
       case BroadcastRecipientType.ALL_USERS:
-        return this.userModel.find({ status: UserStatus.ACTIVE }).select('email name').lean().exec();
+        return this.userModel
+          .find({ status: UserStatus.ACTIVE })
+          .select('email name')
+          .lean()
+          .exec();
 
       case BroadcastRecipientType.COMMUNITY:
         if (!dto.communitySlug) {
           throw new NotFoundException('Community slug is required for COMMUNITY recipient type');
         }
-        const community = await this.communityModel.findOne({ slug: dto.communitySlug }).lean().exec();
+        const community = await this.communityModel
+          .findOne({ slug: dto.communitySlug })
+          .lean()
+          .exec();
         if (!community) {
           throw new NotFoundException(`Community with slug ${dto.communitySlug} not found`);
         }
@@ -169,7 +173,9 @@ export class BroadcastService {
 
       case BroadcastRecipientType.INACTIVE_USERS:
         if (!dto.inactiveDays) {
-          throw new NotFoundException('Inactive days threshold is required for INACTIVE_USERS recipient type');
+          throw new NotFoundException(
+            'Inactive days threshold is required for INACTIVE_USERS recipient type'
+          );
         }
         const daysAgo = new Date();
         daysAgo.setDate(daysAgo.getDate() - parseInt(dto.inactiveDays, 10));
@@ -207,24 +213,21 @@ export class BroadcastService {
     // Generate calendar links if event details are provided
     const calendarLinks = this.generateCalendarLinks(dto);
 
-    await this.emailService.sendTemplatedEmail(
-      recipient.email,
-      dto.subject,
-      'broadcast',
-      {
-        recipientName: recipient.name || 'there',
-        message: dto.message,
-        eventTitle: dto.eventTitle,
-        eventStartTime: dto.eventStartTime ? new Date(dto.eventStartTime).toLocaleString() : undefined,
-        eventEndTime: dto.eventEndTime ? new Date(dto.eventEndTime).toLocaleString() : undefined,
-        eventMeetingLink: dto.eventMeetingLink,
-        eventDescription: dto.eventDescription,
-        googleCalendarLink: calendarLinks.google,
-        outlookCalendarLink: calendarLinks.outlook,
-        icsDownloadLink: calendarLinks.ics,
-        currentYear: new Date().getFullYear(),
-      }
-    );
+    await this.emailService.sendTemplatedEmail(recipient.email, dto.subject, 'broadcast', {
+      recipientName: recipient.name || 'there',
+      message: dto.message,
+      eventTitle: dto.eventTitle,
+      eventStartTime: dto.eventStartTime
+        ? new Date(dto.eventStartTime).toLocaleString()
+        : undefined,
+      eventEndTime: dto.eventEndTime ? new Date(dto.eventEndTime).toLocaleString() : undefined,
+      eventMeetingLink: dto.eventMeetingLink,
+      eventDescription: dto.eventDescription,
+      googleCalendarLink: calendarLinks.google,
+      outlookCalendarLink: calendarLinks.outlook,
+      icsDownloadLink: calendarLinks.ics,
+      currentYear: new Date().getFullYear(),
+    });
   }
 
   private generateCalendarLinks(dto: CreateBroadcastDto): {

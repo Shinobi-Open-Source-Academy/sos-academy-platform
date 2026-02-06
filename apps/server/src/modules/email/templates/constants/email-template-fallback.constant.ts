@@ -132,7 +132,7 @@ export const FALLBACK_TEMPLATES = {
     </body>
     </html>
   `,
-  'broadcast': `
+  broadcast: `
     <!DOCTYPE html>
     <html>
     <head>

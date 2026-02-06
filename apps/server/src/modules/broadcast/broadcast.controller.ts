@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BroadcastService } from './broadcast.service';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
@@ -18,7 +27,12 @@ export class BroadcastController {
 
   @Get()
   @ApiOperation({ summary: 'Get list of recent broadcasts' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of broadcasts to return' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of broadcasts to return',
+  })
   @ApiResponse({ status: 200, description: 'Broadcasts retrieved successfully' })
   async getBroadcasts(@Query('limit') limit?: string) {
     const limitNum = limit ? parseInt(limit, 10) : 50;
