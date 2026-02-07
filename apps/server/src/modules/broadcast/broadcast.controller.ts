@@ -48,10 +48,22 @@ export class BroadcastController {
   }
 
   @Post(':id/retrigger')
-  @ApiOperation({ summary: 'Retrigger/resend a previous broadcast' })
+  @ApiOperation({ summary: 'Retrigger/resend a previous broadcast with optional updates' })
   @ApiParam({ name: 'id', description: 'Broadcast ID to retrigger' })
   @ApiResponse({ status: 200, description: 'Broadcast retriggered successfully' })
-  async retriggerBroadcast(@Param('id') id: string) {
-    return this.broadcastService.retriggerBroadcast(id);
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      skipMissingProperties: true,
+      skipNullProperties: true,
+      skipUndefinedProperties: true,
+    })
+  )
+  async retriggerBroadcast(
+    @Param('id') id: string,
+    @Body() updates?: Partial<CreateBroadcastDto>
+  ) {
+    return this.broadcastService.retriggerBroadcast(id, updates || {});
   }
 }

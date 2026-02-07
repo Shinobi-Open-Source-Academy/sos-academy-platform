@@ -66,9 +66,7 @@
 
     .event-section {
       margin: 30px 0;
-      padding: 20px 0;
-      border-top: 1px solid #e9ecef;
-      border-bottom: 1px solid #e9ecef;
+      padding: 0;
     }
 
     .event-title {
@@ -100,46 +98,42 @@
 
     .action-links {
       margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #e9ecef;
+      padding-top: 0;
     }
 
     .action-link {
       display: inline-block;
-      padding: 10px 20px;
-      background-color: #171717;
-      color: #ffffff;
-      text-decoration: none;
+      color: #304ffe;
+      text-decoration: underline;
       font-size: 14px;
       font-weight: 500;
-      margin-right: 8px;
+      margin-right: 20px;
       margin-bottom: 8px;
     }
 
     .action-link:hover {
-      background-color: #000000;
+      color: #1e3ed8;
     }
 
     .meeting-link {
       display: inline-block;
-      padding: 12px 24px;
-      background-color: #171717;
-      color: #ffffff;
-      text-decoration: none;
+      padding: 12px 0;
+      color: #171717;
+      text-decoration: underline;
       font-size: 15px;
       font-weight: 600;
-      margin-top: 12px;
+      margin-top: 16px;
     }
 
     .meeting-link:hover {
-      background-color: #000000;
+      color: #000000;
     }
 
     .footer {
       background-color: #f7f9fc;
       padding: 25px 30px;
       text-align: center;
-      border-top: 1px solid #e9ecef;
+      margin-top: 40px;
     }
 
     .footer-text {
@@ -195,11 +189,7 @@
         <div class="event-detail-row">
           <span class="event-detail-label">When:</span>
           <span class="event-detail-value">
-            {{#if eventEndTime}}
-              {{eventStartTime}} - {{eventEndTime}}
-            {{else}}
-              {{eventStartTime}}
-            {{/if}}
+            {{eventStartTime}}{{#if eventDuration}} (Duration: {{eventDuration}}){{/if}}
           </span>
         </div>
         {{/if}}
@@ -214,17 +204,17 @@
         <div class="action-links">
           {{#if googleCalendarLink}}
           <a href="{{googleCalendarLink}}" class="action-link" target="_blank" rel="noopener noreferrer">
-            Google Calendar
+            Add to Google Calendar
           </a>
           {{/if}}
           {{#if outlookCalendarLink}}
           <a href="{{outlookCalendarLink}}" class="action-link" target="_blank" rel="noopener noreferrer">
-            Outlook
+            Add to Outlook
           </a>
           {{/if}}
           {{#if icsDownloadLink}}
           <a href="{{icsDownloadLink}}" class="action-link" download="event.ics">
-            Download .ics
+            Download .ics file
           </a>
           {{/if}}
         </div>
@@ -233,14 +223,14 @@
         {{#if eventMeetingLink}}
         <div style="margin-top: 20px;">
           <a href="{{eventMeetingLink}}" class="meeting-link" target="_blank" rel="noopener noreferrer">
-            Join Event
+            Join Event: {{eventMeetingLink}}
           </a>
         </div>
         {{/if}}
       </div>
       {{/if}}
 
-      <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e9ecef;">
+      <div style="margin-top: 40px; padding-top: 0;">
         <p style="font-size: 14px; color: #9e9e9e; margin-bottom: 15px;">
           <strong>Stay Connected:</strong>
         </p>

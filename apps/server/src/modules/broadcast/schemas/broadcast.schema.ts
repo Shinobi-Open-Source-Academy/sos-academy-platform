@@ -40,6 +40,9 @@ export class Broadcast {
   eventStartTime?: string;
 
   @Prop({ required: false })
+  eventDuration?: string;
+
+  @Prop({ required: false })
   eventEndTime?: string;
 
   @Prop({ required: false })

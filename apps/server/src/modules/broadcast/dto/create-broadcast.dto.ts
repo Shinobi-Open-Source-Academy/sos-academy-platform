@@ -85,12 +85,12 @@ export class CreateBroadcastDto {
   eventStartTime?: string;
 
   @ApiProperty({
-    description: 'Event end date/time (ISO 8601 format, optional)',
+    description: 'Event duration in minutes (optional, required if eventStartTime is provided)',
     required: false,
   })
   @IsOptional()
-  @IsDateString()
-  eventEndTime?: string;
+  @IsString()
+  eventDuration?: string;
 
   @ApiProperty({
     description: 'Event meeting link (optional)',

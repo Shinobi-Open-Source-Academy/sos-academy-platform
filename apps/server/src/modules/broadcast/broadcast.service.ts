@@ -25,9 +25,21 @@ export class BroadcastService {
     const recipients = await this.getRecipients(dto);
     const scheduled = !!dto.scheduledAt && new Date(dto.scheduledAt) > new Date();
 
+    // Calculate eventEndTime from eventStartTime + eventDuration if both are provided
+    let eventEndTime: string | undefined;
+    if (dto.eventStartTime && dto.eventDuration) {
+      const startTime = new Date(dto.eventStartTime);
+      const durationMinutes = parseInt(dto.eventDuration, 10);
+      if (!isNaN(durationMinutes)) {
+        const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
+        eventEndTime = endTime.toISOString();
+      }
+    }
+
     // Save broadcast to database
     const broadcast = new this.broadcastModel({
       ...dto,
+      eventEndTime,
       scheduledAt: dto.scheduledAt ? new Date(dto.scheduledAt) : undefined,
       scheduled,
       sentCount: 0,
@@ -77,25 +89,29 @@ export class BroadcastService {
     return this.broadcastModel.findById(id).lean().exec();
   }
 
-  async retriggerBroadcast(id: string): Promise<{ sent: number; scheduled: boolean; id: string }> {
+  async retriggerBroadcast(
+    id: string,
+    updates?: Partial<CreateBroadcastDto>
+  ): Promise<{ sent: number; scheduled: boolean; id: string }> {
     const broadcast = await this.broadcastModel.findById(id).exec();
     if (!broadcast) {
       throw new NotFoundException(`Broadcast with ID ${id} not found`);
     }
 
-    // Get recipients
+    // Merge original broadcast data with any provided updates
     const dto: CreateBroadcastDto = {
-      subject: broadcast.subject,
-      message: broadcast.message,
-      recipientType: broadcast.recipientType,
-      communitySlug: broadcast.communitySlug,
-      userIds: broadcast.userIds,
-      inactiveDays: broadcast.inactiveDays,
-      eventTitle: broadcast.eventTitle,
-      eventStartTime: broadcast.eventStartTime,
-      eventEndTime: broadcast.eventEndTime,
-      eventMeetingLink: broadcast.eventMeetingLink,
-      eventDescription: broadcast.eventDescription,
+      subject: updates?.subject ?? broadcast.subject,
+      message: updates?.message ?? broadcast.message,
+      recipientType: updates?.recipientType ?? broadcast.recipientType,
+      communitySlug: updates?.communitySlug ?? broadcast.communitySlug,
+      userIds: updates?.userIds ?? broadcast.userIds,
+      inactiveDays: updates?.inactiveDays ?? broadcast.inactiveDays,
+      eventTitle: updates?.eventTitle ?? broadcast.eventTitle,
+      eventStartTime: updates?.eventStartTime ?? (broadcast.eventStartTime ? String(broadcast.eventStartTime) : undefined),
+      eventDuration: updates?.eventDuration ?? (broadcast.eventDuration ? String(broadcast.eventDuration) : undefined),
+      eventMeetingLink: updates?.eventMeetingLink ?? broadcast.eventMeetingLink,
+      eventDescription: updates?.eventDescription ?? broadcast.eventDescription,
+      scheduledAt: updates?.scheduledAt ?? (broadcast.scheduledAt ? broadcast.scheduledAt.toISOString() : undefined),
     };
 
     const recipients = await this.getRecipients(dto);
@@ -118,9 +134,21 @@ export class BroadcastService {
       this.logger.warn(`Broadcast retrigger completed with ${errors.length} errors:`, errors);
     }
 
+    // Calculate eventEndTime from eventStartTime + eventDuration if both are provided
+    let eventEndTime: string | undefined;
+    if (dto.eventStartTime && dto.eventDuration) {
+      const startTime = new Date(dto.eventStartTime);
+      const durationMinutes = parseInt(dto.eventDuration, 10);
+      if (!isNaN(durationMinutes)) {
+        const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
+        eventEndTime = endTime.toISOString();
+      }
+    }
+
     // Create a new broadcast record for the retrigger
     const newBroadcast = new this.broadcastModel({
       ...dto,
+      eventEndTime,
       sentCount,
       completed: true,
       sentAt: new Date(),
@@ -210,8 +238,27 @@ export class BroadcastService {
   }
 
   private async sendBroadcastEmail(recipient: User, dto: CreateBroadcastDto): Promise<void> {
+    // Calculate eventEndTime from eventStartTime + eventDuration if both are provided
+    let eventEndTime: string | undefined;
+    if (dto.eventStartTime && dto.eventDuration) {
+      const startTime = new Date(dto.eventStartTime);
+      const durationMinutes = parseInt(dto.eventDuration, 10);
+      if (!isNaN(durationMinutes)) {
+        const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
+        eventEndTime = endTime.toISOString();
+      }
+    }
+
     // Generate calendar links if event details are provided
-    const calendarLinks = this.generateCalendarLinks(dto);
+    const calendarLinks = this.generateCalendarLinks(dto, eventEndTime);
+
+    // Format duration for display
+    const durationMinutes = dto.eventDuration ? parseInt(dto.eventDuration, 10) : undefined;
+    const durationDisplay = durationMinutes
+      ? durationMinutes >= 60
+        ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}m`
+        : `${durationMinutes}m`
+      : undefined;
 
     await this.emailService.sendTemplatedEmail(recipient.email, dto.subject, 'broadcast', {
       recipientName: recipient.name || 'there',
@@ -220,7 +267,8 @@ export class BroadcastService {
       eventStartTime: dto.eventStartTime
         ? new Date(dto.eventStartTime).toLocaleString()
         : undefined,
-      eventEndTime: dto.eventEndTime ? new Date(dto.eventEndTime).toLocaleString() : undefined,
+      eventDuration: durationDisplay,
+      eventEndTime: eventEndTime ? new Date(eventEndTime).toLocaleString() : undefined,
       eventMeetingLink: dto.eventMeetingLink,
       eventDescription: dto.eventDescription,
       googleCalendarLink: calendarLinks.google,
@@ -230,17 +278,33 @@ export class BroadcastService {
     });
   }
 
-  private generateCalendarLinks(dto: CreateBroadcastDto): {
+  private generateCalendarLinks(
+    dto: CreateBroadcastDto,
+    eventEndTime?: string
+  ): {
     google: string | null;
     outlook: string | null;
     ics: string | null;
   } {
-    if (!dto.eventTitle || !dto.eventStartTime || !dto.eventEndTime) {
+    if (!dto.eventTitle || !dto.eventStartTime) {
       return { google: null, outlook: null, ics: null };
     }
 
     const start = new Date(dto.eventStartTime);
-    const end = new Date(dto.eventEndTime);
+    // Use provided eventEndTime or calculate from duration
+    let end: Date;
+    if (eventEndTime) {
+      end = new Date(eventEndTime);
+    } else if (dto.eventDuration) {
+      const durationMinutes = parseInt(dto.eventDuration, 10);
+      if (!isNaN(durationMinutes)) {
+        end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+      } else {
+        return { google: null, outlook: null, ics: null };
+      }
+    } else {
+      return { google: null, outlook: null, ics: null };
+    }
 
     // Format dates for Google Calendar (YYYYMMDDTHHmmssZ)
     const formatGoogleDate = (date: Date): string => {
