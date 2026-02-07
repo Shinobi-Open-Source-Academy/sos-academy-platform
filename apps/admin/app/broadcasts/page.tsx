@@ -205,7 +205,7 @@ export default function BroadcastsPage() {
     setSubject(broadcast.subject);
     setMessage(broadcast.message);
     setRecipientType(broadcast.recipientType);
-    
+
     // Find community by slug if needed
     if (broadcast.recipientType === 'COMMUNITY' && broadcast.communitySlug) {
       const community = communities.find((c) => c.slug === broadcast.communitySlug);
@@ -213,25 +213,25 @@ export default function BroadcastsPage() {
         setSelectedCommunity(community._id);
       }
     }
-    
+
     if (broadcast.userIds) {
       setSelectedUserIds(broadcast.userIds);
     }
-    
+
     if (broadcast.inactiveDays) {
       setInactiveDays(broadcast.inactiveDays);
     }
-    
+
     if (broadcast.eventTitle) {
       setEventTitle(broadcast.eventTitle);
     }
-    
+
     if (broadcast.eventStartTime) {
       // Convert ISO string to datetime-local format
       const startDate = new Date(broadcast.eventStartTime);
       setEventStartTime(startDate.toISOString().slice(0, 16));
     }
-    
+
     if (broadcast.eventDuration) {
       setEventDuration(broadcast.eventDuration);
     } else if (broadcast.eventStartTime && broadcast.eventEndTime) {
@@ -243,20 +243,20 @@ export default function BroadcastsPage() {
         setEventDuration(String(durationMinutes));
       }
     }
-    
+
     if (broadcast.eventMeetingLink) {
       setEventMeetingLink(broadcast.eventMeetingLink);
     }
-    
+
     if (broadcast.eventDescription) {
       setEventDescription(broadcast.eventDescription);
     }
-    
+
     // Fetch users if needed for SPECIFIC_USERS
     if (broadcast.recipientType === 'SPECIFIC_USERS') {
       await fetchUsers();
     }
-    
+
     setRetriggerModal(broadcast);
     setShowForm(false);
   };
@@ -886,16 +886,23 @@ export default function BroadcastsPage() {
                     </div>
                     {selectedUserIds.length > 0 && (
                       <small style={{ color: '#9e9e9e', display: 'block', marginTop: '0.5rem' }}>
-                        {selectedUserIds.length} user{selectedUserIds.length !== 1 ? 's' : ''} selected
+                        {selectedUserIds.length} user{selectedUserIds.length !== 1 ? 's' : ''}{' '}
+                        selected
                       </small>
                     )}
                   </div>
                 )}
 
                 <div
-                  style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e9ecef' }}
+                  style={{
+                    marginTop: '2rem',
+                    paddingTop: '1.5rem',
+                    borderTop: '1px solid #e9ecef',
+                  }}
                 >
-                  <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Event Details (Optional)</h3>
+                  <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+                    Event Details (Optional)
+                  </h3>
 
                   <div style={{ marginBottom: '1rem' }}>
                     <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">

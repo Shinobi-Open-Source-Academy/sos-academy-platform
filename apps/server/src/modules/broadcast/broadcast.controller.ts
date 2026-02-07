@@ -60,10 +60,7 @@ export class BroadcastController {
       skipUndefinedProperties: true,
     })
   )
-  async retriggerBroadcast(
-    @Param('id') id: string,
-    @Body() updates?: Partial<CreateBroadcastDto>
-  ) {
+  async retriggerBroadcast(@Param('id') id: string, @Body() updates?: Partial<CreateBroadcastDto>) {
     return this.broadcastService.retriggerBroadcast(id, updates || {});
   }
 }

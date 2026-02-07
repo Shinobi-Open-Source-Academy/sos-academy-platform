@@ -107,11 +107,17 @@ export class BroadcastService {
       userIds: updates?.userIds ?? broadcast.userIds,
       inactiveDays: updates?.inactiveDays ?? broadcast.inactiveDays,
       eventTitle: updates?.eventTitle ?? broadcast.eventTitle,
-      eventStartTime: updates?.eventStartTime ?? (broadcast.eventStartTime ? String(broadcast.eventStartTime) : undefined),
-      eventDuration: updates?.eventDuration ?? (broadcast.eventDuration ? String(broadcast.eventDuration) : undefined),
+      eventStartTime:
+        updates?.eventStartTime ??
+        (broadcast.eventStartTime ? String(broadcast.eventStartTime) : undefined),
+      eventDuration:
+        updates?.eventDuration ??
+        (broadcast.eventDuration ? String(broadcast.eventDuration) : undefined),
       eventMeetingLink: updates?.eventMeetingLink ?? broadcast.eventMeetingLink,
       eventDescription: updates?.eventDescription ?? broadcast.eventDescription,
-      scheduledAt: updates?.scheduledAt ?? (broadcast.scheduledAt ? broadcast.scheduledAt.toISOString() : undefined),
+      scheduledAt:
+        updates?.scheduledAt ??
+        (broadcast.scheduledAt ? broadcast.scheduledAt.toISOString() : undefined),
     };
 
     const recipients = await this.getRecipients(dto);
