@@ -38,6 +38,30 @@ export class CommunityService {
       .exec();
   }
 
+  async findBySlug(slug: string): Promise<Community | null> {
+    return this.communityModel
+      .findOne({ slug, isActive: true })
+      .select('-__v')
+      .populate({
+        path: 'kage',
+        select: 'name email title description githubProfile',
+      })
+      .populate({
+        path: 'mentors',
+        select: 'name email title description githubProfile socialLinks',
+      })
+      .populate({
+        path: 'members',
+        select: 'name email githubProfile',
+      })
+      .populate({
+        path: 'projects',
+        select: 'name description url',
+      })
+      .lean()
+      .exec();
+  }
+
   async getStats(): Promise<{
     totalCommunities: number;
     totalMembers: number;

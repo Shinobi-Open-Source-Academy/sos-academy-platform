@@ -74,4 +74,20 @@ export class CommunityController {
   async findByName(@Param('name') name: string): Promise<Community | null> {
     return this.communityService.findByName(name);
   }
+
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Get community by slug' })
+  @ApiParam({ name: 'slug', description: 'Community slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'Community details',
+    type: Community,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Community not found',
+  })
+  async findBySlug(@Param('slug') slug: string): Promise<Community | null> {
+    return this.communityService.findBySlug(slug);
+  }
 }

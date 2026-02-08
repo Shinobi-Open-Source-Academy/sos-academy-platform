@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   description: `Learn through practical, collaborative open-source experience. \n
     Gain real-world skills and build your portfolio while working on meaningful projects with experienced mentors. \n
-    Join our JavaScript, Python, Go, Java, and Ruby communities and be paired with expert mentors to support your contribution journey.`,
+    Join our JavaScript, Python, Go, Java, Ruby, Rust, and PHP communities and be paired with expert mentors to support your contribution journey.`,
   keywords: [
     'shinobi',
     'open source academy',
@@ -41,6 +41,8 @@ export const metadata: Metadata = {
     'go',
     'java',
     'ruby',
+    'rust',
+    'php',
     'programming',
     'learning',
     'community',
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
     url: 'https://shinobi-open-source.academy',
     title: 'SOS Academy - Empowering the Next Generation of Open-Source Warriors',
     description:
-      'Learn through practical, collaborative open-source experience. Join communities in JavaScript, Python, Go, Java, and Ruby. Work on real projects with experienced mentors.',
+      'Learn through practical, collaborative open-source experience. Join communities in JavaScript, Python, Go, Java, Ruby, Rust, and PHP. Work on real projects with experienced mentors.',
     siteName: 'Shinobi Open-Source Academy',
     images: [
       {

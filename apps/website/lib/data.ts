@@ -152,6 +152,20 @@ export const COMMUNITIES = [
     meetingTime: '17:00 UTC',
     isActive: false,
   },
+  {
+    id: 'ame',
+    name: 'Ame Community',
+    language: 'PHP',
+    icon: 'PHP',
+    color: '#777BB4',
+    description:
+      'Build dynamic web applications and contribute to PHP-based open-source projects and frameworks.',
+    longDescription:
+      'The Ame Community focuses on PHP development, including modern frameworks like Laravel, Symfony, and WordPress. We work on web applications, APIs, and contribute to popular PHP open-source projects.',
+    meetingDay: 'Sunday',
+    meetingTime: '18:00 UTC',
+    isActive: true,
+  },
 ];
 
 export const MENTORS = [

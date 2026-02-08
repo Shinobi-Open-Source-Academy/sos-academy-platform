@@ -136,3 +136,120 @@ export function getRandomMentors(mentors: Mentor[], count: number = 4): Mentor[]
   const shuffled = [...mentors].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
+
+export interface Community {
+  _id: string;
+  slug: string;
+  name: string;
+  description: string;
+  tags: string[];
+  isActive: boolean;
+  kage?: {
+    _id: string;
+    name: string;
+    email: string;
+    title?: string;
+    description?: string;
+    githubProfile?: {
+      login: string;
+      htmlUrl: string;
+      avatarUrl?: string;
+    };
+  };
+  mentors?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    title?: string;
+    description?: string;
+    githubProfile?: {
+      login: string;
+      htmlUrl: string;
+      avatarUrl?: string;
+    };
+    socialLinks?: {
+      github?: string;
+      linkedin?: string;
+      twitter?: string;
+      website?: string;
+    };
+  }>;
+  members?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    githubProfile?: {
+      login: string;
+      htmlUrl: string;
+      avatarUrl?: string;
+    };
+  }>;
+  projects?: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    url?: string;
+  }>;
+}
+
+export async function getCommunityBySlug(slug: string): Promise<Community | null> {
+  try {
+    const response = await fetch(`${API_URL}/communities/slug/${slug}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to fetch community');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching community:', error);
+    return null;
+  }
+}
+
+export async function getMentorsByCommunity(communitySlug: string): Promise<Mentor[]> {
+  try {
+    const response = await fetch(
+      `${API_URL}/users/admin/users?role=MENTOR&status=ACTIVE&community=${communitySlug}&limit=100`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      }
+    );
+    if (!response.ok) {
+      return [];
+    }
+    const data = await response.json();
+    return data.users || [];
+  } catch (error) {
+    console.error('Error fetching mentors by community:', error);
+    return [];
+  }
+}
+
+export async function getMembersByCommunity(communitySlug: string): Promise<number> {
+  try {
+    const response = await fetch(
+      `${API_URL}/users/admin/users?role=MEMBER&status=ACTIVE&community=${communitySlug}&limit=1`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      }
+    );
+    if (!response.ok) {
+      return 0;
+    }
+    const data = await response.json();
+    return data.pagination?.total || 0;
+  } catch (error) {
+    console.error('Error fetching members count:', error);
+    return 0;
+  }
+}
