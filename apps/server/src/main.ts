@@ -8,7 +8,10 @@ import { SeederService } from './modules/seeder/seeder.service';
 async function bootstrap() {
   const command = process.argv[2];
 
-  if (command && ['seed', 'clear', 'reset', 'status', 'php', 'projects', 'refresh-stats'].includes(command)) {
+  if (
+    command &&
+    ['seed', 'clear', 'reset', 'status', 'php', 'projects', 'refresh-stats'].includes(command)
+  ) {
     await runSeederCommand(command);
     return;
   }

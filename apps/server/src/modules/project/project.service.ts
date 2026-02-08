@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { GitHubService } from '../github/github.service';
 import { Project, ProjectDocument } from './schemas/project.schema';
+import { Community, CommunityDocument } from '../community/schemas/community.schema';
 
 interface ProjectStats {
   stars: number;
@@ -20,6 +21,7 @@ export class ProjectService {
 
   constructor(
     @InjectModel(Project.name) private projectModel: Model<ProjectDocument>,
+    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
     private readonly githubService: GitHubService
   ) {}
 
@@ -69,7 +71,9 @@ export class ProjectService {
         }
         return null;
       } catch (error) {
-        this.logger.error(`Failed to fetch stats for project ${project.name || projectId}: ${error instanceof Error ? error.message : String(error)}`);
+        this.logger.error(
+          `Failed to fetch stats for project ${project.name || projectId}: ${error instanceof Error ? error.message : String(error)}`
+        );
         return null;
       } finally {
         // Remove from in-flight requests when done
@@ -88,7 +92,9 @@ export class ProjectService {
    * @param projects Array of project documents
    * @returns Map of project ID to stats
    */
-  async fetchMultipleProjectStats(projects: Array<ProjectDocument | any>): Promise<Map<string, ProjectStats>> {
+  async fetchMultipleProjectStats(
+    projects: Array<ProjectDocument | any>
+  ): Promise<Map<string, ProjectStats>> {
     const statsMap = new Map<string, ProjectStats>();
     const projectsToFetch: Array<{ id: string; project: ProjectDocument | any }> = [];
 
@@ -128,14 +134,14 @@ export class ProjectService {
     for (let i = 0; i < uniqueReposArray.length; i++) {
       const [repoUrl, projects] = uniqueReposArray[i];
       const stats = await this.fetchProjectStats(projects[0].project);
-      
+
       // Apply stats to all projects with this repo URL
       if (stats) {
         for (const { id } of projects) {
           statsMap.set(id, stats);
         }
       }
-      
+
       // Delay between requests to avoid rate limiting (except for last item)
       if (i < uniqueReposArray.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 300));
@@ -169,5 +175,124 @@ export class ProjectService {
    */
   clearCache(): void {
     this.statsCache.clear();
+  }
+
+  /**
+   * Get projects with pagination, filtering, and sorting
+   */
+  async getProjects(query: {
+    community?: string;
+    search?: string;
+    sortBy?: string;
+    order?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const { community, search, sortBy = 'rank', order = 'asc', page = 1, limit = 10 } = query;
+
+    // Normalize pagination
+    const normalizedLimit = Math.min(Math.max(limit, 1), 50);
+    const normalizedPage = Math.max(page, 1);
+    const skip = (normalizedPage - 1) * normalizedLimit;
+
+    // Build filter
+    const filter: Record<string, unknown> = {};
+
+    // Filter by community
+    if (community) {
+      const communityDoc = await this.communityModel
+        .findOne({ slug: community })
+        .select('_id')
+        .lean()
+        .exec();
+      if (communityDoc) {
+        filter.community = communityDoc._id;
+      } else {
+        // Return empty if community not found
+        return {
+          projects: [],
+          pagination: {
+            total: 0,
+            page: normalizedPage,
+            limit: normalizedLimit,
+            pages: 0,
+          },
+        };
+      }
+    }
+
+    // Search filter
+    if (search) {
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(safeSearch, 'i');
+      filter.$or = [{ name: regex }, { description: regex }, { technologies: { $in: [regex] } }];
+    }
+
+    // Build sort
+    let sort: Record<string, 1 | -1> = {};
+    const sortOrder = order === 'desc' ? -1 : 1;
+
+    switch (sortBy) {
+      case 'rank': {
+        // Custom sort for rank: A first, then S, then B, C, D
+        // We'll sort by rank field and handle A/S ordering in application logic
+        sort = { rank: sortOrder };
+        break;
+      }
+      case 'latest': {
+        sort = { lastUpdated: sortOrder };
+        break;
+      }
+      case 'stars': {
+        sort = { stars: sortOrder };
+        break;
+      }
+      case 'name': {
+        sort = { name: sortOrder };
+        break;
+      }
+      default: {
+        sort = { rank: sortOrder };
+      }
+    }
+
+    // Query projects
+    const [projects, total] = await Promise.all([
+      this.projectModel
+        .find(filter)
+        .select(
+          'name description url website stars contributors lastUpdated technologies rank githubRepo'
+        )
+        .populate({ path: 'community', select: 'name slug', options: { lean: true } })
+        .sort(sort)
+        .skip(skip)
+        .limit(normalizedLimit)
+        .lean()
+        .exec(),
+      this.projectModel.countDocuments(filter).exec(),
+    ]);
+
+    // Custom sort for rank (A first, then S, then B, C, D)
+    if (sortBy === 'rank') {
+      const rankOrder: Record<string, number> = { A: 0, S: 1, B: 2, C: 3, D: 4 };
+      projects.sort((a, b) => {
+        const aRank = rankOrder[a.rank || 'D'] ?? 5;
+        const bRank = rankOrder[b.rank || 'D'] ?? 5;
+        const comparison = aRank - bRank;
+        // For ascending: A (0) < S (1) < B (2) < C (3) < D (4)
+        // For descending: D (4) > C (3) > B (2) > S (1) > A (0)
+        return order === 'desc' ? -comparison : comparison;
+      });
+    }
+
+    return {
+      projects,
+      pagination: {
+        total,
+        page: normalizedPage,
+        limit: normalizedLimit,
+        pages: Math.ceil(total / normalizedLimit),
+      },
+    };
   }
 }

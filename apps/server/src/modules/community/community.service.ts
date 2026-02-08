@@ -7,10 +7,7 @@ import { CommunityStatsDto } from './dto/community-stats.dto';
 
 @Injectable()
 export class CommunityService {
-  constructor(
-    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
-    private readonly projectService: ProjectService
-  ) {}
+  constructor(@InjectModel(Community.name) private communityModel: Model<CommunityDocument>) {}
 
   async findAll(): Promise<Community[]> {
     return this.communityModel
@@ -44,7 +41,7 @@ export class CommunityService {
   }
 
   async findBySlug(slug: string): Promise<Community | null> {
-    // Return data immediately from DB - don't block on stats fetching
+    // Return data immediately from DB - projects are fetched separately via projects API
     const community = await this.communityModel
       .findOne({ slug, isActive: true })
       .select('-__v')
@@ -60,14 +57,10 @@ export class CommunityService {
         path: 'members',
         select: 'name email githubProfile',
       })
-      .populate({
-        path: 'projects',
-        select: 'name description url website stars contributors lastUpdated technologies rank githubRepo',
-      })
       .lean()
       .exec();
 
-    // Return immediately with DB data - stats will be fetched individually on frontend
+    // Don't populate projects - they're fetched separately via projects API with pagination
     return community;
   }
 

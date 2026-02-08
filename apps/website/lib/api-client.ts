@@ -190,6 +190,7 @@ export interface Community {
     description?: string;
     url?: string;
     website?: string;
+    githubRepo?: string;
     stars?: number;
     contributors?: number;
     lastUpdated?: string;
@@ -281,5 +282,59 @@ export async function getProjectStats(projectId: string): Promise<ProjectStats |
   } catch (error) {
     console.error('Error fetching project stats:', error);
     return null;
+  }
+}
+
+export interface ProjectsResponse {
+  projects: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    url?: string;
+    website?: string;
+    githubRepo?: string;
+    stars?: number;
+    contributors?: number;
+    lastUpdated?: string;
+    technologies?: string[];
+    rank?: string;
+  }>;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export async function getProjects(params: {
+  community?: string;
+  search?: string;
+  sortBy?: 'rank' | 'latest' | 'stars' | 'name';
+  order?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}): Promise<ProjectsResponse> {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params.community) queryParams.set('community', params.community);
+    if (params.search) queryParams.set('search', params.search);
+    if (params.sortBy) queryParams.set('sortBy', params.sortBy);
+    if (params.order) queryParams.set('order', params.order);
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.limit) queryParams.set('limit', params.limit.toString());
+
+    const response = await fetch(`${API_URL}/projects?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return { projects: [], pagination: { total: 0, page: 1, limit: 10, pages: 0 } };
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    return { projects: [], pagination: { total: 0, page: 1, limit: 10, pages: 0 } };
   }
 }

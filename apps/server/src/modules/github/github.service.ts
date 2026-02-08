@@ -266,7 +266,9 @@ export class GitHubService {
       const stats = {
         stars: repoResponse.data.stargazers_count || 0,
         contributors: contributorsCount,
-        lastUpdated: repoResponse.data.updated_at ? new Date(repoResponse.data.updated_at) : new Date(),
+        lastUpdated: repoResponse.data.updated_at
+          ? new Date(repoResponse.data.updated_at)
+          : new Date(),
         website: repoResponse.data.homepage || repoResponse.data.html_url || null,
       };
 
@@ -284,7 +286,7 @@ export class GitHubService {
         if (status === 403) {
           const rateLimitRemaining = error.response?.headers['x-ratelimit-remaining'];
           const rateLimitReset = error.response?.headers['x-ratelimit-reset'];
-          
+
           if (rateLimitRemaining === '0') {
             const resetTime = rateLimitReset ? new Date(parseInt(rateLimitReset, 10) * 1000) : null;
             this.logger.warn(
@@ -294,7 +296,9 @@ export class GitHubService {
             this.logger.warn(`GitHub API returned 403 for ${repoUrl}: ${message}`);
           }
         } else {
-          this.logger.error(`Failed to fetch repository stats for ${repoUrl}: ${status} - ${message}`);
+          this.logger.error(
+            `Failed to fetch repository stats for ${repoUrl}: ${status} - ${message}`
+          );
         }
       } else {
         this.logger.error(

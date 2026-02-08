@@ -160,7 +160,8 @@ export class SeederService {
       },
       {
         name: 'SQLModel',
-        description: 'SQL databases in Python, designed for simplicity, compatibility, and robustness',
+        description:
+          'SQL databases in Python, designed for simplicity, compatibility, and robustness',
         githubRepo: 'https://github.com/tiangolo/sqlmodel',
         url: 'https://github.com/tiangolo/sqlmodel',
         technologies: ['python', 'sql', 'orm', 'database'],
@@ -186,7 +187,7 @@ export class SeederService {
       },
       {
         name: 'Hugo',
-        description: 'The world\'s fastest framework for building websites',
+        description: "The world's fastest framework for building websites",
         githubRepo: 'https://github.com/gohugoio/hugo',
         url: 'https://github.com/gohugoio/hugo',
         technologies: ['go', 'static-site', 'ssg', 'hugo'],
@@ -194,7 +195,8 @@ export class SeederService {
       },
       {
         name: 'Caddy',
-        description: 'Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS',
+        description:
+          'Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS',
         githubRepo: 'https://github.com/caddyserver/caddy',
         url: 'https://github.com/caddyserver/caddy',
         technologies: ['go', 'web-server', 'https', 'reverse-proxy'],
@@ -212,7 +214,8 @@ export class SeederService {
     iwa: [
       {
         name: 'Spring Boot',
-        description: 'Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications',
+        description:
+          'Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications',
         githubRepo: 'https://github.com/spring-projects/spring-boot',
         url: 'https://github.com/spring-projects/spring-boot',
         technologies: ['java', 'spring', 'spring-boot', 'framework'],
@@ -220,7 +223,8 @@ export class SeederService {
       },
       {
         name: 'Spring Framework',
-        description: 'Spring Framework provides a comprehensive programming and configuration model',
+        description:
+          'Spring Framework provides a comprehensive programming and configuration model',
         githubRepo: 'https://github.com/spring-projects/spring-framework',
         url: 'https://github.com/spring-projects/spring-framework',
         technologies: ['java', 'spring', 'framework', 'dependency-injection'],
@@ -228,7 +232,8 @@ export class SeederService {
       },
       {
         name: 'Spring Cloud',
-        description: 'Spring Cloud provides tools for developers to quickly build distributed systems',
+        description:
+          'Spring Cloud provides tools for developers to quickly build distributed systems',
         githubRepo: 'https://github.com/spring-cloud/spring-cloud',
         url: 'https://github.com/spring-cloud/spring-cloud',
         technologies: ['java', 'spring', 'microservices', 'cloud'],
@@ -236,7 +241,8 @@ export class SeederService {
       },
       {
         name: 'Spring Security',
-        description: 'Spring Security is a powerful and highly customizable authentication and access-control framework',
+        description:
+          'Spring Security is a powerful and highly customizable authentication and access-control framework',
         githubRepo: 'https://github.com/spring-projects/spring-security',
         url: 'https://github.com/spring-projects/spring-security',
         technologies: ['java', 'spring', 'security', 'authentication'],
@@ -280,7 +286,8 @@ export class SeederService {
     kumo: [
       {
         name: 'Tauri',
-        description: 'Build smaller, faster, and more secure desktop applications with a web frontend',
+        description:
+          'Build smaller, faster, and more secure desktop applications with a web frontend',
         githubRepo: 'https://github.com/tauri-apps/tauri',
         url: 'https://github.com/tauri-apps/tauri',
         technologies: ['rust', 'desktop', 'webview', 'gui'],
@@ -304,7 +311,8 @@ export class SeederService {
       },
       {
         name: 'Ripgrep',
-        description: 'A line-oriented search tool that recursively searches directories for a regex pattern',
+        description:
+          'A line-oriented search tool that recursively searches directories for a regex pattern',
         githubRepo: 'https://github.com/BurntSushi/ripgrep',
         url: 'https://github.com/BurntSushi/ripgrep',
         technologies: ['rust', 'cli', 'search', 'grep'],
@@ -767,7 +775,9 @@ export class SeederService {
         const projectsData = this.PROJECTS_DATA[slug];
 
         if (!projectsData) {
-          this.logger.warn(`No project data found for community: ${community.name} (slug: ${slug})`);
+          this.logger.warn(
+            `No project data found for community: ${community.name} (slug: ${slug})`
+          );
           continue;
         }
 
@@ -911,7 +921,9 @@ export class SeederService {
           continue;
         }
 
-        this.logger.log(`Found ${missingProjects.length} missing project(s) for ${community.name}:`);
+        this.logger.log(
+          `Found ${missingProjects.length} missing project(s) for ${community.name}:`
+        );
         for (const project of missingProjects) {
           this.logger.log(`   - ${project.name}`);
         }
@@ -1010,7 +1022,10 @@ export class SeederService {
     try {
       this.logger.log('Refreshing GitHub stats for all projects...');
 
-      const projects = await this.projectModel.find({ githubRepo: { $exists: true, $ne: null } }).lean().exec();
+      const projects = await this.projectModel
+        .find({ githubRepo: { $exists: true, $ne: null } })
+        .lean()
+        .exec();
 
       if (projects.length === 0) {
         this.logger.log('No projects with GitHub repositories found.');
@@ -1056,11 +1071,16 @@ export class SeederService {
           }
         } catch (error) {
           failed++;
-          this.logger.error(`Error refreshing stats for ${project.name}:`, (error as Error).message);
+          this.logger.error(
+            `Error refreshing stats for ${project.name}:`,
+            (error as Error).message
+          );
         }
       }
 
-      this.logger.log(`Successfully refreshed ${updated} project(s)${failed > 0 ? `, ${failed} failed` : ''}`);
+      this.logger.log(
+        `Successfully refreshed ${updated} project(s)${failed > 0 ? `, ${failed} failed` : ''}`
+      );
 
       return {
         success: true,

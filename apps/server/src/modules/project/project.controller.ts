@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ProjectService } from './project.service';
 import { Project, ProjectDocument } from './schemas/project.schema';
+import { GetProjectsQueryDto } from './dto/get-projects.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -12,6 +14,13 @@ export class ProjectController {
     private readonly projectService: ProjectService,
     @InjectModel(Project.name) private projectModel: Model<ProjectDocument>
   ) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get projects with pagination, filtering, and sorting' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getProjects(@Query() query: GetProjectsQueryDto) {
+    return this.projectService.getProjects(query);
+  }
 
   @Get(':id/stats')
   @ApiOperation({ summary: 'Get fresh GitHub stats for a project' })

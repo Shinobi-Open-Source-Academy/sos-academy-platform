@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Community, CommunitySchema } from '../community/schemas/community.schema';
 import { GitHubModule } from '../github/github.module';
 import { UserModule } from '../user/user.module';
 import { ProjectController } from './project.controller';
@@ -8,7 +9,10 @@ import { Project, ProjectSchema } from './schemas/project.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
+    MongooseModule.forFeature([
+      { name: Project.name, schema: ProjectSchema },
+      { name: Community.name, schema: CommunitySchema },
+    ]),
     UserModule,
     GitHubModule,
   ],
