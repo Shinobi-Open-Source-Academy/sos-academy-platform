@@ -47,6 +47,7 @@ interface Broadcast {
   eventTitle?: string;
   eventStartTime?: string;
   eventEndTime?: string;
+  eventDuration?: string;
   eventMeetingLink?: string;
   eventDescription?: string;
 }
@@ -104,6 +105,8 @@ export default function BroadcastsPage() {
       try {
         const response = await apiClient.get<Broadcast>(`/broadcast/${sendingBroadcastId}`);
         const broadcast = response.data;
+
+        if (!broadcast) return;
 
         // Update the broadcast in the list
         setBroadcasts((prev) => prev.map((b) => (b._id === sendingBroadcastId ? broadcast : b)));

@@ -211,13 +211,12 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                     <div className="flex items-start gap-6">
                       {/* Kage Avatar with Special Frame */}
                       <div className="relative flex-shrink-0">
-                        {/* Outer decorative frame */}
+                        {/* Outer decorative frame - square with community color */}
                         <div
                           className="absolute inset-0 border-2"
                           style={{
                             borderColor: `${communityColor}60`,
                             transform: 'scale(1.15)',
-                            borderRadius: '50%',
                           }}
                         />
                         {/* Middle frame */}
@@ -226,37 +225,33 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                           style={{
                             borderColor: `${communityColor}40`,
                             transform: 'scale(1.08)',
-                            borderRadius: '50%',
                           }}
                         />
-                        {/* Avatar */}
+                        {/* Avatar - circular for profile picture */}
                         {community.kage.githubProfile?.avatarUrl ? (
                           <img
                             src={community.kage.githubProfile.avatarUrl}
                             alt={community.kage.name}
-                            className="relative w-24 h-24 object-cover border-2"
+                            className="relative w-24 h-24 object-cover border-2 rounded-full"
                             style={{
                               borderColor: communityColor,
-                              borderRadius: '50%',
                             }}
                           />
                         ) : (
                           <div
-                            className="relative w-24 h-24 bg-zinc-800 flex items-center justify-center text-zinc-500 text-3xl font-medium border-2"
+                            className="relative w-24 h-24 bg-zinc-800 flex items-center justify-center text-zinc-500 text-3xl font-medium border-2 rounded-full"
                             style={{
                               borderColor: communityColor,
-                              borderRadius: '50%',
                             }}
                           >
                             {community.kage.name.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        {/* Kage Badge */}
+                        {/* Kage Badge - square */}
                         <div
                           className="absolute -bottom-1 -right-1 w-8 h-8 flex items-center justify-center text-xs font-bold border-2 bg-black"
                           style={{
                             borderColor: communityColor,
-                            borderRadius: '50%',
                             color: communityColor,
                           }}
                           title="Community Kage"
