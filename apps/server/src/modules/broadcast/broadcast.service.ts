@@ -50,12 +50,16 @@ export class BroadcastService {
 
     // Return immediately, send emails asynchronously (non-blocking)
     setImmediate(() => {
-      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch((error) => {
-        this.logger.error(`Failed to send broadcast emails for ${savedBroadcast._id}:`, error);
-      });
+      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch(
+        (error) => {
+          this.logger.error(`Failed to send broadcast emails for ${savedBroadcast._id}:`, error);
+        }
+      );
     });
 
-    this.logger.log(`Broadcast created with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`);
+    this.logger.log(
+      `Broadcast created with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`
+    );
 
     return {
       sent: 0,
@@ -94,7 +98,9 @@ export class BroadcastService {
           if (sentCount % 10 === 0 || i === recipients.length - 1) {
             broadcast.sentCount = sentCount;
             await broadcast.save();
-            this.logger.log(`Broadcast ${broadcastId}: ${sentCount}/${recipients.length} emails sent`);
+            this.logger.log(
+              `Broadcast ${broadcastId}: ${sentCount}/${recipients.length} emails sent`
+            );
           }
         } catch (error) {
           const errorMsg = `Failed to send to ${recipient.email}: ${error instanceof Error ? error.message : String(error)}`;
@@ -104,7 +110,10 @@ export class BroadcastService {
       }
 
       if (errors.length > 0) {
-        this.logger.warn(`Broadcast ${broadcastId} completed with ${errors.length} errors:`, errors);
+        this.logger.warn(
+          `Broadcast ${broadcastId} completed with ${errors.length} errors:`,
+          errors
+        );
       }
 
       // Final update
@@ -113,7 +122,9 @@ export class BroadcastService {
       broadcast.sentAt = new Date();
       await broadcast.save();
 
-      this.logger.log(`Broadcast ${broadcastId} completed: ${sentCount}/${recipients.length} emails sent`);
+      this.logger.log(
+        `Broadcast ${broadcastId} completed: ${sentCount}/${recipients.length} emails sent`
+      );
     } catch (error) {
       this.logger.error(`Error in async email sending for broadcast ${broadcastId}:`, error);
       // Mark as completed even on error
@@ -189,12 +200,19 @@ export class BroadcastService {
 
     // Return immediately, send emails asynchronously (non-blocking)
     setImmediate(() => {
-      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch((error) => {
-        this.logger.error(`Failed to send retrigger broadcast emails for ${savedBroadcast._id}:`, error);
-      });
+      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch(
+        (error) => {
+          this.logger.error(
+            `Failed to send retrigger broadcast emails for ${savedBroadcast._id}:`,
+            error
+          );
+        }
+      );
     });
 
-    this.logger.log(`Broadcast retriggered with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`);
+    this.logger.log(
+      `Broadcast retriggered with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`
+    );
 
     return {
       sent: 0,

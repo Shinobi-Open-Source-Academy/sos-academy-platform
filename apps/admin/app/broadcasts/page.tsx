@@ -106,9 +106,7 @@ export default function BroadcastsPage() {
         const broadcast = response.data;
 
         // Update the broadcast in the list
-        setBroadcasts((prev) =>
-          prev.map((b) => (b._id === sendingBroadcastId ? broadcast : b))
-        );
+        setBroadcasts((prev) => prev.map((b) => (b._id === sendingBroadcastId ? broadcast : b)));
 
         // If completed, show final toast and stop polling
         if (broadcast.completed) {
@@ -206,7 +204,9 @@ export default function BroadcastsPage() {
       resetForm();
       setShowForm(false);
       setSendingBroadcastId(response.data?.id || null);
-      toast.success(`Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`);
+      toast.success(
+        `Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`
+      );
 
       // Refresh broadcasts list
       await fetchBroadcasts();
@@ -356,7 +356,9 @@ export default function BroadcastsPage() {
       // Hide modal immediately and show initial toast
       closeRetriggerModal();
       setSendingBroadcastId(response.data?.id || null);
-      toast.success(`Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`);
+      toast.success(
+        `Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`
+      );
 
       // Refresh broadcasts list
       await fetchBroadcasts();
@@ -767,18 +769,20 @@ export default function BroadcastsPage() {
                               </>
                             )}
                           </div>
-                          {!broadcast.completed && broadcast.totalRecipients && broadcast.totalRecipients > 0 && (
-                            <div className="mt-2">
-                              <div className="w-full bg-zinc-800 h-1.5">
-                                <div
-                                  className="bg-blue-500 h-1.5 transition-all duration-300"
-                                  style={{
-                                    width: `${Math.min((broadcast.sentCount / broadcast.totalRecipients) * 100, 100)}%`,
-                                  }}
-                                />
+                          {!broadcast.completed &&
+                            broadcast.totalRecipients &&
+                            broadcast.totalRecipients > 0 && (
+                              <div className="mt-2">
+                                <div className="w-full bg-zinc-800 h-1.5">
+                                  <div
+                                    className="bg-blue-500 h-1.5 transition-all duration-300"
+                                    style={{
+                                      width: `${Math.min((broadcast.sentCount / broadcast.totalRecipients) * 100, 100)}%`,
+                                    }}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
                         </div>
                         <button
                           onClick={() => openRetriggerModal(broadcast)}
