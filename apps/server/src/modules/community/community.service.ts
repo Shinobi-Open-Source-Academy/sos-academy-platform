@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ProjectService } from '../project/project.service';
 import { Community, CommunityDocument } from './schemas/community.schema';
+import { CommunityStatsDto } from './dto/community-stats.dto';
 
 @Injectable()
 export class CommunityService {
-  constructor(@InjectModel(Community.name) private communityModel: Model<CommunityDocument>) {}
+  constructor(
+    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
+    private readonly projectService: ProjectService
+  ) {}
 
   async findAll(): Promise<Community[]> {
     return this.communityModel
@@ -39,7 +44,8 @@ export class CommunityService {
   }
 
   async findBySlug(slug: string): Promise<Community | null> {
-    return this.communityModel
+    // Return data immediately from DB - don't block on stats fetching
+    const community = await this.communityModel
       .findOne({ slug, isActive: true })
       .select('-__v')
       .populate({
@@ -56,18 +62,16 @@ export class CommunityService {
       })
       .populate({
         path: 'projects',
-        select: 'name description url',
+        select: 'name description url website stars contributors lastUpdated technologies rank githubRepo',
       })
       .lean()
       .exec();
+
+    // Return immediately with DB data - stats will be fetched individually on frontend
+    return community;
   }
 
-  async getStats(): Promise<{
-    totalCommunities: number;
-    totalMembers: number;
-    totalMentors: number;
-    totalProjects: number;
-  }> {
+  async getStats(): Promise<CommunityStatsDto> {
     const stats = await this.communityModel.aggregate([
       {
         $match: { isActive: true },

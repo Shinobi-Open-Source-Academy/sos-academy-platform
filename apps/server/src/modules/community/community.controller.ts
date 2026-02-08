@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
 import { Community } from './schemas/community.schema';
+import { CommunityStatsDto } from './dto/community-stats.dto';
 
 @ApiTags('communities')
 @Controller('communities')
@@ -20,26 +21,13 @@ export class CommunityController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Get community  statistics' })
+  @ApiOperation({ summary: 'Get community statistics' })
   @ApiResponse({
     status: 200,
     description: 'Community statistics including total counts',
-    schema: {
-      type: 'object',
-      properties: {
-        totalCommunities: { type: 'number' },
-        totalMembers: { type: 'number' },
-        totalMentors: { type: 'number' },
-        totalProjects: { type: 'number' },
-      },
-    },
+    type: CommunityStatsDto,
   })
-  async getStats(): Promise<{
-    totalCommunities: number;
-    totalMembers: number;
-    totalMentors: number;
-    totalProjects: number;
-  }> {
+  async getStats(): Promise<CommunityStatsDto> {
     return this.communityService.getStats();
   }
 

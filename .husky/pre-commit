@@ -6,5 +6,3 @@ pnpm format
 
 # Stage any formatting changes
 git add -u
-
-# Continue with commit

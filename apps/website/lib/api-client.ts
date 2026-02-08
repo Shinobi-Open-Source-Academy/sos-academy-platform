@@ -189,6 +189,12 @@ export interface Community {
     name: string;
     description?: string;
     url?: string;
+    website?: string;
+    stars?: number;
+    contributors?: number;
+    lastUpdated?: string;
+    technologies?: string[];
+    rank?: string;
   }>;
 }
 
@@ -251,5 +257,29 @@ export async function getMembersByCommunity(communitySlug: string): Promise<numb
   } catch (error) {
     console.error('Error fetching members count:', error);
     return 0;
+  }
+}
+
+export interface ProjectStats {
+  stars: number;
+  contributors: number;
+  lastUpdated: string;
+  website: string | null;
+}
+
+export async function getProjectStats(projectId: string): Promise<ProjectStats | null> {
+  try {
+    const response = await fetch(`${API_URL}/projects/${projectId}/stats`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching project stats:', error);
+    return null;
   }
 }

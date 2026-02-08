@@ -12,10 +12,13 @@ export class GitHubService {
   private readonly logger = new Logger(GitHubService.name);
   private readonly orgName: string | undefined;
   private readonly orgAdminToken: string | undefined;
+  private readonly apiToken: string | undefined;
 
   constructor(private readonly configService: ConfigService) {
     this.orgName = this.configService.get<string>('GITHUB_ORG_NAME');
     this.orgAdminToken = this.configService.get<string>('GITHUB_ORG_ADMIN_TOKEN');
+    // Use GITHUB_API_TOKEN if available, otherwise fall back to GITHUB_ORG_ADMIN_TOKEN
+    this.apiToken = this.configService.get<string>('GITHUB_API_TOKEN') || this.orgAdminToken;
 
     if (this.orgName && this.orgAdminToken) {
       this.logger.log(`GitHub org integration enabled for: ${this.orgName}`);
@@ -24,6 +27,30 @@ export class GitHubService {
         'GitHub org integration disabled: GITHUB_ORG_NAME or GITHUB_ORG_ADMIN_TOKEN not configured'
       );
     }
+
+    if (this.apiToken) {
+      this.logger.log('GitHub API token configured for authenticated requests');
+    } else {
+      this.logger.warn(
+        'GitHub API token not configured. API requests will be rate-limited (60/hour). Set GITHUB_API_TOKEN or GITHUB_ORG_ADMIN_TOKEN for higher limits (5000/hour).'
+      );
+    }
+  }
+
+  /**
+   * Get headers for GitHub API requests with authentication if available
+   */
+  private getApiHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': GITHUB_API_VERSION,
+    };
+
+    if (this.apiToken) {
+      headers.Authorization = `Bearer ${this.apiToken}`;
+    }
+
+    return headers;
   }
 
   /**
@@ -36,10 +63,7 @@ export class GitHubService {
       this.logger.log(`Fetching GitHub profile for: ${handle}`);
 
       const response = await axios.get(`${GITHUB_API_BASE_URL}/users/${handle}`, {
-        headers: {
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': GITHUB_API_VERSION,
-        },
+        headers: this.getApiHeaders(),
         timeout: GITHUB_API_TIMEOUT,
       });
 
@@ -163,5 +187,121 @@ export class GitHubService {
     }
 
     return profile;
+  }
+
+  /**
+   * Fetch GitHub repository statistics
+   * @param repoUrl Full GitHub repository URL (e.g., https://github.com/owner/repo)
+   * @returns Repository stats or null if not found/error
+   */
+  async fetchRepositoryStats(repoUrl: string): Promise<{
+    stars: number;
+    contributors: number;
+    lastUpdated: Date;
+    website: string | null;
+  } | null> {
+    try {
+      // Extract owner/repo from URL
+      const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+      if (!match) {
+        this.logger.warn(`Invalid GitHub URL format: ${repoUrl}`);
+        return null;
+      }
+
+      const [, owner, repo] = match;
+      const repoPath = `${owner}/${repo.replace(/\.git$/, '')}`;
+
+      // Only log if not using token (for debugging rate limit issues)
+      if (!this.apiToken) {
+        this.logger.debug(`Fetching GitHub repository stats for: ${repoPath}`);
+      }
+
+      // Fetch repository info
+      const repoResponse = await axios.get(`${GITHUB_API_BASE_URL}/repos/${repoPath}`, {
+        headers: this.getApiHeaders(),
+        timeout: GITHUB_API_TIMEOUT,
+      });
+
+      // Fetch contributors count using Link header pagination
+      let contributorsCount = 0;
+      try {
+        const contributorsResponse = await axios.get(
+          `${GITHUB_API_BASE_URL}/repos/${repoPath}/contributors?per_page=100&anon=false`,
+          {
+            headers: this.getApiHeaders(),
+            timeout: GITHUB_API_TIMEOUT,
+          }
+        );
+
+        // Get total count from Link header if available
+        const linkHeader = contributorsResponse.headers.link;
+        if (linkHeader) {
+          const lastPageMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
+          if (lastPageMatch) {
+            const lastPage = parseInt(lastPageMatch[1], 10);
+            if (lastPage > 1) {
+              // Fetch last page to get accurate count
+              const lastPageResponse = await axios.get(
+                `${GITHUB_API_BASE_URL}/repos/${repoPath}/contributors?per_page=100&page=${lastPage}&anon=false`,
+                {
+                  headers: this.getApiHeaders(),
+                  timeout: GITHUB_API_TIMEOUT,
+                }
+              );
+              contributorsCount = (lastPage - 1) * 100 + lastPageResponse.data.length;
+            } else {
+              contributorsCount = contributorsResponse.data.length;
+            }
+          } else {
+            contributorsCount = contributorsResponse.data.length;
+          }
+        } else {
+          contributorsCount = contributorsResponse.data.length;
+        }
+      } catch (contribError) {
+        this.logger.warn(`Failed to fetch contributors for ${repoPath}, using 0`);
+        contributorsCount = 0;
+      }
+
+      const stats = {
+        stars: repoResponse.data.stargazers_count || 0,
+        contributors: contributorsCount,
+        lastUpdated: repoResponse.data.updated_at ? new Date(repoResponse.data.updated_at) : new Date(),
+        website: repoResponse.data.homepage || repoResponse.data.html_url || null,
+      };
+
+      // Only log success in debug mode to reduce noise
+      this.logger.debug(
+        `Repository stats fetched for ${repoPath}: ${stats.stars} stars, ${stats.contributors} contributors`
+      );
+      return stats;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const message = error.response?.data?.message || error.message;
+
+        // Handle rate limiting
+        if (status === 403) {
+          const rateLimitRemaining = error.response?.headers['x-ratelimit-remaining'];
+          const rateLimitReset = error.response?.headers['x-ratelimit-reset'];
+          
+          if (rateLimitRemaining === '0') {
+            const resetTime = rateLimitReset ? new Date(parseInt(rateLimitReset, 10) * 1000) : null;
+            this.logger.warn(
+              `GitHub API rate limit exceeded for ${repoUrl}. ${resetTime ? `Resets at ${resetTime.toISOString()}` : 'Please wait before retrying.'}`
+            );
+          } else {
+            this.logger.warn(`GitHub API returned 403 for ${repoUrl}: ${message}`);
+          }
+        } else {
+          this.logger.error(`Failed to fetch repository stats for ${repoUrl}: ${status} - ${message}`);
+        }
+      } else {
+        this.logger.error(
+          `Failed to fetch repository stats for ${repoUrl}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+      return null;
+    }
   }
 }
