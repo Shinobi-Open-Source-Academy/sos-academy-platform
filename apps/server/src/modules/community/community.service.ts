@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ProjectService } from '../project/project.service';
-import { Community, CommunityDocument } from './schemas/community.schema';
 import { CommunityStatsDto } from './dto/community-stats.dto';
+import { Community, CommunityDocument } from './schemas/community.schema';
 
 @Injectable()
 export class CommunityService {

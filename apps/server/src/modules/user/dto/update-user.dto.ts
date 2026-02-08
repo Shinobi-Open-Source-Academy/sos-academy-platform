@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { OmitType, PartialType } from '@nestjs/mapped-types';
-import { IsOptional, IsString, IsUrl, MaxLength, ValidateNested } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsUrl, MaxLength, ValidateNested } from 'class-validator';
 import { CreateUserDto } from './create-user.dto';
 
 class SocialLinksDto {

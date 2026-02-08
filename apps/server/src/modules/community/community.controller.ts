@@ -1,8 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
-import { Community } from './schemas/community.schema';
 import { CommunityStatsDto } from './dto/community-stats.dto';
+import { Community } from './schemas/community.schema';
 
 @ApiTags('communities')
 @Controller('communities')

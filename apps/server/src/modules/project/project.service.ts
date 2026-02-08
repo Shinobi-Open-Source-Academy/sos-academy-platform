@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { GitHubService } from '../github/github.service';
 import { Project, ProjectDocument } from './schemas/project.schema';
-import { Community, CommunityDocument } from '../community/schemas/community.schema';
 
 interface ProjectStats {
   stars: number;
@@ -132,7 +132,7 @@ export class ProjectService {
     // Fetch each unique repo once, then apply results to all projects with that repo
     const uniqueReposArray = Array.from(uniqueRepos.entries());
     for (let i = 0; i < uniqueReposArray.length; i++) {
-      const [repoUrl, projects] = uniqueReposArray[i];
+      const [, projects] = uniqueReposArray[i];
       const stats = await this.fetchProjectStats(projects[0].project);
 
       // Apply stats to all projects with this repo URL

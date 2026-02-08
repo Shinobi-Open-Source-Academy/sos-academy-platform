@@ -202,7 +202,7 @@ export class GitHubService {
   } | null> {
     try {
       // Extract owner/repo from URL
-      const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+      const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
       if (!match) {
         this.logger.warn(`Invalid GitHub URL format: ${repoUrl}`);
         return null;
@@ -258,7 +258,7 @@ export class GitHubService {
         } else {
           contributorsCount = contributorsResponse.data.length;
         }
-      } catch (contribError) {
+      } catch (_contribError) {
         this.logger.warn(`Failed to fetch contributors for ${repoPath}, using 0`);
         contributorsCount = 0;
       }

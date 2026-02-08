@@ -213,9 +213,13 @@ export default function BroadcastsPage() {
 
       // Refresh broadcasts list
       await fetchBroadcasts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to send broadcast:', error);
-      toast.error(error.response?.data?.message || 'Failed to send broadcast');
+      const errorMessage =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : undefined;
+      toast.error(errorMessage || 'Failed to send broadcast');
     } finally {
       setLoading(false);
     }

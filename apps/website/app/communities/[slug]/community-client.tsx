@@ -99,8 +99,8 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
     if (!projects.length) return;
 
     // Fetch stats for each project individually (non-blocking)
-    projects.forEach((project) => {
-      if (!project._id || !project.githubRepo) return;
+    for (const project of projects) {
+      if (!project._id || !project.githubRepo) continue;
 
       // Small delay to stagger requests and avoid rate limiting
       setTimeout(async () => {
@@ -112,7 +112,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
           }));
         }
       }, Math.random() * 500); // Random delay 0-500ms to stagger requests
-    });
+    }
   }, [projects]);
 
   if (loading) {
@@ -292,7 +292,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
+                              aria-label="External link"
                             >
+                              <title>External link</title>
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -462,6 +464,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                       />
                       {searchQuery && (
                         <button
+                          type="button"
                           onClick={() => setSearchQuery('')}
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                           aria-label="Clear search"
@@ -471,7 +474,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
+                            aria-label="Close"
                           >
+                            <title>Close</title>
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -501,6 +506,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          aria-hidden="true"
                         >
                           <path
                             strokeLinecap="round"
@@ -514,6 +520,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
 
                     {/* Sort Order Toggle */}
                     <button
+                      type="button"
                       onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
                       className="px-3 py-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
                       title={`Sort ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
@@ -524,7 +531,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          aria-label="Sort ascending"
                         >
+                          <title>Sort ascending</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -538,7 +547,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          aria-label="Sort descending"
                         >
+                          <title>Sort descending</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -645,7 +656,13 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                               {/* Stats Row */}
                               <div className="flex flex-wrap items-center gap-4 mb-4 text-xs">
                                 <div className="flex items-center gap-1.5 text-gray-400">
-                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                    aria-label="Stars"
+                                  >
+                                    <title>Stars</title>
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                   </svg>
                                   <span className="font-medium">
@@ -659,7 +676,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
+                                    aria-label="Contributors"
                                   >
+                                    <title>Contributors</title>
                                     <path
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
@@ -679,7 +698,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                                       fill="none"
                                       stroke="currentColor"
                                       viewBox="0 0 24 24"
+                                      aria-label="Last updated"
                                     >
+                                      <title>Last updated</title>
                                       <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -695,9 +716,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                               {/* Technology Tags */}
                               {project.technologies && project.technologies.length > 0 && (
                                 <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                                  {project.technologies.slice(0, 4).map((tech, idx) => (
+                                  {project.technologies.slice(0, 4).map((tech) => (
                                     <span
-                                      key={idx}
+                                      key={tech}
                                       className="text-xs px-2 py-1 bg-white/5 border border-white/10 text-gray-400 hover:border-white/20 transition-colors"
                                     >
                                       {tech}
@@ -720,6 +741,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                     {pagination.pages > 1 && (
                       <div className="flex items-center justify-center gap-2 mt-8">
                         <button
+                          type="button"
                           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                           disabled={currentPage === 1}
                           className="px-4 py-2 bg-white/5 border border-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
@@ -730,6 +752,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                           Page {pagination.page} of {pagination.pages}
                         </span>
                         <button
+                          type="button"
                           onClick={() => setCurrentPage((p) => Math.min(pagination.pages, p + 1))}
                           disabled={currentPage === pagination.pages}
                           className="px-4 py-2 bg-white/5 border border-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"

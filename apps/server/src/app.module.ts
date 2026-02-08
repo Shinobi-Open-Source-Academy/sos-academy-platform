@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { databaseConfig } from './common/config/database.config';
-import { envConfig } from './common/config/env.config';
 
 import { BroadcastModule } from './modules/broadcast/broadcast.module';
 import { CalendarModule } from './modules/calendar/calendar.module';

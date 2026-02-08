@@ -1,12 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
-import { User } from '../user/schemas/user.schema';
+import { Model } from 'mongoose';
 import { Community } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
+import { User } from '../user/schemas/user.schema';
+import { BroadcastRecipientType, CreateBroadcastDto } from './dto/create-broadcast.dto';
 import { Broadcast } from './schemas/broadcast.schema';
-import { CreateBroadcastDto, BroadcastRecipientType } from './dto/create-broadcast.dto';
 
 @Injectable()
 export class BroadcastService {
@@ -30,7 +30,7 @@ export class BroadcastService {
     if (dto.eventStartTime && dto.eventDuration) {
       const startTime = new Date(dto.eventStartTime);
       const durationMinutes = parseInt(dto.eventDuration, 10);
-      if (!isNaN(durationMinutes)) {
+      if (!Number.isNaN(durationMinutes)) {
         const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
         eventEndTime = endTime.toISOString();
       }
@@ -182,7 +182,7 @@ export class BroadcastService {
     if (dto.eventStartTime && dto.eventDuration) {
       const startTime = new Date(dto.eventStartTime);
       const durationMinutes = parseInt(dto.eventDuration, 10);
-      if (!isNaN(durationMinutes)) {
+      if (!Number.isNaN(durationMinutes)) {
         const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
         eventEndTime = endTime.toISOString();
       }
@@ -231,7 +231,7 @@ export class BroadcastService {
           .lean()
           .exec();
 
-      case BroadcastRecipientType.COMMUNITY:
+      case BroadcastRecipientType.COMMUNITY: {
         if (!dto.communitySlug) {
           throw new NotFoundException('Community slug is required for COMMUNITY recipient type');
         }
@@ -250,6 +250,7 @@ export class BroadcastService {
           .select('email name')
           .lean()
           .exec();
+      }
 
       case BroadcastRecipientType.MENTORS:
         return this.userModel
@@ -261,7 +262,7 @@ export class BroadcastService {
           .lean()
           .exec();
 
-      case BroadcastRecipientType.INACTIVE_USERS:
+      case BroadcastRecipientType.INACTIVE_USERS: {
         if (!dto.inactiveDays) {
           throw new NotFoundException(
             'Inactive days threshold is required for INACTIVE_USERS recipient type'
@@ -281,6 +282,7 @@ export class BroadcastService {
           .select('email name')
           .lean()
           .exec();
+      }
 
       case BroadcastRecipientType.SPECIFIC_USERS:
         if (!dto.userIds || dto.userIds.length === 0) {
@@ -305,7 +307,7 @@ export class BroadcastService {
     if (dto.eventStartTime && dto.eventDuration) {
       const startTime = new Date(dto.eventStartTime);
       const durationMinutes = parseInt(dto.eventDuration, 10);
-      if (!isNaN(durationMinutes)) {
+      if (!Number.isNaN(durationMinutes)) {
         const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
         eventEndTime = endTime.toISOString();
       }
@@ -359,7 +361,7 @@ export class BroadcastService {
       end = new Date(eventEndTime);
     } else if (dto.eventDuration) {
       const durationMinutes = parseInt(dto.eventDuration, 10);
-      if (!isNaN(durationMinutes)) {
+      if (!Number.isNaN(durationMinutes)) {
         end = new Date(start.getTime() + durationMinutes * 60 * 1000);
       } else {
         return { google: null, outlook: null, ics: null };

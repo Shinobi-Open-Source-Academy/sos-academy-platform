@@ -1,11 +1,10 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
+import { GetProjectsQueryDto } from './dto/get-projects.dto';
 import { ProjectService } from './project.service';
 import { Project, ProjectDocument } from './schemas/project.schema';
-import { GetProjectsQueryDto } from './dto/get-projects.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
