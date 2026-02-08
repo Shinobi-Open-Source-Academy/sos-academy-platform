@@ -211,9 +211,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                     <div className="flex items-start gap-6">
                       {/* Kage Avatar with Special Frame */}
                       <div className="relative flex-shrink-0">
-                        {/* Outer decorative frame - square with community color */}
+                        {/* Outer decorative frame */}
                         <div
-                          className="absolute inset-0 border-2"
+                          className="absolute inset-0 border-2 rounded-full"
                           style={{
                             borderColor: `${communityColor}60`,
                             transform: 'scale(1.15)',
@@ -221,7 +221,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                         />
                         {/* Middle frame */}
                         <div
-                          className="absolute inset-0 border"
+                          className="absolute inset-0 border rounded-full"
                           style={{
                             borderColor: `${communityColor}40`,
                             transform: 'scale(1.08)',
@@ -247,9 +247,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                             {community.kage.name.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        {/* Kage Badge - square */}
+                        {/* Kage Badge */}
                         <div
-                          className="absolute -bottom-1 -right-1 w-8 h-8 flex items-center justify-center text-xs font-bold border-2 bg-black"
+                          className="absolute -bottom-1 -right-1 w-8 h-8 flex items-center justify-center text-xs font-bold border-2 bg-black rounded-full"
                           style={{
                             borderColor: communityColor,
                             color: communityColor,
