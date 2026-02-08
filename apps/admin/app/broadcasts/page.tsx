@@ -39,6 +39,7 @@ interface Broadcast {
   userIds?: string[];
   inactiveDays?: string;
   sentCount: number;
+  totalRecipients?: number;
   scheduled: boolean;
   completed: boolean;
   sentAt?: string;
@@ -60,6 +61,7 @@ export default function BroadcastsPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [retriggerModal, setRetriggerModal] = useState<Broadcast | null>(null);
+  const [sendingBroadcastId, setSendingBroadcastId] = useState<string | null>(null);
 
   // Form state
   const [subject, setSubject] = useState('');
@@ -93,6 +95,36 @@ export default function BroadcastsPage() {
       fetchUsers();
     }
   }, [mounted, router, recipientType]);
+
+  // Poll for broadcast progress if there's a sending broadcast
+  useEffect(() => {
+    if (!sendingBroadcastId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await apiClient.get<Broadcast>(`/broadcast/${sendingBroadcastId}`);
+        const broadcast = response.data;
+
+        // Update the broadcast in the list
+        setBroadcasts((prev) =>
+          prev.map((b) => (b._id === sendingBroadcastId ? broadcast : b))
+        );
+
+        // If completed, show final toast and stop polling
+        if (broadcast.completed) {
+          clearInterval(pollInterval);
+          setSendingBroadcastId(null);
+          toast.success(
+            `Broadcast completed! Sent to ${broadcast.sentCount} of ${broadcast.totalRecipients || broadcast.sentCount} recipients`
+          );
+        }
+      } catch (error) {
+        console.error('Failed to poll broadcast status:', error);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [sendingBroadcastId]);
 
   const fetchCommunities = async () => {
     try {
@@ -163,13 +195,20 @@ export default function BroadcastsPage() {
         payload.scheduledAt = scheduledAt;
       }
 
-      const response = await apiClient.post<{ sent: number; scheduled: boolean; id: string }>(
-        '/broadcast',
-        payload
-      );
-      toast.success(`Broadcast sent to ${response.data?.sent || 0} recipients`);
+      const response = await apiClient.post<{
+        sent: number;
+        scheduled: boolean;
+        id: string;
+        totalRecipients: number;
+      }>('/broadcast', payload);
+
+      // Hide form immediately and show initial toast
       resetForm();
       setShowForm(false);
+      setSendingBroadcastId(response.data?.id || null);
+      toast.success(`Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`);
+
+      // Refresh broadcasts list
       await fetchBroadcasts();
     } catch (error: any) {
       console.error('Failed to send broadcast:', error);
@@ -307,12 +346,19 @@ export default function BroadcastsPage() {
         if (eventDescription) payload.eventDescription = eventDescription;
       }
 
-      const response = await apiClient.post<{ sent: number; scheduled: boolean; id: string }>(
-        `/broadcast/${retriggerModal._id}/retrigger`,
-        payload
-      );
-      toast.success(`Broadcast resent to ${response.data?.sent || 0} recipients`);
+      const response = await apiClient.post<{
+        sent: number;
+        scheduled: boolean;
+        id: string;
+        totalRecipients: number;
+      }>(`/broadcast/${retriggerModal._id}/retrigger`, payload);
+
+      // Hide modal immediately and show initial toast
       closeRetriggerModal();
+      setSendingBroadcastId(response.data?.id || null);
+      toast.success(`Broadcast queued! Sending to ${response.data?.totalRecipients || 0} recipients...`);
+
+      // Refresh broadcasts list
       await fetchBroadcasts();
     } catch (error: any) {
       console.error('Failed to retrigger broadcast:', error);
@@ -690,7 +736,15 @@ export default function BroadcastsPage() {
                           <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
                             <span>To: {getRecipientLabel(broadcast)}</span>
                             <span>•</span>
-                            <span>Sent: {broadcast.sentCount} recipients</span>
+                            {broadcast.completed ? (
+                              <span>Sent: {broadcast.sentCount} recipients</span>
+                            ) : broadcast.totalRecipients ? (
+                              <span className="text-blue-400">
+                                Sending: {broadcast.sentCount} / {broadcast.totalRecipients}
+                              </span>
+                            ) : (
+                              <span>Sent: {broadcast.sentCount} recipients</span>
+                            )}
                             <span>•</span>
                             <span>
                               {broadcast.sentAt
@@ -703,11 +757,32 @@ export default function BroadcastsPage() {
                                 <span className="text-emerald-400">Completed</span>
                               </>
                             )}
+                            {!broadcast.completed && broadcast.totalRecipients && (
+                              <>
+                                <span>•</span>
+                                <span className="text-blue-400 flex items-center gap-1">
+                                  <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent animate-spin" />
+                                  Sending...
+                                </span>
+                              </>
+                            )}
                           </div>
+                          {!broadcast.completed && broadcast.totalRecipients && broadcast.totalRecipients > 0 && (
+                            <div className="mt-2">
+                              <div className="w-full bg-zinc-800 h-1.5">
+                                <div
+                                  className="bg-blue-500 h-1.5 transition-all duration-300"
+                                  style={{
+                                    width: `${Math.min((broadcast.sentCount / broadcast.totalRecipients) * 100, 100)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <button
                           onClick={() => openRetriggerModal(broadcast)}
-                          disabled={retriggering === broadcast._id}
+                          disabled={retriggering === broadcast._id || !broadcast.completed}
                           className="btn-secondary text-xs px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                           type="button"
                         >

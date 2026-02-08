@@ -8,8 +8,6 @@ interface MentorsSectionProps {
 
 export default function MentorsSection({ mentors, loading }: MentorsSectionProps) {
   if (loading) {
-    // Loading state is handled by the parent component on mentors page
-    // This is a fallback for other pages (like home page)
     return (
       <div className="p-6 border border-white/5 bg-white/[0.02]">
         <div className="flex items-center gap-2 mb-2">

@@ -57,6 +57,9 @@ export class Broadcast {
   @Prop({ default: 0 })
   sentCount: number;
 
+  @Prop({ default: 0 })
+  totalRecipients: number;
+
   @Prop({ default: false })
   scheduled: boolean;
 

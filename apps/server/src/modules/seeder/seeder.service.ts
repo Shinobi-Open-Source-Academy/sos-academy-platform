@@ -77,6 +77,14 @@ export class SeederService {
       tags: ['rust', 'systems', 'performance', 'memory-safe', 'backend', 'blockchain'],
       isActive: true,
     },
+    {
+      name: 'PHP',
+      slug: 'ame',
+      description:
+        'Build dynamic web applications and contribute to PHP-based open-source projects and frameworks.',
+      tags: ['php', 'web', 'backend', 'laravel', 'symfony', 'wordpress'],
+      isActive: true,
+    },
   ];
 
   constructor(
@@ -153,6 +161,65 @@ export class SeederService {
       }
 
       this.logger.error('Error seeding communities:', (error as Error).message);
+      throw error;
+    }
+  }
+
+  /**
+   * Upsert PHP community (update if exists, create if not)
+   */
+  async upsertPhpCommunity(): Promise<SeedingResult> {
+    try {
+      this.logger.log('Starting PHP community upsert...');
+
+      const phpCommunityData = this.COMMUNITIES_DATA.find((c) => c.slug === 'ame');
+      if (!phpCommunityData) {
+        throw new Error('PHP community data not found in seed data');
+      }
+
+      // Check if PHP community already exists
+      const existingCommunity = await this.communityModel.findOne({ slug: 'ame' }).lean().exec();
+      const wasCreated = !existingCommunity;
+
+      // Get or create a temporary ObjectId for kage (required field)
+      const tempKageId = existingCommunity?.kage || new this.communityModel()._id;
+
+      // Upsert: update if exists (by slug), create if not
+      const result = await this.communityModel.findOneAndUpdate(
+        { slug: 'ame' },
+        {
+          $set: {
+            name: phpCommunityData.name,
+            slug: phpCommunityData.slug,
+            description: phpCommunityData.description,
+            tags: phpCommunityData.tags,
+            isActive: phpCommunityData.isActive,
+          },
+          $setOnInsert: {
+            kage: tempKageId,
+            mentors: [],
+            members: [],
+            projects: [],
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      this.logger.log(
+        `PHP community ${wasCreated ? 'created' : 'updated'}: ${result.name} (slug: ${result.slug})`
+      );
+
+      return {
+        success: true,
+        count: 1,
+        message: `PHP community ${wasCreated ? 'created' : 'updated'} successfully`,
+      };
+    } catch (error) {
+      this.logger.error('Error upserting PHP community:', (error as Error).message);
       throw error;
     }
   }

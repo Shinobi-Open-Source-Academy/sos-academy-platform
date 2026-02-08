@@ -9,7 +9,7 @@ async function bootstrap() {
   // Check if this is a CLI command
   const command = process.argv[2];
 
-  if (command && ['seed', 'clear', 'reset', 'status'].includes(command)) {
+  if (command && ['seed', 'clear', 'reset', 'status', 'php'].includes(command)) {
     // Run as CLI seeder
     await runSeederCommand(command);
     return;
@@ -132,6 +132,9 @@ async function runSeederCommand(command: string): Promise<void> {
         break;
       case 'status':
         await seederService.getDatabaseStatus();
+        break;
+      case 'php':
+        await seederService.upsertPhpCommunity();
         break;
       default:
         await seederService.seedCommunities();

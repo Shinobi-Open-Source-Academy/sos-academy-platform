@@ -21,7 +21,7 @@ export class BroadcastService {
 
   async createBroadcast(
     dto: CreateBroadcastDto
-  ): Promise<{ sent: number; scheduled: boolean; id: string }> {
+  ): Promise<{ sent: number; scheduled: boolean; id: string; totalRecipients: number }> {
     const recipients = await this.getRecipients(dto);
     const scheduled = !!dto.scheduledAt && new Date(dto.scheduledAt) > new Date();
 
@@ -36,49 +36,93 @@ export class BroadcastService {
       }
     }
 
-    // Save broadcast to database
+    // Save broadcast to database immediately
     const broadcast = new this.broadcastModel({
       ...dto,
       eventEndTime,
       scheduledAt: dto.scheduledAt ? new Date(dto.scheduledAt) : undefined,
       scheduled,
       sentCount: 0,
+      totalRecipients: recipients.length,
       completed: false,
     });
     const savedBroadcast = await broadcast.save();
 
-    if (scheduled) {
-      // TODO: Implement scheduled sending (could use a job queue like Bull)
-      this.logger.warn('Scheduled broadcasts not yet implemented. Sending immediately.');
-    }
+    // Return immediately, send emails asynchronously (non-blocking)
+    setImmediate(() => {
+      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch((error) => {
+        this.logger.error(`Failed to send broadcast emails for ${savedBroadcast._id}:`, error);
+      });
+    });
 
-    let sentCount = 0;
-    const errors: string[] = [];
+    this.logger.log(`Broadcast created with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`);
 
-    for (const recipient of recipients) {
-      try {
-        await this.sendBroadcastEmail(recipient, dto);
-        sentCount++;
-      } catch (error) {
-        const errorMsg = `Failed to send to ${recipient.email}: ${error instanceof Error ? error.message : String(error)}`;
-        this.logger.error(errorMsg);
-        errors.push(errorMsg);
+    return {
+      sent: 0,
+      scheduled: false,
+      id: savedBroadcast._id.toString(),
+      totalRecipients: recipients.length,
+    };
+  }
+
+  /**
+   * Send broadcast emails asynchronously and update progress
+   */
+  private async sendBroadcastEmailsAsync(
+    broadcastId: string,
+    recipients: User[],
+    dto: CreateBroadcastDto
+  ): Promise<void> {
+    try {
+      const broadcast = await this.broadcastModel.findById(broadcastId).exec();
+      if (!broadcast) {
+        this.logger.error(`Broadcast ${broadcastId} not found`);
+        return;
+      }
+
+      let sentCount = 0;
+      const errors: string[] = [];
+
+      // Send emails with progress updates
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i];
+        try {
+          await this.sendBroadcastEmail(recipient, dto);
+          sentCount++;
+
+          // Update progress every 10 emails or at the end
+          if (sentCount % 10 === 0 || i === recipients.length - 1) {
+            broadcast.sentCount = sentCount;
+            await broadcast.save();
+            this.logger.log(`Broadcast ${broadcastId}: ${sentCount}/${recipients.length} emails sent`);
+          }
+        } catch (error) {
+          const errorMsg = `Failed to send to ${recipient.email}: ${error instanceof Error ? error.message : String(error)}`;
+          this.logger.error(errorMsg);
+          errors.push(errorMsg);
+        }
+      }
+
+      if (errors.length > 0) {
+        this.logger.warn(`Broadcast ${broadcastId} completed with ${errors.length} errors:`, errors);
+      }
+
+      // Final update
+      broadcast.sentCount = sentCount;
+      broadcast.completed = true;
+      broadcast.sentAt = new Date();
+      await broadcast.save();
+
+      this.logger.log(`Broadcast ${broadcastId} completed: ${sentCount}/${recipients.length} emails sent`);
+    } catch (error) {
+      this.logger.error(`Error in async email sending for broadcast ${broadcastId}:`, error);
+      // Mark as completed even on error
+      const broadcast = await this.broadcastModel.findById(broadcastId).exec();
+      if (broadcast) {
+        broadcast.completed = true;
+        await broadcast.save();
       }
     }
-
-    if (errors.length > 0) {
-      this.logger.warn(`Broadcast completed with ${errors.length} errors:`, errors);
-    }
-
-    // Update broadcast with results
-    savedBroadcast.sentCount = sentCount;
-    savedBroadcast.completed = true;
-    savedBroadcast.sentAt = new Date();
-    await savedBroadcast.save();
-
-    this.logger.log(`Broadcast sent to ${sentCount} recipients`);
-
-    return { sent: sentCount, scheduled: false, id: savedBroadcast._id.toString() };
   }
 
   async getBroadcasts(limit: number = 50): Promise<Broadcast[]> {
@@ -92,7 +136,7 @@ export class BroadcastService {
   async retriggerBroadcast(
     id: string,
     updates?: Partial<CreateBroadcastDto>
-  ): Promise<{ sent: number; scheduled: boolean; id: string }> {
+  ): Promise<{ sent: number; scheduled: boolean; id: string; totalRecipients: number }> {
     const broadcast = await this.broadcastModel.findById(id).exec();
     if (!broadcast) {
       throw new NotFoundException(`Broadcast with ID ${id} not found`);
@@ -121,24 +165,6 @@ export class BroadcastService {
     };
 
     const recipients = await this.getRecipients(dto);
-    let sentCount = 0;
-    const errors: string[] = [];
-
-    // Resend emails
-    for (const recipient of recipients) {
-      try {
-        await this.sendBroadcastEmail(recipient, dto);
-        sentCount++;
-      } catch (error) {
-        const errorMsg = `Failed to send to ${recipient.email}: ${error instanceof Error ? error.message : String(error)}`;
-        this.logger.error(errorMsg);
-        errors.push(errorMsg);
-      }
-    }
-
-    if (errors.length > 0) {
-      this.logger.warn(`Broadcast retrigger completed with ${errors.length} errors:`, errors);
-    }
 
     // Calculate eventEndTime from eventStartTime + eventDuration if both are provided
     let eventEndTime: string | undefined;
@@ -155,15 +181,27 @@ export class BroadcastService {
     const newBroadcast = new this.broadcastModel({
       ...dto,
       eventEndTime,
-      sentCount,
-      completed: true,
-      sentAt: new Date(),
+      sentCount: 0,
+      totalRecipients: recipients.length,
+      completed: false,
     });
     const savedBroadcast = await newBroadcast.save();
 
-    this.logger.log(`Broadcast retriggered and sent to ${sentCount} recipients`);
+    // Return immediately, send emails asynchronously (non-blocking)
+    setImmediate(() => {
+      this.sendBroadcastEmailsAsync(savedBroadcast._id.toString(), recipients, dto).catch((error) => {
+        this.logger.error(`Failed to send retrigger broadcast emails for ${savedBroadcast._id}:`, error);
+      });
+    });
 
-    return { sent: sentCount, scheduled: false, id: savedBroadcast._id.toString() };
+    this.logger.log(`Broadcast retriggered with ID ${savedBroadcast._id}, sending to ${recipients.length} recipients asynchronously`);
+
+    return {
+      sent: 0,
+      scheduled: false,
+      id: savedBroadcast._id.toString(),
+      totalRecipients: recipients.length,
+    };
   }
 
   private async getRecipients(dto: CreateBroadcastDto): Promise<User[]> {

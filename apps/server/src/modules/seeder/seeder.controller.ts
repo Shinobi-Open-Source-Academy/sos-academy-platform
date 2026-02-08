@@ -142,4 +142,22 @@ export class SeederController {
   async resetAdmin(): Promise<SeedingResult> {
     return await this.seederService.resetAdmin();
   }
+
+  @Post('php/upsert')
+  @ApiOperation({ summary: 'Upsert PHP community (update if exists, create if not)' })
+  @ApiResponse({
+    status: 200,
+    description: 'PHP community upserted successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        count: { type: 'number', example: 1 },
+        message: { type: 'string', example: 'PHP community created successfully' },
+      },
+    },
+  })
+  async upsertPhpCommunity(): Promise<SeedingResult> {
+    return await this.seederService.upsertPhpCommunity();
+  }
 }
