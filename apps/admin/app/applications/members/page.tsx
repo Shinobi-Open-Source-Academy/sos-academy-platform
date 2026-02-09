@@ -173,7 +173,8 @@ export default function MembersPage() {
         userIds,
         status: 'ACTIVE',
       });
-      toast.success(`Successfully activated ${response.data.updated} member(s)`);
+      const updatedCount = response.data?.updated ?? userIds.length;
+      toast.success(`Successfully activated ${updatedCount} member(s)`);
       setSelectedMembers(new Set());
       await fetchMembers();
     } catch (error) {
@@ -231,7 +232,7 @@ export default function MembersPage() {
           </div>
           <button
             type="button"
-            onClick={fetchMembers}
+            onClick={() => fetchMembers()}
             disabled={loading}
             className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
