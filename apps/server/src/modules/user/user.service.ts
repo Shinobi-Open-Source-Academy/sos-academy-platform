@@ -613,4 +613,15 @@ export class UserService {
     // Prevent ReDoS / special char issues in regex
     return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
+
+  /**
+   * Bulk update user status
+   */
+  async bulkUpdateStatus(userIds: string[], status: UserStatus): Promise<{ updated: number }> {
+    const result = await this.userModel
+      .updateMany({ _id: { $in: userIds } }, { $set: { status } })
+      .exec();
+
+    return { updated: result.modifiedCount };
+  }
 }

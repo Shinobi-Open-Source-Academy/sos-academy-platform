@@ -167,7 +167,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
 
   // Get counts from real data
   const mentorCount = community.mentors?.length || 0;
-  const memberCount = community.members?.length || 0;
+  const memberCount = community.memberCount ?? community.members?.length ?? 0;
   const projectCount = community.projects?.length || 0;
 
   return (

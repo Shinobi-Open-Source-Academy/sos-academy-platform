@@ -144,6 +144,7 @@ export interface Community {
   description: string;
   tags: string[];
   isActive: boolean;
+  memberCount?: number;
   kage?: {
     _id: string;
     name: string;

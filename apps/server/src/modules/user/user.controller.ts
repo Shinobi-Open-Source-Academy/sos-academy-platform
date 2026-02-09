@@ -30,6 +30,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersQueryDto } from './dto/get-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
+import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto';
 import { RejectMentorDto } from './dto/reject-mentor.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -242,5 +243,19 @@ export class UserController {
       users: userDtos,
       pagination: result.pagination,
     };
+  }
+
+  /**
+   * Bulk update user status
+   * @param dto - BulkUpdateStatusDto
+   * @returns {Promise<{users: UserResponseDto[], pagination: PaginationResponseDto}>}
+   */
+  @Put('bulk/status')
+  @ApiOperation({ summary: 'Bulk update user status' })
+  @ApiBody({ type: BulkUpdateStatusDto })
+  @ApiOkResponse({ description: 'Users updated successfully' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async bulkUpdateStatus(@Body() dto: BulkUpdateStatusDto) {
+    return this.userService.bulkUpdateStatus(dto.userIds, dto.status);
   }
 }

@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UserRole, UserStatus } from '@sos-academy/shared';
+import { User } from '../user/schemas/user.schema';
 import { CommunityStatsDto } from './dto/community-stats.dto';
 import { Community, CommunityDocument } from './schemas/community.schema';
 
 @Injectable()
 export class CommunityService {
-  constructor(@InjectModel(Community.name) private communityModel: Model<CommunityDocument>) {}
+  constructor(
+    @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
+    @InjectModel(User.name) private userModel: Model<User>
+  ) {}
 
   async findAll(): Promise<Community[]> {
     return this.communityModel
@@ -59,8 +64,23 @@ export class CommunityService {
       .lean()
       .exec();
 
-    // Don't populate projects - they're fetched separately via projects API with pagination
-    return community;
+    if (!community) {
+      return null;
+    }
+
+    const memberCount = await this.userModel
+      .countDocuments({
+        role: UserRole.MEMBER,
+        status: UserStatus.ACTIVE,
+        communities: community._id,
+      })
+      .exec();
+
+    // Add member count to the community object
+    return {
+      ...community,
+      memberCount,
+    } as Community & { memberCount: number };
   }
 
   async getStats(): Promise<CommunityStatsDto> {
