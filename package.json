@@ -124,7 +124,7 @@
     "react-dom": "19.0.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.2.2",
     "resend": "^6.6.0",
     "rxjs": "^7.8.0",
     "swagger-ui-express": "^5.0.0",
