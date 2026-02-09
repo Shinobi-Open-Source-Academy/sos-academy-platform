@@ -6,11 +6,12 @@ import { envConfig } from './common/config/env.config';
 import { SeederService } from './modules/seeder/seeder.service';
 
 async function bootstrap() {
-  // Check if this is a CLI command
   const command = process.argv[2];
 
-  if (command && ['seed', 'clear', 'reset', 'status'].includes(command)) {
-    // Run as CLI seeder
+  if (
+    command &&
+    ['seed', 'clear', 'reset', 'status', 'php', 'projects', 'refresh-stats'].includes(command)
+  ) {
     await runSeederCommand(command);
     return;
   }
@@ -102,7 +103,14 @@ async function autoSeedDatabase(app): Promise<void> {
       logger.log('Database seeded successfully');
     } else {
       logger.log(`Database already seeded (${status.totalCommunities} communities found)`);
+      // Check for and upsert any missing communities from seed data
+      await seederService.upsertMissingCommunities();
     }
+
+    // Check for and upsert any missing projects
+    logger.log('Checking for missing projects...');
+    await seederService.upsertMissingProjects();
+    logger.log('Projects check completed');
 
     // Always try to seed admin user if it doesn't exist
     logger.log('Checking admin user status...');
@@ -132,6 +140,15 @@ async function runSeederCommand(command: string): Promise<void> {
         break;
       case 'status':
         await seederService.getDatabaseStatus();
+        break;
+      case 'php':
+        await seederService.upsertPhpCommunity();
+        break;
+      case 'projects':
+        await seederService.seedProjects();
+        break;
+      case 'refresh-stats':
+        await seederService.refreshProjectStats();
         break;
       default:
         await seederService.seedCommunities();

@@ -232,6 +232,57 @@ export class EmailService {
   }
 
   /**
+   * Send mentor approval email (same template style as other emails, with follow-up actions)
+   * @param to Mentor's email address
+   * @param name Mentor's name
+   * @param customMessage Optional custom message from admin
+   * @param communityNames Comma-separated community names the mentor will lead
+   */
+  async sendMentorApprovedEmail(
+    to: string,
+    name: string,
+    customMessage?: string,
+    communityNames?: string
+  ): Promise<void> {
+    const params: EmailTemplateParams = {
+      name,
+      date: new Date().toLocaleDateString(),
+      currentYear: new Date().getFullYear(),
+      customMessage: customMessage ?? '',
+      communityNames: communityNames ?? 'our communities',
+    };
+
+    await this.sendTemplatedEmail(
+      to,
+      'Welcome as a Mentor at Shinobi Open-Source Academy',
+      'mentor-approved',
+      params
+    );
+  }
+
+  /**
+   * Send mentor rejection email (same template style, with follow-up actions)
+   * @param to Applicant's email address
+   * @param name Applicant's name
+   * @param reason Reason for rejection (required)
+   */
+  async sendMentorRejectedEmail(to: string, name: string, reason: string): Promise<void> {
+    const params: EmailTemplateParams = {
+      name,
+      date: new Date().toLocaleDateString(),
+      currentYear: new Date().getFullYear(),
+      reason,
+    };
+
+    await this.sendTemplatedEmail(
+      to,
+      'Update on Your Mentor Application – Shinobi Open-Source Academy',
+      'mentor-rejected',
+      params
+    );
+  }
+
+  /**
    * Utility method to send a simple email (for testing)
    * @param to Recipient email address
    * @param subject Email subject

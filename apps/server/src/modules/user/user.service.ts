@@ -12,11 +12,13 @@ import { Community, CommunityDocument } from '../community/schemas/community.sch
 import { EmailService } from '../email/email.service';
 import { GitHubService } from '../github/github.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersQueryDto } from './dto/get-user.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
+import { RejectMentorDto } from './dto/reject-mentor.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -233,20 +235,51 @@ export class UserService {
     return newMember.save();
   }
 
-  async approveUser(id: string): Promise<User> {
+  async approveUser(id: string, dto: ApproveMentorDto = {}): Promise<User> {
     const user = await this.userModel.findById(id).exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+    const { customMessage, communityIds = [] } = dto;
+    const communityObjectIds =
+      communityIds.length > 0
+        ? communityIds
+            .filter((id) => mongoose.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose.Types.ObjectId(id) as any)
+        : [];
+
     user.status = UserStatus.ACTIVE;
     user.isActive = true;
+    user.communities = communityObjectIds as typeof user.communities;
 
-    return user.save();
+    const savedUser = await user.save();
+
+    // Add mentor to each community's mentors array
+    for (const communityId of communityObjectIds) {
+      await this.communityModel
+        .findByIdAndUpdate(communityId, { $addToSet: { mentors: savedUser._id } })
+        .exec();
+    }
+
+    // Send approval email (non-blocking)
+    const communityDocs = await this.communityModel
+      .find({ _id: { $in: communityObjectIds } })
+      .select('name')
+      .exec();
+    const communityNames = communityDocs.map((c) => c.name).join(', ') || undefined;
+
+    this.emailService
+      .sendMentorApprovedEmail(user.email, user.name ?? 'there', customMessage, communityNames)
+      .catch((error) => {
+        console.error('Failed to send mentor approval email:', error);
+      });
+
+    return savedUser;
   }
 
-  async rejectUser(id: string): Promise<User> {
+  async rejectUser(id: string, dto: RejectMentorDto): Promise<User> {
     const user = await this.userModel.findById(id).exec();
 
     if (!user) {
@@ -255,7 +288,31 @@ export class UserService {
 
     user.status = UserStatus.REJECTED;
 
-    return user.save();
+    // Optionally assign to a community as a member (hacker)
+    if (dto.communityId && mongoose.Types.ObjectId.isValid(dto.communityId)) {
+      const communityIdStr = dto.communityId;
+      const community = await this.communityModel.findById(communityIdStr).exec();
+      if (community) {
+        user.role = UserRole.MEMBER;
+        user.communities = [new mongoose.Types.ObjectId(communityIdStr) as any];
+        user.status = UserStatus.ACTIVE;
+        user.isActive = true;
+        await this.communityModel
+          .findByIdAndUpdate(communityIdStr, { $addToSet: { members: user._id } })
+          .exec();
+      }
+    }
+
+    const savedUser = await user.save();
+
+    // Send rejection email (non-blocking)
+    this.emailService
+      .sendMentorRejectedEmail(user.email, user.name ?? 'there', dto.reason)
+      .catch((error) => {
+        console.error('Failed to send mentor rejection email:', error);
+      });
+
+    return savedUser;
   }
 
   /**
@@ -523,6 +580,9 @@ export class UserService {
       createdAt: 1,
       expertise: 1,
       motivation: 1,
+      title: 1,
+      description: 1,
+      socialLinks: 1,
     };
 
     // Query with lean to avoid class-transformer recursion
@@ -552,5 +612,16 @@ export class UserService {
   private escapeRegex(input: string): string {
     // Prevent ReDoS / special char issues in regex
     return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  /**
+   * Bulk update user status
+   */
+  async bulkUpdateStatus(userIds: string[], status: UserStatus): Promise<{ updated: number }> {
+    const result = await this.userModel
+      .updateMany({ _id: { $in: userIds } }, { $set: { status } })
+      .exec();
+
+    return { updated: result.modifiedCount };
   }
 }

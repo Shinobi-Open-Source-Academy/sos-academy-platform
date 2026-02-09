@@ -64,6 +64,21 @@ export class Project {
   @Prop()
   githubRepo: string;
 
+  @Prop()
+  url: string;
+
+  @Prop()
+  website: string;
+
+  @Prop({ default: 0 })
+  stars: number;
+
+  @Prop({ default: 0 })
+  contributors: number;
+
+  @Prop()
+  lastUpdated: Date;
+
   @Prop({ default: [] })
   technologies: string[];
 

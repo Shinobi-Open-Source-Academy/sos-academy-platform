@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
 import DeleteModal from '../../components/DeleteModal';
@@ -11,11 +12,20 @@ import Sidebar from '../../components/Sidebar';
 export const dynamic = 'force-dynamic';
 
 interface Mentor {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   email: string;
   expertise?: string;
   motivation?: string;
+  title?: string;
+  description?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
   githubProfile?: {
     login: string;
     htmlUrl: string;
@@ -24,6 +34,20 @@ interface Mentor {
   communities?: { name: string; slug: string }[];
   status: string;
   createdAt: string;
+}
+
+/** Get a string user id from API response (DTO returns `id`, raw may have `_id` as string or object). */
+function getMentorId(mentor: Mentor): string {
+  const id = mentor.id ?? mentor._id;
+  if (typeof id === 'string') return id;
+  if (
+    id != null &&
+    typeof id === 'object' &&
+    typeof (id as { toString?: () => string }).toString === 'function'
+  ) {
+    return (id as { toString: () => string }).toString();
+  }
+  return '';
 }
 
 interface PaginatedResponse {
@@ -36,6 +60,12 @@ interface PaginatedResponse {
   };
 }
 
+interface CommunityOption {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
 export default function MentorsPage() {
   const router = useRouter();
   const [mentors, setMentors] = useState<Mentor[]>([]);
@@ -43,6 +73,7 @@ export default function MentorsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [communityFilter, setCommunityFilter] = useState<string>('all');
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; mentor: Mentor | null }>({
     isOpen: false,
     mentor: null,
@@ -51,6 +82,19 @@ export default function MentorsPage() {
     isOpen: false,
     mentor: null,
   });
+  const [detailsSubForm, setDetailsSubForm] = useState<'approve' | 'reject' | 'edit' | null>(null);
+  const [communities, setCommunities] = useState<CommunityOption[]>([]);
+  const [approveCustomMessage, setApproveCustomMessage] = useState('');
+  const [approveCommunityIds, setApproveCommunityIds] = useState<string[]>([]);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectCommunityId, setRejectCommunityId] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editGithub, setEditGithub] = useState('');
+  const [editLinkedin, setEditLinkedin] = useState('');
+  const [editTwitter, setEditTwitter] = useState('');
+  const [editWebsite, setEditWebsite] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -66,9 +110,30 @@ export default function MentorsPage() {
     }
 
     fetchMentors();
+    fetchCommunities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, router]);
 
-  const fetchMentors = async () => {
+  useEffect(() => {
+    if ((detailsSubForm === 'approve' || detailsSubForm === 'reject') && detailsModal.mentor) {
+      fetchCommunities();
+    }
+  }, [detailsSubForm]);
+
+  // Reset to page 1 when filters change (debounce search)
+  useEffect(() => {
+    if (!mounted) return;
+    const timeoutId = setTimeout(
+      () => {
+        setPagination((prev) => ({ ...prev, page: 1 }));
+      },
+      searchTerm ? 500 : 0
+    ); // Debounce search by 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, statusFilter, communityFilter, mounted]);
+
+  const fetchMentors = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -85,6 +150,16 @@ export default function MentorsPage() {
         params.append('status', statusFilter);
       }
 
+      if (communityFilter !== 'all') {
+        // Find the community by slug or ID
+        const selectedCommunity = communities.find(
+          (c) => c._id === communityFilter || c.slug === communityFilter
+        );
+        if (selectedCommunity) {
+          params.append('community', selectedCommunity.slug);
+        }
+      }
+
       const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
       if (response.data) {
         setMentors(response.data.users || []);
@@ -92,33 +167,134 @@ export default function MentorsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch mentors:', error);
+      toast.error('Failed to load mentors');
     } finally {
       setLoading(false);
     }
+  }, [pagination.page, pagination.limit, searchTerm, statusFilter, communityFilter, communities]);
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await apiClient.get<CommunityOption[]>('/communities');
+      if (response.data && Array.isArray(response.data)) {
+        setCommunities(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch communities:', error);
+    }
   };
 
-  const handleApprove = async (id: string) => {
+  // Refetch when filters or pagination changes
+  useEffect(() => {
+    if (!mounted) return;
+    fetchMentors();
+  }, [mounted, fetchMentors]);
+
+  const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
+    setDetailsModal({ isOpen: true, mentor });
+    setDetailsSubForm(subForm ?? null);
+    setApproveCustomMessage('');
+    setApproveCommunityIds([]);
+    setRejectReason('');
+    setRejectCommunityId('');
+    setEditTitle(mentor.title || '');
+    setEditDescription(mentor.description || '');
+    // Prefill GitHub from socialLinks or githubProfile.htmlUrl
+    setEditGithub(mentor.socialLinks?.github || mentor.githubProfile?.htmlUrl || '');
+    setEditLinkedin(mentor.socialLinks?.linkedin || '');
+    setEditTwitter(mentor.socialLinks?.twitter || '');
+    setEditWebsite(mentor.socialLinks?.website || '');
+    if (subForm === 'reject' || subForm === 'approve') fetchCommunities();
+  };
+
+  const closeDetailsModal = () => {
+    setDetailsModal({ isOpen: false, mentor: null });
+    setDetailsSubForm(null);
+    setApproveCustomMessage('');
+    setApproveCommunityIds([]);
+    setRejectReason('');
+    setRejectCommunityId('');
+    setEditTitle('');
+    setEditDescription('');
+    setEditGithub('');
+    setEditLinkedin('');
+    setEditTwitter('');
+    setEditWebsite('');
+  };
+
+  const handleApprove = async (
+    id: string,
+    payload?: { customMessage?: string; communityIds?: string[] }
+  ) => {
+    setSubmitting(true);
     try {
-      await apiClient.put(`/users/${id}/approve`);
+      await apiClient.put(`/users/${String(id)}/approve`, {
+        customMessage: payload?.customMessage || undefined,
+        communityIds: payload?.communityIds ?? [],
+      });
       await fetchMentors();
+      closeDetailsModal();
+      toast.success('Mentor approved successfully');
     } catch (error) {
       console.error('Failed to approve mentor:', error);
-      alert('Failed to approve mentor');
+      toast.error('Failed to approve mentor');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleReject = async (id: string) => {
-    const confirmReject = window.confirm('Are you sure you want to reject this application?');
-    if (!confirmReject) {
+  const handleReject = async (id: string, payload?: { reason: string; communityId?: string }) => {
+    if (payload && !payload.reason?.trim()) {
+      toast.error('Please provide a reason for rejection');
       return;
     }
-
+    setSubmitting(true);
     try {
-      await apiClient.put(`/users/${id}/reject`);
+      await apiClient.put(`/users/${String(id)}/reject`, {
+        reason:
+          payload?.reason ??
+          'We have decided not to move forward with your application at this time.',
+        communityId: payload?.communityId?.trim() || undefined,
+      });
       await fetchMentors();
+      closeDetailsModal();
+      toast.success('Mentor rejected successfully');
     } catch (error) {
       console.error('Failed to reject mentor:', error);
-      alert('Failed to reject mentor');
+      toast.error('Failed to reject mentor');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const toggleCommunitySelection = (id: string) => {
+    setApproveCommunityIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  };
+
+  const handleUpdateMentor = async (id: string) => {
+    setSubmitting(true);
+    try {
+      const socialLinks: Record<string, string> = {};
+      if (editGithub.trim()) socialLinks.github = editGithub.trim();
+      if (editLinkedin.trim()) socialLinks.linkedin = editLinkedin.trim();
+      if (editTwitter.trim()) socialLinks.twitter = editTwitter.trim();
+      if (editWebsite.trim()) socialLinks.website = editWebsite.trim();
+
+      await apiClient.put(`/users/${String(id)}`, {
+        title: editTitle.trim() || undefined,
+        description: editDescription.trim() || undefined,
+        socialLinks: Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
+      });
+      await fetchMentors();
+      closeDetailsModal();
+      toast.success('Mentor updated successfully');
+    } catch (error) {
+      console.error('Failed to update mentor:', error);
+      toast.error('Failed to update mentor');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -129,12 +305,13 @@ export default function MentorsPage() {
 
     try {
       console.log('Delete reason:', reason);
-      await apiClient.delete(`/users/${deleteModal.mentor._id}`);
+      await apiClient.delete(`/users/${getMentorId(deleteModal.mentor)}`);
       setDeleteModal({ isOpen: false, mentor: null });
       await fetchMentors();
+      toast.success('Mentor deleted successfully');
     } catch (error) {
       console.error('Failed to delete mentor:', error);
-      alert('Failed to delete mentor');
+      toast.error('Failed to delete mentor');
     }
   };
 
@@ -228,7 +405,6 @@ export default function MentorsPage() {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setPagination((prev) => ({ ...prev, page: 1 }));
               }}
               className="input pl-10"
             />
@@ -237,7 +413,6 @@ export default function MentorsPage() {
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
-              setPagination((prev) => ({ ...prev, page: 1 }));
             }}
             className="select w-40"
           >
@@ -246,6 +421,20 @@ export default function MentorsPage() {
             <option value="PENDING">Pending</option>
             <option value="APPLIED_MENTOR">Applied</option>
             <option value="REJECTED">Rejected</option>
+          </select>
+          <select
+            value={communityFilter}
+            onChange={(e) => {
+              setCommunityFilter(e.target.value);
+            }}
+            className="select w-48"
+          >
+            <option value="all">All Communities</option>
+            {communities.map((community) => (
+              <option key={community._id} value={community._id}>
+                {community.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -301,7 +490,7 @@ export default function MentorsPage() {
                 ) : (
                   mentors.map((mentor, index) => (
                     <tr
-                      key={mentor._id || `mentor-${index}`}
+                      key={getMentorId(mentor) || `mentor-${index}`}
                       className="table-row animate-fade-in"
                       style={{ animationDelay: `${index * 30}ms` }}
                     >
@@ -361,14 +550,14 @@ export default function MentorsPage() {
                             <>
                               <button
                                 type="button"
-                                onClick={() => handleApprove(mentor._id)}
+                                onClick={() => openDetailsModal(mentor, 'approve')}
                                 className="btn-success text-xs px-3 py-1.5"
                               >
                                 Approve
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleReject(mentor._id)}
+                                onClick={() => openDetailsModal(mentor, 'reject')}
                                 className="btn-danger text-xs px-3 py-1.5"
                               >
                                 Reject
@@ -379,7 +568,7 @@ export default function MentorsPage() {
                             githubUrl={mentor.githubProfile?.htmlUrl}
                             email={mentor.email}
                             onDelete={() => setDeleteModal({ isOpen: true, mentor })}
-                            onViewDetails={() => setDetailsModal({ isOpen: true, mentor })}
+                            onViewDetails={() => openDetailsModal(mentor)}
                           />
                         </div>
                       </td>
@@ -434,10 +623,18 @@ export default function MentorsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-[#111] border border-white/10 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
-              <h2 className="text-lg font-semibold text-white">Application Details</h2>
+              <h2 className="text-lg font-semibold text-white">
+                {detailsSubForm === 'approve'
+                  ? 'Approve application'
+                  : detailsSubForm === 'reject'
+                    ? 'Reject application'
+                    : detailsSubForm === 'edit'
+                      ? 'Edit mentor'
+                      : 'Application Details'}
+              </h2>
               <button
                 type="button"
-                onClick={() => setDetailsModal({ isOpen: false, mentor: null })}
+                onClick={closeDetailsModal}
                 className="p-1 text-zinc-500 hover:text-white transition-colors"
               >
                 <svg
@@ -453,130 +650,460 @@ export default function MentorsPage() {
               </button>
             </div>
 
-            <div className="p-5 space-y-4">
-              {/* Header with avatar */}
-              <div className="flex items-center gap-4 pb-4 border-b border-white/[0.06]">
-                {detailsModal.mentor.githubProfile?.avatarUrl ? (
-                  <img
-                    src={detailsModal.mentor.githubProfile.avatarUrl}
-                    alt={detailsModal.mentor.name}
-                    className="w-14 h-14 object-cover"
-                  />
-                ) : (
-                  <div className="w-14 h-14 bg-zinc-800 flex items-center justify-center text-zinc-500 text-xl font-medium">
-                    {detailsModal.mentor.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white">{detailsModal.mentor.name}</h3>
-                  <p className="text-sm text-zinc-400 mono">{detailsModal.mentor.email}</p>
-                </div>
-                {getStatusBadge(detailsModal.mentor.status)}
-              </div>
-
-              {/* GitHub */}
-              <div>
-                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">GitHub</p>
-                {detailsModal.mentor.githubProfile ? (
-                  <a
-                    href={detailsModal.mentor.githubProfile.htmlUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-400 hover:text-blue-300 mono"
-                  >
-                    github.com/{detailsModal.mentor.githubProfile.login}
-                  </a>
-                ) : (
-                  <p className="text-sm text-zinc-600 italic">Not provided</p>
-                )}
-              </div>
-
-              {/* Expertise */}
-              <div>
-                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
-                  Areas of Expertise
+            {detailsSubForm === 'approve' ? (
+              <div className="p-5 space-y-4">
+                <p className="text-sm text-zinc-400">
+                  Optional custom message and communities for the approval email sent to{' '}
+                  <strong className="text-white">{detailsModal.mentor.name}</strong>.
                 </p>
-                {detailsModal.mentor.expertise ? (
-                  <p className="text-sm text-zinc-300">{detailsModal.mentor.expertise}</p>
-                ) : (
-                  <p className="text-sm text-zinc-600 italic">Not provided</p>
-                )}
-              </div>
-
-              {/* Motivation */}
-              <div>
-                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
-                  Why They Want to Be a Sensei
-                </p>
-                {detailsModal.mentor.motivation ? (
-                  <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                    {detailsModal.mentor.motivation}
-                  </p>
-                ) : (
-                  <p className="text-sm text-zinc-600 italic">Not provided</p>
-                )}
-              </div>
-
-              {/* Communities */}
-              {detailsModal.mentor.communities && detailsModal.mentor.communities.length > 0 && (
                 <div>
-                  <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Communities</p>
-                  <div className="flex flex-wrap gap-2">
-                    {detailsModal.mentor.communities.map((community) => (
-                      <span key={community.slug} className="badge-info">
-                        {community.name}
-                      </span>
-                    ))}
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Custom email message (optional)
+                  </label>
+                  <textarea
+                    value={approveCustomMessage}
+                    onChange={(e) => setApproveCustomMessage(e.target.value)}
+                    placeholder="e.g. We are excited to have you lead our React community."
+                    rows={4}
+                    className="input w-full resize-y"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Communities the mentor will lead
+                  </label>
+                  <div className="border border-white/10 rounded-lg max-h-40 overflow-y-auto p-2 space-y-1">
+                    {communities.length === 0 ? (
+                      <p className="text-sm text-zinc-500 py-2">Loading communities…</p>
+                    ) : (
+                      communities.map((c) => (
+                        <label
+                          key={c._id}
+                          className="flex items-center gap-2 py-2 px-2 rounded hover:bg-white/[0.04] cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={approveCommunityIds.includes(c._id)}
+                            onChange={() => toggleCommunitySelection(c._id)}
+                            className="rounded border-white/20 bg-white/5 text-green-500 focus:ring-green-500/50"
+                          />
+                          <span className="text-sm text-zinc-300">{c.name}</span>
+                        </label>
+                      ))
+                    )}
                   </div>
                 </div>
-              )}
-
-              {/* Applied Date */}
-              <div className="pt-2 border-t border-white/[0.06]">
-                <p className="text-xs text-zinc-600">
-                  Applied on {formatDate(detailsModal.mentor.createdAt)}
-                </p>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDetailsSubForm(null)}
+                    className="btn-secondary flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() =>
+                      handleApprove(getMentorId(detailsModal.mentor!), {
+                        customMessage: approveCustomMessage.trim() || undefined,
+                        communityIds: approveCommunityIds,
+                      })
+                    }
+                    className="btn-success flex-1 disabled:opacity-50"
+                  >
+                    {submitting ? 'Sending…' : 'Approve & send email'}
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : detailsSubForm === 'reject' ? (
+              <div className="p-5 space-y-4">
+                <p className="text-sm text-zinc-400">
+                  Provide a reason for rejection. This will be included in the email sent to{' '}
+                  <strong className="text-white">{detailsModal.mentor.name}</strong>. You can
+                  optionally assign them to a community as a member (hacker).
+                </p>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Reason for rejection <span className="text-red-400">*</span>
+                  </label>
+                  <textarea
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder="e.g. We have decided to pursue other candidates at this time."
+                    rows={4}
+                    className="input w-full resize-y"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Assign to community as member (optional)
+                  </label>
+                  <select
+                    value={rejectCommunityId}
+                    onChange={(e) => setRejectCommunityId(e.target.value)}
+                    className="select w-full"
+                  >
+                    <option value="">No community — reject only</option>
+                    {communities.length === 0 ? (
+                      <option disabled>Loading communities…</option>
+                    ) : (
+                      communities.map((c) => (
+                        <option key={c._id} value={c._id}>
+                          {c.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    If selected, they will be added as a member (hacker) to this community and can
+                    use the member portal.
+                  </p>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDetailsSubForm(null)}
+                    className="btn-secondary flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={submitting || !rejectReason.trim()}
+                    onClick={() =>
+                      handleReject(getMentorId(detailsModal.mentor!), {
+                        reason: rejectReason.trim(),
+                        communityId: rejectCommunityId.trim() || undefined,
+                      })
+                    }
+                    className="btn-danger flex-1 disabled:opacity-50"
+                  >
+                    {submitting ? 'Sending…' : 'Reject & send email'}
+                  </button>
+                </div>
+              </div>
+            ) : detailsSubForm === 'edit' ? (
+              <div className="p-5 space-y-4">
+                <p className="text-sm text-zinc-400">
+                  Update the mentor's public title, description, and social links. These will be
+                  displayed on the website.
+                </p>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="e.g. Senior Backend Engineer"
+                    maxLength={100}
+                    className="input w-full"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Shown under the mentor's name</p>
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="e.g. Senior Backend Engineer with 7+ years of experience..."
+                    rows={4}
+                    className="input w-full resize-y"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Max 1000 characters</p>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      GitHub URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editGithub}
+                      onChange={(e) => setEditGithub(e.target.value)}
+                      placeholder="https://github.com/username"
+                      className="input w-full"
+                    />
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Prefilled from existing GitHub profile. Update if needed.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      LinkedIn URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editLinkedin}
+                      onChange={(e) => setEditLinkedin(e.target.value)}
+                      placeholder="https://linkedin.com/in/username"
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Twitter/X URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editTwitter}
+                      onChange={(e) => setEditTwitter(e.target.value)}
+                      placeholder="https://x.com/username"
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editWebsite}
+                      onChange={(e) => setEditWebsite(e.target.value)}
+                      placeholder="https://example.com"
+                      className="input w-full"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDetailsSubForm(null)}
+                    className="btn-secondary flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleUpdateMentor(getMentorId(detailsModal.mentor!))}
+                    className="btn-success flex-1 disabled:opacity-50"
+                  >
+                    {submitting ? 'Saving…' : 'Save changes'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="p-5 space-y-4">
+                  {/* Header with avatar */}
+                  <div className="flex items-center gap-4 pb-4 border-b border-white/[0.06]">
+                    {detailsModal.mentor.githubProfile?.avatarUrl ? (
+                      <img
+                        src={detailsModal.mentor.githubProfile.avatarUrl}
+                        alt={detailsModal.mentor.name}
+                        className="w-14 h-14 object-cover"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 bg-zinc-800 flex items-center justify-center text-zinc-500 text-xl font-medium">
+                        {detailsModal.mentor.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white">
+                        {detailsModal.mentor.name}
+                      </h3>
+                      <p className="text-sm text-zinc-400 mono">{detailsModal.mentor.email}</p>
+                    </div>
+                    {getStatusBadge(detailsModal.mentor.status)}
+                  </div>
 
-            {/* Actions */}
-            <div className="p-5 border-t border-white/[0.06] flex gap-3">
-              {(detailsModal.mentor.status === 'PENDING' ||
-                detailsModal.mentor.status === 'APPLIED_MENTOR') && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (detailsModal.mentor) {
-                        handleApprove(detailsModal.mentor._id);
-                        setDetailsModal({ isOpen: false, mentor: null });
-                      }
-                    }}
-                    className="btn-success flex-1"
+                  {/* GitHub */}
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">GitHub</p>
+                    {detailsModal.mentor.githubProfile ? (
+                      <a
+                        href={detailsModal.mentor.githubProfile.htmlUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-400 hover:text-blue-300 mono"
+                      >
+                        github.com/{detailsModal.mentor.githubProfile.login}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-zinc-600 italic">Not provided</p>
+                    )}
+                  </div>
+
+                  {/* Expertise */}
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Areas of Expertise
+                    </p>
+                    {detailsModal.mentor.expertise ? (
+                      <p className="text-sm text-zinc-300">{detailsModal.mentor.expertise}</p>
+                    ) : (
+                      <p className="text-sm text-zinc-600 italic">Not provided</p>
+                    )}
+                  </div>
+
+                  {/* Motivation */}
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                      Why They Want to Be a Sensei
+                    </p>
+                    {detailsModal.mentor.motivation ? (
+                      <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                        {detailsModal.mentor.motivation}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-zinc-600 italic">Not provided</p>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <div>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Title</p>
+                      {detailsModal.mentor.title ? (
+                        <p className="text-sm text-zinc-300">{detailsModal.mentor.title}</p>
+                      ) : (
+                        <p className="text-sm text-zinc-600 italic">Not set</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <div>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                        Description
+                      </p>
+                      {detailsModal.mentor.description ? (
+                        <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                          {detailsModal.mentor.description}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-zinc-600 italic">Not set</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Social Links */}
+                  {detailsModal.mentor.status === 'ACTIVE' &&
+                    detailsModal.mentor.socialLinks &&
+                    (detailsModal.mentor.socialLinks.github ||
+                      detailsModal.mentor.socialLinks.linkedin ||
+                      detailsModal.mentor.socialLinks.twitter ||
+                      detailsModal.mentor.socialLinks.website) && (
+                      <div>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                          Social Links
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {detailsModal.mentor.socialLinks.github && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              GitHub
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.linkedin && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              LinkedIn
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.twitter && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.twitter}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              Twitter
+                            </a>
+                          )}
+                          {detailsModal.mentor.socialLinks.website && (
+                            <a
+                              href={detailsModal.mentor.socialLinks.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-400 hover:text-blue-300"
+                            >
+                              Website
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Communities */}
+                  {detailsModal.mentor.communities &&
+                    detailsModal.mentor.communities.length > 0 && (
+                      <div>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+                          Communities
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {detailsModal.mentor.communities.map((community) => (
+                            <span key={community.slug} className="badge-info">
+                              {community.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Applied Date */}
+                  <div className="pt-2 border-t border-white/[0.06]">
+                    <p className="text-xs text-zinc-600">
+                      Applied on {formatDate(detailsModal.mentor.createdAt)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="p-5 border-t border-white/[0.06] flex gap-3">
+                  {(detailsModal.mentor.status === 'PENDING' ||
+                    detailsModal.mentor.status === 'APPLIED_MENTOR') && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setDetailsSubForm('approve')}
+                        className="btn-success flex-1"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDetailsSubForm('reject')}
+                        className="btn-danger flex-1"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {detailsModal.mentor.status === 'ACTIVE' && (
+                    <button
+                      type="button"
+                      onClick={() => setDetailsSubForm('edit')}
+                      className="btn-secondary flex-1"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  <a
+                    href={`mailto:${detailsModal.mentor.email}`}
+                    className="btn-secondary flex-1 text-center"
                   >
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (detailsModal.mentor) {
-                        handleReject(detailsModal.mentor._id);
-                        setDetailsModal({ isOpen: false, mentor: null });
-                      }
-                    }}
-                    className="btn-danger flex-1"
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
-              <a
-                href={`mailto:${detailsModal.mentor.email}`}
-                className="btn-secondary flex-1 text-center"
-              >
-                Contact
-              </a>
-            </div>
+                    Contact
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

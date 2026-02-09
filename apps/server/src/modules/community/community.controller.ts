@@ -1,6 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
+import { CommunityStatsDto } from './dto/community-stats.dto';
 import { Community } from './schemas/community.schema';
 
 @ApiTags('communities')
@@ -20,26 +21,13 @@ export class CommunityController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Get community  statistics' })
+  @ApiOperation({ summary: 'Get community statistics' })
   @ApiResponse({
     status: 200,
     description: 'Community statistics including total counts',
-    schema: {
-      type: 'object',
-      properties: {
-        totalCommunities: { type: 'number' },
-        totalMembers: { type: 'number' },
-        totalMentors: { type: 'number' },
-        totalProjects: { type: 'number' },
-      },
-    },
+    type: CommunityStatsDto,
   })
-  async getStats(): Promise<{
-    totalCommunities: number;
-    totalMembers: number;
-    totalMentors: number;
-    totalProjects: number;
-  }> {
+  async getStats(): Promise<CommunityStatsDto> {
     return this.communityService.getStats();
   }
 
@@ -73,5 +61,21 @@ export class CommunityController {
   })
   async findByName(@Param('name') name: string): Promise<Community | null> {
     return this.communityService.findByName(name);
+  }
+
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Get community by slug' })
+  @ApiParam({ name: 'slug', description: 'Community slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'Community details',
+    type: Community,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Community not found',
+  })
+  async findBySlug(@Param('slug') slug: string): Promise<Community | null> {
+    return this.communityService.findBySlug(slug);
   }
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { apiClient } from '../../lib/api-client';
 import { isAuthenticated } from '../../lib/auth';
 import Sidebar from '../components/Sidebar';
@@ -71,6 +72,7 @@ export default function EventsPage() {
       setEvents(response.data || []);
     } catch (error) {
       console.error('Failed to fetch events:', error);
+      toast.error('Failed to load events');
     } finally {
       setLoading(false);
     }
@@ -81,9 +83,10 @@ export default function EventsPage() {
       await apiClient.delete(`/calendar/events/${id}`);
       setDeleteConfirm(null);
       await fetchEvents();
+      toast.success('Event deleted successfully');
     } catch (error) {
       console.error('Failed to delete event:', error);
-      alert('Failed to delete event');
+      toast.error('Failed to delete event');
     }
   };
 
@@ -98,6 +101,7 @@ export default function EventsPage() {
       }
     } catch (error) {
       console.error('Failed to get invite link:', error);
+      toast.error('Failed to get invite link');
     }
   };
 

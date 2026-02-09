@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentor Application Approved - Shinobi Open-Source Academy</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #171717;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+
+    .header {
+      background-color: #0d1b60;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .logo {
+      max-width: 180px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .content {
+      padding: 40px 30px;
+    }
+
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      color: #304ffe;
+      margin-bottom: 20px;
+    }
+
+    .main-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .info-box {
+      background-color: #f7f9fc;
+      border: 1px solid #e9ecef;
+      padding: 25px;
+      margin: 25px 0;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: #9e9e9e;
+      font-size: 14px;
+      margin-right: 15px;
+    }
+
+    .info-value {
+      font-weight: 600;
+      color: #171717;
+      font-size: 14px;
+      text-align: right;
+      flex: 1;
+    }
+
+    .custom-message-box {
+      background-color: rgba(48, 79, 254, 0.1);
+      border: 1px solid rgba(48, 79, 254, 0.2);
+      border-radius: 12px;
+      padding: 25px;
+      margin: 25px 0;
+    }
+
+    .footer {
+      background-color: #f7f9fc;
+      padding: 25px 30px;
+      text-align: center;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: #9e9e9e;
+      margin-bottom: 10px;
+    }
+
+    .social-links {
+      margin-top: 15px;
+    }
+
+    .social-links a {
+      color: #304ffe;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .contact-info {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #9e9e9e;
+    }
+
+    .contact-info a {
+      color: #304ffe;
+      text-decoration: none;
+    }
+
+    .reminder-box {
+      background-color: #f7f9fc;
+      border: 1px solid #e9ecef;
+      padding: 20px;
+      margin: 25px 0;
+      font-size: 14px;
+      color: #171717;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="cid:logo" alt="Shinobi Open-Source Academy" class="logo">
+    </div>
+
+    <div class="content">
+      <div class="greeting">Dear {{name}},</div>
+
+      <div class="main-heading">Congratulations – Your Mentor Application Has Been Approved!</div>
+
+      <p>We are pleased to inform you that your application to become a mentor at <strong>Shinobi Open-Source
+          Academy</strong> has been approved. Thank you for your interest in guiding and supporting our community.</p>
+
+      {{#if communityNames}}
+      <div class="info-box">
+        <div class="info-row">
+          <div class="info-label">Communities you will lead</div>
+          <div class="info-value">{{communityNames}}</div>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if customMessage}}
+      <div class="custom-message-box">
+        <p style="margin: 0; color: #171717; font-size: 14px; line-height: 1.6;">{{customMessage}}</p>
+      </div>
+      {{/if}}
+
+      <p>Next steps: our team will reach out with onboarding details and how to join mentor channels. You will receive
+        calendar invites and updates via email.</p>
+
+      <div class="reminder-box">
+        <strong>Stay connected:</strong> Follow us on social media and join our Discord to stay updated on events,
+        workshops, and community announcements. We also send a weekly digest – please keep an eye on your inbox for
+        upcoming events.
+      </div>
+
+      <div class="contact-info">
+        <p>Questions? Contact us at <a
+            href="mailto:contact@shinobi-open-source.academy">contact@shinobi-open-source.academy</a></p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-text">© {{currentYear}} Shinobi Open-Source Academy. All rights reserved.</div>
+      <div class="footer-text">You're receiving this email because your mentor application was approved at Shinobi
+        Open-Source Academy.</div>
+      <div class="social-links">
+        <a href="https://github.com/Shinobi-Open-Source-Academy">GitHub</a>
+        <a href="https://x.com/SOSAcademy_">X (Twitter)</a>
+        <a href="https://www.linkedin.com/company/shinobi-open-source-academy-sos-a/about/">LinkedIn</a>
+        <a href="https://discord.gg/9Wgx7bCh">Discord</a>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

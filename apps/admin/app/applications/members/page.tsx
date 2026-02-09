@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
 import DeleteModal from '../../components/DeleteModal';
@@ -11,7 +12,8 @@ import Sidebar from '../../components/Sidebar';
 export const dynamic = 'force-dynamic';
 
 interface Member {
-  _id: string;
+  id?: string;
+  _id?: string;
   name: string;
   email: string;
   githubProfile?: {
@@ -42,6 +44,8 @@ export default function MembersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [communityFilter, setCommunityFilter] = useState<string>('all');
   const [communities, setCommunities] = useState<{ name: string; slug: string }[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; member: Member | null }>({
     isOpen: false,
     member: null,
@@ -64,6 +68,11 @@ export default function MembersPage() {
   }, [mounted, router]);
 
   useEffect(() => {
+    // Reset selection when members change
+    setSelectedMembers(new Set());
+  }, [members]);
+
+  useEffect(() => {
     fetchCommunities();
   }, []);
 
@@ -76,12 +85,13 @@ export default function MembersPage() {
     }
   };
 
-  const fetchMembers = async () => {
+  const fetchMembers = async (pageOverride?: number) => {
     setLoading(true);
     try {
+      const pageToUse = pageOverride ?? pagination.page;
       const params = new URLSearchParams({
         role: 'MEMBER',
-        page: pagination.page.toString(),
+        page: pageToUse.toString(),
         limit: pagination.limit.toString(),
       });
 
@@ -100,6 +110,7 @@ export default function MembersPage() {
       }
     } catch (error) {
       console.error('Failed to fetch members:', error);
+      toast.error('Failed to load members');
     } finally {
       setLoading(false);
     }
@@ -112,12 +123,70 @@ export default function MembersPage() {
 
     try {
       console.log('Delete reason:', reason);
-      await apiClient.delete(`/users/${deleteModal.member._id}`);
+      await apiClient.delete(`/users/${getMemberId(deleteModal.member)}`);
       setDeleteModal({ isOpen: false, member: null });
       await fetchMembers();
+      toast.success('Member deleted successfully');
     } catch (error) {
       console.error('Failed to delete member:', error);
-      alert('Failed to delete member');
+      toast.error('Failed to delete member');
+    }
+  };
+
+  const getMemberId = (member: Member): string => {
+    return member.id || member._id || '';
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedMembers(
+        new Set(members.map((m) => getMemberId(m)).filter((id) => id && id.length === 24))
+      );
+    } else {
+      setSelectedMembers(new Set());
+    }
+  };
+
+  const handleSelectMember = (memberId: string, checked: boolean) => {
+    const newSelected = new Set(selectedMembers);
+    if (checked) {
+      newSelected.add(memberId);
+    } else {
+      newSelected.delete(memberId);
+    }
+    setSelectedMembers(newSelected);
+  };
+
+  const handleBulkActivate = async () => {
+    if (selectedMembers.size === 0) return;
+
+    setBulkUpdating(true);
+    try {
+      const userIds = Array.from(selectedMembers).filter((id) => id && id.length === 24);
+      if (userIds.length === 0) {
+        toast.error('No valid member IDs selected');
+        setBulkUpdating(false);
+        return;
+      }
+
+      const response = await apiClient.put<{ updated: number }>('/users/bulk/status', {
+        userIds,
+        status: 'ACTIVE',
+      });
+      const updatedCount = response.data?.updated ?? userIds.length;
+      toast.success(`Successfully activated ${updatedCount} member(s)`);
+      setSelectedMembers(new Set());
+      await fetchMembers();
+    } catch (error) {
+      console.error('Failed to activate members:', error);
+      const errorMessage =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Failed to activate members'
+          : 'Failed to activate members';
+      toast.error(errorMessage);
+    } finally {
+      setBulkUpdating(false);
     }
   };
 
@@ -163,7 +232,7 @@ export default function MembersPage() {
           </div>
           <button
             type="button"
-            onClick={fetchMembers}
+            onClick={() => fetchMembers()}
             disabled={loading}
             className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
@@ -184,6 +253,23 @@ export default function MembersPage() {
             Refresh
           </button>
         </div>
+
+        {/* Bulk Actions */}
+        {selectedMembers.size > 0 && (
+          <div className="mb-4 p-4 bg-white/5 border border-white/10 flex items-center justify-between">
+            <span className="text-sm text-white">
+              {selectedMembers.size} member{selectedMembers.size > 1 ? 's' : ''} selected
+            </span>
+            <button
+              type="button"
+              onClick={handleBulkActivate}
+              disabled={bulkUpdating}
+              className="btn-primary px-4 py-2 text-sm disabled:opacity-50"
+            >
+              {bulkUpdating ? 'Activating...' : 'Mark as Active'}
+            </button>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex gap-3 mb-6">
@@ -210,6 +296,11 @@ export default function MembersPage() {
                 setSearchTerm(e.target.value);
                 setPagination((prev) => ({ ...prev, page: 1 }));
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  fetchMembers(1);
+                }
+              }}
               className="input pl-10"
             />
           </div>
@@ -218,6 +309,8 @@ export default function MembersPage() {
             onChange={(e) => {
               setCommunityFilter(e.target.value);
               setPagination((prev) => ({ ...prev, page: 1 }));
+              // Auto-fetch when filter changes
+              setTimeout(() => fetchMembers(1), 100);
             }}
             className="select w-48"
           >
@@ -236,6 +329,14 @@ export default function MembersPage() {
             <table className="w-full">
               <thead>
                 <tr className="table-header">
+                  <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider w-12">
+                    <input
+                      type="checkbox"
+                      checked={selectedMembers.size === members.length && members.length > 0}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="w-4 h-4 border-white/20 bg-white/5 checked:bg-blue-500"
+                    />
+                  </th>
                   <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     Member
                   </th>
@@ -259,7 +360,7 @@ export default function MembersPage() {
               <tbody>
                 {members.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-16 text-center">
+                    <td colSpan={7} className="px-5 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <svg
                           className="w-8 h-8 text-zinc-600"
@@ -280,79 +381,90 @@ export default function MembersPage() {
                     </td>
                   </tr>
                 ) : (
-                  members.map((member, index) => (
-                    <tr
-                      key={member._id}
-                      className="table-row animate-fade-in"
-                      style={{ animationDelay: `${index * 30}ms` }}
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          {member.githubProfile?.avatarUrl ? (
-                            <img
-                              src={member.githubProfile.avatarUrl}
-                              alt={member.name}
-                              className="w-9 h-9 object-cover"
-                            />
-                          ) : (
-                            <div className="w-9 h-9 bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm font-medium">
-                              {member.name.charAt(0).toUpperCase()}
+                  members.map((member, index) => {
+                    const memberId = getMemberId(member);
+                    return (
+                      <tr
+                        key={memberId}
+                        className="table-row animate-fade-in"
+                        style={{ animationDelay: `${index * 30}ms` }}
+                      >
+                        <td className="px-5 py-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedMembers.has(memberId)}
+                            onChange={(e) => handleSelectMember(memberId, e.target.checked)}
+                            className="w-4 h-4 border-white/20 bg-white/5 checked:bg-blue-500"
+                          />
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            {member.githubProfile?.avatarUrl ? (
+                              <img
+                                src={member.githubProfile.avatarUrl}
+                                alt={member.name}
+                                className="w-9 h-9 object-cover"
+                              />
+                            ) : (
+                              <div className="w-9 h-9 bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm font-medium">
+                                {member.name.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-sm font-medium text-white">{member.name}</p>
+                              <p className="text-xs text-zinc-500 mono">{member.email}</p>
                             </div>
-                          )}
-                          <div>
-                            <p className="text-sm font-medium text-white">{member.name}</p>
-                            <p className="text-xs text-zinc-500 mono">{member.email}</p>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">
-                        {member.githubProfile ? (
-                          <a
-                            href={member.githubProfile.htmlUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-zinc-400 hover:text-white transition-colors mono"
-                          >
-                            @{member.githubProfile.login}
-                          </a>
-                        ) : (
-                          <span className="text-sm text-zinc-600">-</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {member.communities && member.communities.length > 0 ? (
-                            member.communities.map((community) => {
-                              const name =
-                                typeof community === 'string' ? community : community.name;
-                              const key =
-                                typeof community === 'string' ? community : community.slug;
-                              return (
-                                <span key={key} className="badge-info">
-                                  {name}
-                                </span>
-                              );
-                            })
+                        </td>
+                        <td className="px-5 py-4">
+                          {member.githubProfile ? (
+                            <a
+                              href={member.githubProfile.htmlUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-zinc-400 hover:text-white transition-colors mono"
+                            >
+                              @{member.githubProfile.login}
+                            </a>
                           ) : (
                             <span className="text-sm text-zinc-600">-</span>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">{getStatusBadge(member.status)}</td>
-                      <td className="px-5 py-4 text-sm text-zinc-500">
-                        {formatDate(member.createdAt)}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center justify-end">
-                          <QuickActionsMenu
-                            githubUrl={member.githubProfile?.htmlUrl}
-                            email={member.email}
-                            onDelete={() => setDeleteModal({ isOpen: true, member })}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {member.communities && member.communities.length > 0 ? (
+                              member.communities.map((community) => {
+                                const name =
+                                  typeof community === 'string' ? community : community.name;
+                                const key =
+                                  typeof community === 'string' ? community : community.slug;
+                                return (
+                                  <span key={key} className="badge-info">
+                                    {name}
+                                  </span>
+                                );
+                              })
+                            ) : (
+                              <span className="text-sm text-zinc-600">-</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-5 py-4">{getStatusBadge(member.status)}</td>
+                        <td className="px-5 py-4 text-sm text-zinc-500">
+                          {formatDate(member.createdAt)}
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center justify-end">
+                            <QuickActionsMenu
+                              githubUrl={member.githubProfile?.htmlUrl}
+                              email={member.email}
+                              onDelete={() => setDeleteModal({ isOpen: true, member })}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -369,7 +481,11 @@ export default function MembersPage() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() => {
+                const newPage = pagination.page - 1;
+                setPagination((prev) => ({ ...prev, page: newPage }));
+                fetchMembers(newPage);
+              }}
               disabled={pagination.page === 1}
               className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
             >
@@ -380,7 +496,11 @@ export default function MembersPage() {
             </span>
             <button
               type="button"
-              onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() => {
+                const newPage = pagination.page + 1;
+                setPagination((prev) => ({ ...prev, page: newPage }));
+                fetchMembers(newPage);
+              }}
               disabled={pagination.page === pagination.pages || pagination.pages === 0}
               className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
             >

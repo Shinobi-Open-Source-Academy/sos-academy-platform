@@ -159,6 +159,29 @@ export class User {
 
   @Prop({ required: false })
   motivation?: string;
+
+  @Prop({ required: false })
+  description?: string;
+
+  @Prop({ required: false, maxlength: 100 })
+  title?: string;
+
+  @Prop({
+    type: {
+      github: String,
+      linkedin: String,
+      twitter: String,
+      website: String,
+    },
+    required: false,
+    _id: false,
+  })
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

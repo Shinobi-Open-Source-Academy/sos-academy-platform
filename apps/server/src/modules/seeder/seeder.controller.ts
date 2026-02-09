@@ -142,4 +142,76 @@ export class SeederController {
   async resetAdmin(): Promise<SeedingResult> {
     return await this.seederService.resetAdmin();
   }
+
+  @Post('php/upsert')
+  @ApiOperation({ summary: 'Upsert PHP community (update if exists, create if not)' })
+  @ApiResponse({
+    status: 200,
+    description: 'PHP community upserted successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        count: { type: 'number', example: 1 },
+        message: { type: 'string', example: 'PHP community created successfully' },
+      },
+    },
+  })
+  async upsertPhpCommunity(): Promise<SeedingResult> {
+    return await this.seederService.upsertPhpCommunity();
+  }
+
+  @Post('projects/seed')
+  @ApiOperation({ summary: 'Seed projects for all communities' })
+  @ApiResponse({
+    status: 201,
+    description: 'Projects seeded successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        count: { type: 'number', example: 28 },
+        message: { type: 'string', example: 'Seeded 28 projects (0 already existed)' },
+      },
+    },
+  })
+  async seedProjects(): Promise<SeedingResult> {
+    return await this.seederService.seedProjects();
+  }
+
+  @Post('projects/upsert')
+  @ApiOperation({ summary: 'Upsert missing projects (update if exists, create if not)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Projects upserted successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        count: { type: 'number', example: 4 },
+        message: { type: 'string', example: 'Upserted 4 project(s) (4 created, 0 updated)' },
+      },
+    },
+  })
+  async upsertMissingProjects(): Promise<SeedingResult> {
+    return await this.seederService.upsertMissingProjects();
+  }
+
+  @Post('projects/refresh-stats')
+  @ApiOperation({ summary: 'Refresh GitHub stats for all existing projects' })
+  @ApiResponse({
+    status: 200,
+    description: 'Project stats refreshed successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        count: { type: 'number', example: 28 },
+        message: { type: 'string', example: 'Refreshed stats for 28 project(s)' },
+      },
+    },
+  })
+  async refreshProjectStats(): Promise<SeedingResult> {
+    return await this.seederService.refreshProjectStats();
+  }
 }

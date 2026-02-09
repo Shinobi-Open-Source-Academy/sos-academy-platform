@@ -1,1 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Format files
 pnpm format
+
+# Stage any formatting changes
+git add -u

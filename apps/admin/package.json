@@ -9,6 +9,7 @@
     "lint": "biome lint ."
   },
   "dependencies": {
-    "@sos-academy/shared": "workspace:*"
+    "@sos-academy/shared": "workspace:*",
+    "react-hot-toast": "^2.4.1"
   }
 }
