@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../providers/AuthProvider';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
     'checking'
   );
+  const { loginWithGithub } = useAuth();
 
   // Check auth and redirect if authenticated
   useEffect(() => {
@@ -47,23 +49,7 @@ export default function LoginPage() {
 
   const handleGitHubLogin = () => {
     setIsLoading(true);
-    // TODO: Implement actual GitHub OAuth
-    // For now, simulate login
-    setTimeout(() => {
-      localStorage.setItem('hacker_token', 'demo_token');
-      localStorage.setItem(
-        'hacker_user',
-        JSON.stringify({
-          id: '1',
-          name: 'Demo Hacker',
-          email: 'hacker@example.com',
-          avatar: 'https://avatars.githubusercontent.com/u/1?v=4',
-          githubHandle: 'demo-hacker',
-          community: 'Konoha',
-        })
-      );
-      router.push('/');
-    }, 1500);
+    loginWithGithub();
   };
 
   return (

@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../app/providers/AuthProvider';
 
 interface User {
   name: string;
@@ -112,7 +113,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -128,10 +129,8 @@ export default function Sidebar() {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('hacker_token');
-    localStorage.removeItem('hacker_user');
-    router.replace('/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

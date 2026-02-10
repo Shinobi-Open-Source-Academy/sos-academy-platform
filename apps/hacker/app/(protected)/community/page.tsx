@@ -1,9 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ComingSoon } from '../../components/ComingSoon';
-import Sidebar from '../../components/Sidebar';
+import { ComingSoon } from '../../../components/ComingSoon';
+import Sidebar from '../../../components/Sidebar';
+import { IUser } from '@sos-academy/shared';
 
 /**
  * Mock members data
@@ -55,43 +55,20 @@ const mockMembers = [
 ];
 
 export default function CommunityPage() {
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ community: string } | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
 
+  // Load user from localStorage
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
-    const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
-    if (!token || !userStr) {
-      router.replace('/login');
-      return;
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch {
+        setUser(null);
+        console.error('Failed to parse user data:', userStr);
+      }
     }
-    try {
-      setUser(JSON.parse(userStr));
-      setLoading(false);
-    } catch {
-      localStorage.removeItem('hacker_token');
-      localStorage.removeItem('hacker_user');
-      router.replace('/login');
-    }
-  }, [mounted, router]);
-
-  if (!mounted || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-black flex">
@@ -99,7 +76,10 @@ export default function CommunityPage() {
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-2xl font-semibold text-white">{user?.community} Community</h1>
+            <h1 className="text-2xl font-semibold text-white">
+              {user?.communities?.map((community) => community).join(', ')} Communit
+              {user?.communities?.length === 1 ? 'y' : 'ies'}
+            </h1>
             <p className="text-zinc-500 text-sm mt-1">Connect with fellow community members</p>
           </div>
 

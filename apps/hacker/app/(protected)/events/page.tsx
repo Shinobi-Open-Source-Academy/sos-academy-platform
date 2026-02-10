@@ -1,9 +1,6 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { ComingSoon } from '../../components/ComingSoon';
-import Sidebar from '../../components/Sidebar';
+import { ComingSoon } from '../../../components/ComingSoon';
+import Sidebar from '../../../components/Sidebar';
 
 const mockEvents = [
   {
@@ -54,35 +51,6 @@ const mockEvents = [
 ];
 
 export default function EventsPage() {
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
-    const token = localStorage.getItem('hacker_token');
-    if (!token) {
-      router.replace('/login');
-      return;
-    }
-    setLoading(false);
-  }, [mounted, router]);
-
-  if (!mounted || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return { month: date.toLocaleString('en-US', { month: 'short' }), day: date.getDate() };

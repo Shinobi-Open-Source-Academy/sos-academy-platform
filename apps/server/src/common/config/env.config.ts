@@ -16,6 +16,11 @@ export const envConfig = {
   jwt: {
     secret: getEnvValue('JWT_SECRET', 'default_jwt_secret_key_change_in_production'),
     expiresIn: getEnvValue('JWT_EXPIRATION', '1d'),
+    refreshSecret: getEnvValue(
+      'JWT_REFRESH_SECRET',
+      'default_jwt_refresh_secret_key_change_in_production'
+    ),
+    refreshExpiration: getEnvValue('JWT_REFRESH_EXPIRATION', '7d'),
   },
   cors: {
     origin: getEnvValue('CORS_ORIGIN', 'http://localhost:3000'),
@@ -26,5 +31,16 @@ export const envConfig = {
   admin: {
     email: getEnvValue('ADMIN_EMAIL', 'admin@shinobi-open-source.academy'),
     password: getEnvValue('ADMIN_PASSWORD', 'admin123'),
+  },
+  frontends: {
+    hackerPortalUrl: getEnvValue('HACKER_PORTAL_URL', 'http://localhost:3000'),
+  },
+  github: {
+    clientId: getEnvValue('GITHUB_CLIENT_ID', 'default_github_client_id_change_in_production'),
+    clientSecret: getEnvValue(
+      'GITHUB_CLIENT_SECRET',
+      'default_github_client_secret_change_in_production'
+    ),
+    callbackUrl: getEnvValue('GITHUB_CALLBACK_URL', 'http://localhost:4200/auth/github/callback'),
   },
 };
