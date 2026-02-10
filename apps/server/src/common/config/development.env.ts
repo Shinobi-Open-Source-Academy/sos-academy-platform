@@ -21,8 +21,8 @@ export const developmentEnv = {
   // Frontend URLs
   HACKER_PORTAL_URL: 'http://localhost:3002',
 
-  // GitHub OAuth (use your actual credentials from .env or GitHub settings)
-  GITHUB_CLIENT_ID: 'Ov23liytG22eP4HXSDOw',
-  GITHUB_CLIENT_SECRET: '17edca4f32e11dda78de9c6880d6cffabd98b589',
+  // GitHub OAuth
+  GITHUB_CLIENT_ID: 'your_github_client_id',
+  GITHUB_CLIENT_SECRET: 'your_github_client_secret',
   GITHUB_CALLBACK_URL: 'http://localhost:4200/api/auth/github/callback',
 };
