@@ -101,24 +101,72 @@ export default function MentorsPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
+  // Accept overrides so callers can pass newest values immediately and avoid stale state
+  const fetchMentors = useCallback(
+    async (
+      pageOverride?: number,
+      communityOverride?: string | null,
+      searchOverride?: string | null,
+      statusOverride?: string | null
+    ) => {
+      // Don't fetch before mount/auth
+      if (!mounted) return;
+      setLoading(true);
+      try {
+        const pageToUse = pageOverride ?? pagination.page;
+        const communityToUse = communityOverride ?? communityFilter;
+        const searchToUse = searchOverride ?? searchTerm;
+        const statusToUse = statusOverride ?? statusFilter;
 
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
+        const params = new URLSearchParams({
+          role: 'MENTOR',
+          page: pageToUse.toString(),
+          limit: pagination.limit.toString(),
+        });
+
+        if (searchToUse) params.set('search', searchToUse);
+        if (statusToUse && statusToUse !== 'all') params.set('status', statusToUse);
+
+        if (communityToUse && communityToUse !== 'all') {
+          const selected = communities.find(
+            (c) => c._id === communityToUse || c.slug === communityToUse
+          );
+          if (selected) params.set('community', selected.slug);
+        }
+
+        const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
+        if (response.data) {
+          setMentors(response.data.users || []);
+          setPagination(response.data.pagination);
+        }
+      } catch (error) {
+        console.error('Failed to fetch mentors:', error);
+        toast.error('Failed to load mentors');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      mounted,
+      pagination.page,
+      pagination.limit,
+      searchTerm,
+      statusFilter,
+      communityFilter,
+      communities,
+    ]
+  );
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await apiClient.get<CommunityOption[]>('/communities');
+      if (response.data && Array.isArray(response.data)) {
+        setCommunities(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch communities:', error);
     }
-
-    fetchMentors();
-    fetchCommunities();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, router]);
-
-  useEffect(() => {
-    if ((detailsSubForm === 'approve' || detailsSubForm === 'reject') && detailsModal.mentor) {
-      fetchCommunities();
-    }
-  }, [detailsSubForm]);
+  };
 
   // Reset to page 1 when filters change (debounce search)
   useEffect(() => {
@@ -133,61 +181,17 @@ export default function MentorsPage() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, statusFilter, communityFilter, mounted]);
 
-  const fetchMentors = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        role: 'MENTOR',
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-      });
-
-      if (searchTerm) {
-        params.append('search', searchTerm);
-      }
-
-      if (statusFilter !== 'all') {
-        params.append('status', statusFilter);
-      }
-
-      if (communityFilter !== 'all') {
-        // Find the community by slug or ID
-        const selectedCommunity = communities.find(
-          (c) => c._id === communityFilter || c.slug === communityFilter
-        );
-        if (selectedCommunity) {
-          params.append('community', selectedCommunity.slug);
-        }
-      }
-
-      const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
-      if (response.data) {
-        setMentors(response.data.users || []);
-        setPagination(response.data.pagination);
-      }
-    } catch (error) {
-      console.error('Failed to fetch mentors:', error);
-      toast.error('Failed to load mentors');
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, pagination.limit, searchTerm, statusFilter, communityFilter, communities]);
-
-  const fetchCommunities = async () => {
-    try {
-      const response = await apiClient.get<CommunityOption[]>('/communities');
-      if (response.data && Array.isArray(response.data)) {
-        setCommunities(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch communities:', error);
-    }
-  };
-
   // Refetch when filters or pagination changes
   useEffect(() => {
     if (!mounted) return;
-    fetchMentors();
+
+    if (!isAuthenticated()) {
+      router.replace('/login');
+      return;
+    }
+
+    // initial load and subsequent refetches — intentionally ignore returned promise
+    void fetchMentors();
   }, [mounted, fetchMentors]);
 
   const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
@@ -360,7 +364,7 @@ export default function MentorsPage() {
           </div>
           <button
             type="button"
-            onClick={fetchMentors}
+            onClick={() => void fetchMentors()}
             disabled={loading}
             className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
@@ -404,7 +408,10 @@ export default function MentorsPage() {
               placeholder="Search by name, email, or GitHub..."
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                const v = e.target.value;
+                setSearchTerm(v);
+                setPagination((prev) => ({ ...prev, page: 1 }));
+                void fetchMentors(1, undefined, v);
               }}
               className="input pl-10"
             />
@@ -412,7 +419,10 @@ export default function MentorsPage() {
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value);
+              const v = e.target.value;
+              setStatusFilter(v);
+              setPagination((prev) => ({ ...prev, page: 1 }));
+              void fetchMentors(1, undefined, undefined, v);
             }}
             className="select w-40"
           >
@@ -425,7 +435,11 @@ export default function MentorsPage() {
           <select
             value={communityFilter}
             onChange={(e) => {
-              setCommunityFilter(e.target.value);
+              const val = e.target.value;
+              setCommunityFilter(val);
+              setPagination((prev) => ({ ...prev, page: 1 }));
+              // pass the new community and current search/status to avoid stale state
+              void fetchMentors(1, val, searchTerm, statusFilter);
             }}
             className="select w-48"
           >
