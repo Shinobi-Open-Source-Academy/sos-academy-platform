@@ -64,7 +64,7 @@ export default function MembersPage() {
       return;
     }
 
-    fetchMembers();
+    void fetchMembers();
   }, [mounted, router]);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function MembersPage() {
   }, [members]);
 
   useEffect(() => {
-    fetchCommunities();
+    void fetchCommunities();
   }, []);
 
   const fetchCommunities = async () => {
@@ -85,22 +85,30 @@ export default function MembersPage() {
     }
   };
 
-  const fetchMembers = async (pageOverride?: number) => {
+  const fetchMembers = async (
+    pageOverride?: number,
+    communityOverride?: string | null,
+    searchOverride?: string | null
+  ) => {
+    if (!mounted) return;
     setLoading(true);
     try {
       const pageToUse = pageOverride ?? pagination.page;
+      const communityToUse = communityOverride ?? communityFilter;
+      const searchToUse = searchOverride ?? searchTerm;
+
       const params = new URLSearchParams({
         role: 'MEMBER',
         page: pageToUse.toString(),
         limit: pagination.limit.toString(),
       });
 
-      if (searchTerm) {
-        params.append('search', searchTerm);
+      if (searchToUse) {
+        params.set('search', searchToUse);
       }
 
-      if (communityFilter !== 'all') {
-        params.append('community', communityFilter);
+      if (communityToUse && communityToUse !== 'all') {
+        params.set('community', communityToUse);
       }
 
       const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
@@ -232,7 +240,7 @@ export default function MembersPage() {
           </div>
           <button
             type="button"
-            onClick={() => fetchMembers()}
+            onClick={() => void fetchMembers()}
             disabled={loading}
             className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
@@ -293,12 +301,14 @@ export default function MembersPage() {
               placeholder="Search by name, email, or GitHub..."
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                const value = e.target.value;
+                setSearchTerm(value);
                 setPagination((prev) => ({ ...prev, page: 1 }));
+                void fetchMembers(1, undefined, value);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  fetchMembers(1);
+                  void fetchMembers(1, undefined, searchTerm);
                 }
               }}
               className="input pl-10"
@@ -307,10 +317,11 @@ export default function MembersPage() {
           <select
             value={communityFilter}
             onChange={(e) => {
-              setCommunityFilter(e.target.value);
+              const val = e.target.value;
+              setCommunityFilter(val);
               setPagination((prev) => ({ ...prev, page: 1 }));
-              // Auto-fetch when filter changes
-              setTimeout(() => fetchMembers(1), 100);
+              // pass the new community value (and current searchTerm) to avoid stale state
+              void fetchMembers(1, val, searchTerm);
             }}
             className="select w-48"
           >
@@ -484,7 +495,7 @@ export default function MembersPage() {
               onClick={() => {
                 const newPage = pagination.page - 1;
                 setPagination((prev) => ({ ...prev, page: newPage }));
-                fetchMembers(newPage);
+                void fetchMembers(newPage, undefined, undefined);
               }}
               disabled={pagination.page === 1}
               className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
@@ -499,7 +510,7 @@ export default function MembersPage() {
               onClick={() => {
                 const newPage = pagination.page + 1;
                 setPagination((prev) => ({ ...prev, page: newPage }));
-                fetchMembers(newPage);
+                void fetchMembers(newPage, undefined, undefined);
               }}
               disabled={pagination.page === pagination.pages || pagination.pages === 0}
               className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
