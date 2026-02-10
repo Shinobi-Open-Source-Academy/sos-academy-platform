@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
@@ -66,8 +66,23 @@ interface CommunityOption {
   slug: string;
 }
 
+// Helper to read URL params client-side only
+function getInitialUrlParams() {
+  if (typeof window === 'undefined') {
+    return { search: '', status: 'all', community: 'all', page: 1 };
+  }
+  const params = new URLSearchParams(window.location.search);
+  return {
+    search: params.get('search') || '',
+    status: params.get('status') || 'all',
+    community: params.get('community') || 'all',
+    page: Number(params.get('page')) || 1,
+  };
+}
+
 export default function MentorsPage() {
   const router = useRouter();
+
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   const [loading, setLoading] = useState(true);
@@ -97,9 +112,48 @@ export default function MentorsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Track if URL params have been initialized
+  const urlParamsInitialized = useRef(false);
+
+  // Initialize from URL params on mount (client-side only)
   useEffect(() => {
+    if (!urlParamsInitialized.current) {
+      const initialParams = getInitialUrlParams();
+      setSearchTerm(initialParams.search);
+      setStatusFilter(initialParams.status);
+      setCommunityFilter(initialParams.community);
+      setPagination((prev) => ({ ...prev, page: initialParams.page }));
+      urlParamsInitialized.current = true;
+    }
     setMounted(true);
   }, []);
+
+  // Function to update URL query params without triggering a navigation
+  const updateUrlParams = useCallback(
+    (params: { search?: string; status?: string; community?: string; page?: number }) => {
+      if (typeof window === 'undefined') return;
+
+      const newParams = new URLSearchParams();
+
+      const search = params.search ?? searchTerm;
+      const status = params.status ?? statusFilter;
+      const community = params.community ?? communityFilter;
+      const page = params.page ?? pagination.page;
+
+      if (search) newParams.set('search', search);
+      if (status && status !== 'all') newParams.set('status', status);
+      if (community && community !== 'all') newParams.set('community', community);
+      if (page > 1) newParams.set('page', page.toString());
+
+      const queryString = newParams.toString();
+      const newUrl = queryString
+        ? `${window.location.pathname}?${queryString}`
+        : window.location.pathname;
+      // Use replaceState to update URL without triggering navigation
+      window.history.replaceState({}, '', newUrl);
+    },
+    [searchTerm, statusFilter, communityFilter, pagination.page]
+  );
 
   // Accept overrides so callers can pass newest values immediately and avoid stale state
   const fetchMentors = useCallback(
@@ -107,7 +161,8 @@ export default function MentorsPage() {
       pageOverride?: number,
       communityOverride?: string | null,
       searchOverride?: string | null,
-      statusOverride?: string | null
+      statusOverride?: string | null,
+      options?: { skipCache?: boolean }
     ) => {
       // Don't fetch before mount/auth
       if (!mounted) return;
@@ -117,6 +172,14 @@ export default function MentorsPage() {
         const communityToUse = communityOverride ?? communityFilter;
         const searchToUse = searchOverride ?? searchTerm;
         const statusToUse = statusOverride ?? statusFilter;
+
+        // Update URL params to reflect current filters
+        updateUrlParams({
+          search: searchToUse,
+          status: statusToUse,
+          community: communityToUse,
+          page: pageToUse,
+        });
 
         const params = new URLSearchParams({
           role: 'MENTOR',
@@ -134,7 +197,10 @@ export default function MentorsPage() {
           if (selected) params.set('community', selected.slug);
         }
 
-        const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
+        // Use caching for GET requests unless explicitly skipped (e.g., after mutations)
+        const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`, {
+          useCache: !options?.skipCache,
+        });
         if (response.data) {
           setMentors(response.data.users || []);
           setPagination(response.data.pagination);
@@ -154,6 +220,7 @@ export default function MentorsPage() {
       statusFilter,
       communityFilter,
       communities,
+      updateUrlParams,
     ]
   );
 
@@ -240,7 +307,7 @@ export default function MentorsPage() {
         customMessage: payload?.customMessage || undefined,
         communityIds: payload?.communityIds ?? [],
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor approved successfully');
     } catch (error) {
@@ -264,7 +331,7 @@ export default function MentorsPage() {
           'We have decided not to move forward with your application at this time.',
         communityId: payload?.communityId?.trim() || undefined,
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor rejected successfully');
     } catch (error) {
@@ -295,7 +362,7 @@ export default function MentorsPage() {
         description: editDescription.trim() || undefined,
         socialLinks: Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor updated successfully');
     } catch (error) {
@@ -315,7 +382,7 @@ export default function MentorsPage() {
       console.log('Delete reason:', reason);
       await apiClient.delete(`/users/${getMentorId(deleteModal.mentor)}`);
       setDeleteModal({ isOpen: false, mentor: null });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       toast.success('Mentor deleted successfully');
     } catch (error) {
       console.error('Failed to delete mentor:', error);
@@ -449,7 +516,7 @@ export default function MentorsPage() {
           >
             <option value="all">All Communities</option>
             {communities.map((community) => (
-              <option key={community._id} value={community._id}>
+              <option key={community.slug} value={community.slug}>
                 {community.name}
               </option>
             ))}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
@@ -36,8 +36,38 @@ interface PaginatedResponse {
   };
 }
 
+// Helper to read URL params client-side only
+function getInitialUrlParams() {
+  if (typeof window === 'undefined') {
+    return { search: '', community: 'all', page: 1 };
+  }
+  const params = new URLSearchParams(window.location.search);
+  return {
+    search: params.get('search') || '',
+    community: params.get('community') || 'all',
+    page: Number(params.get('page')) || 1,
+  };
+}
+
+function buildFilterParams(opts: {
+  search?: string;
+  community?: string;
+  page?: number;
+  limit?: number;
+  role?: string;
+}): URLSearchParams {
+  const params = new URLSearchParams();
+  if (opts.role) params.set('role', opts.role);
+  if (opts.search) params.set('search', opts.search);
+  if (opts.community && opts.community !== 'all') params.set('community', opts.community);
+  if (opts.page && opts.page > 1) params.set('page', String(opts.page));
+  if (opts.limit) params.set('limit', String(opts.limit));
+  return params;
+}
+
 export default function MembersPage() {
   const router = useRouter();
+
   const [members, setMembers] = useState<Member[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   const [loading, setLoading] = useState(true);
@@ -52,9 +82,40 @@ export default function MembersPage() {
   });
   const [mounted, setMounted] = useState(false);
 
+  // Track if URL params have been initialized
+  const urlParamsInitialized = useRef(false);
+
+  // Initialize from URL params on mount (client-side only)
   useEffect(() => {
+    if (!urlParamsInitialized.current) {
+      const initialParams = getInitialUrlParams();
+      setSearchTerm(initialParams.search);
+      setCommunityFilter(initialParams.community);
+      setPagination((prev) => ({ ...prev, page: initialParams.page }));
+      urlParamsInitialized.current = true;
+    }
     setMounted(true);
   }, []);
+
+  // Function to update URL query params without triggering a navigation
+  const updateUrlParams = useCallback(
+    (params: { search?: string; community?: string; page?: number }) => {
+      if (typeof window === 'undefined') return;
+
+      const search = params.search ?? searchTerm;
+      const community = params.community ?? communityFilter;
+      const page = params.page ?? pagination.page;
+
+      const newParams = buildFilterParams({ search, community, page });
+      const queryString = newParams.toString();
+      const newUrl = queryString
+        ? `${window.location.pathname}?${queryString}`
+        : window.location.pathname;
+      // Use replaceState to update URL without triggering navigation
+      window.history.replaceState({}, '', newUrl);
+    },
+    [searchTerm, communityFilter, pagination.page]
+  );
 
   useEffect(() => {
     if (!mounted) return;
@@ -85,44 +146,52 @@ export default function MembersPage() {
     }
   };
 
-  const fetchMembers = async (
-    pageOverride?: number,
-    communityOverride?: string | null,
-    searchOverride?: string | null
-  ) => {
-    if (!mounted) return;
-    setLoading(true);
-    try {
-      const pageToUse = pageOverride ?? pagination.page;
-      const communityToUse = communityOverride ?? communityFilter;
-      const searchToUse = searchOverride ?? searchTerm;
+  const fetchMembers = useCallback(
+    async (
+      pageOverride?: number,
+      communityOverride?: string | null,
+      searchOverride?: string | null,
+      options?: { skipCache?: boolean }
+    ) => {
+      if (!mounted) return;
+      setLoading(true);
+      try {
+        const pageToUse = pageOverride ?? pagination.page;
+        const communityToUse = communityOverride ?? communityFilter;
+        const searchToUse = searchOverride ?? searchTerm;
 
-      const params = new URLSearchParams({
-        role: 'MEMBER',
-        page: pageToUse.toString(),
-        limit: pagination.limit.toString(),
-      });
+        // Update URL params to reflect current filters
+        updateUrlParams({
+          search: searchToUse,
+          community: communityToUse,
+          page: pageToUse,
+        });
 
-      if (searchToUse) {
-        params.set('search', searchToUse);
+        const params = buildFilterParams({
+          role: 'MEMBER',
+          search: searchToUse,
+          community: communityToUse,
+          page: pageToUse,
+          limit: pagination.limit,
+        });
+
+        // Use caching for GET requests unless explicitly skipped (e.g., after mutations)
+        const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`, {
+          useCache: !options?.skipCache,
+        });
+        if (response.data) {
+          setMembers(response.data.users || []);
+          setPagination(response.data.pagination);
+        }
+      } catch (error) {
+        console.error('Failed to fetch members:', error);
+        toast.error('Failed to load members');
+      } finally {
+        setLoading(false);
       }
-
-      if (communityToUse && communityToUse !== 'all') {
-        params.set('community', communityToUse);
-      }
-
-      const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
-      if (response.data) {
-        setMembers(response.data.users || []);
-        setPagination(response.data.pagination);
-      }
-    } catch (error) {
-      console.error('Failed to fetch members:', error);
-      toast.error('Failed to load members');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [mounted, pagination.page, pagination.limit, searchTerm, communityFilter, updateUrlParams]
+  );
 
   const handleDelete = async (reason: string) => {
     if (!deleteModal.member) {
@@ -133,7 +202,7 @@ export default function MembersPage() {
       console.log('Delete reason:', reason);
       await apiClient.delete(`/users/${getMemberId(deleteModal.member)}`);
       setDeleteModal({ isOpen: false, member: null });
-      await fetchMembers();
+      await fetchMembers(undefined, undefined, undefined, { skipCache: true });
       toast.success('Member deleted successfully');
     } catch (error) {
       console.error('Failed to delete member:', error);
@@ -184,7 +253,7 @@ export default function MembersPage() {
       const updatedCount = response.data?.updated ?? userIds.length;
       toast.success(`Successfully activated ${updatedCount} member(s)`);
       setSelectedMembers(new Set());
-      await fetchMembers();
+      await fetchMembers(undefined, undefined, undefined, { skipCache: true });
     } catch (error) {
       console.error('Failed to activate members:', error);
       const errorMessage =
