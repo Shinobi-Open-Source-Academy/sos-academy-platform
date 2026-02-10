@@ -17,7 +17,7 @@ interface Community {
 }
 
 interface User {
-  _id: string;
+  _id: string | { toString: () => string } | unknown;
   id?: string;
   name: string;
   email: string;
@@ -248,8 +248,11 @@ export default function BroadcastsPage() {
   const getUserId = (user: User): string => {
     if (typeof user._id === 'string') return user._id;
     if (typeof user.id === 'string') return user.id;
-    if (user._id && typeof user._id === 'object' && 'toString' in user._id) {
-      return user._id.toString();
+    if (user._id && typeof user._id === 'object' && user._id !== null && 'toString' in user._id) {
+      return (user._id as { toString: () => string }).toString();
+    }
+    if (user._id) {
+      return String(user._id);
     }
     return '';
   };
