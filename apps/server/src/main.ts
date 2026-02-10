@@ -22,8 +22,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // allow all origins for now
-  app.enableCors();
+  // Configure CORS to allow credentials (cookies) from specific origins
+  app.enableCors({
+    origin: envConfig.cors.origin.split(',').map((o) => o.trim()),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
 
   // Configure API prefix
   app.setGlobalPrefix('api');
