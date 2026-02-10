@@ -294,7 +294,7 @@ export default function AvailabilityPage() {
     return bookedSessions.filter((session) => new Date(session.startTime) >= now).slice(0, 6);
   }, [bookedSessions]);
 
-  if (!mounted || loading) {
+  if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">
