@@ -9,6 +9,7 @@
     "lint": "biome lint ."
   },
   "dependencies": {
-    "@sos-academy/shared": "workspace:*"
+    "@sos-academy/shared": "workspace:*",
+    "@vercel/analytics": "^1.6.1"
   }
 }

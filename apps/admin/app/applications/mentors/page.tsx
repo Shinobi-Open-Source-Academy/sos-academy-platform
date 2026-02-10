@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
 import { isAuthenticated } from '../../../lib/auth';
@@ -66,8 +66,23 @@ interface CommunityOption {
   slug: string;
 }
 
+// Helper to read URL params client-side only
+function getInitialUrlParams() {
+  if (typeof window === 'undefined') {
+    return { search: '', status: 'all', community: 'all', page: 1 };
+  }
+  const params = new URLSearchParams(window.location.search);
+  return {
+    search: params.get('search') || '',
+    status: params.get('status') || 'all',
+    community: params.get('community') || 'all',
+    page: Number(params.get('page')) || 1,
+  };
+}
+
 export default function MentorsPage() {
   const router = useRouter();
+
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   const [loading, setLoading] = useState(true);
@@ -97,28 +112,132 @@ export default function MentorsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Track if URL params have been initialized
+  const urlParamsInitialized = useRef(false);
+
+  // Initialize from URL params on mount (client-side only)
   useEffect(() => {
+    if (!urlParamsInitialized.current) {
+      const initialParams = getInitialUrlParams();
+      setSearchTerm(initialParams.search);
+      setStatusFilter(initialParams.status);
+      setCommunityFilter(initialParams.community);
+      setPagination((prev) => ({ ...prev, page: initialParams.page }));
+      urlParamsInitialized.current = true;
+    }
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
+  // Function to update URL query params without triggering a navigation
+  const updateUrlParams = useCallback(
+    (params: { search?: string; status?: string; community?: string; page?: number }) => {
+      if (typeof window === 'undefined') return;
 
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
+      const newParams = new URLSearchParams();
+
+      const search = params.search ?? searchTerm;
+      const status = params.status ?? statusFilter;
+      const community = params.community ?? communityFilter;
+      const page = params.page ?? pagination.page;
+
+      if (search) newParams.set('search', search);
+      if (status && status !== 'all') newParams.set('status', status);
+      if (community && community !== 'all') newParams.set('community', community);
+      if (page > 1) newParams.set('page', page.toString());
+
+      const queryString = newParams.toString();
+      const newUrl = queryString
+        ? `${window.location.pathname}?${queryString}`
+        : window.location.pathname;
+      // Use replaceState to update URL without triggering navigation
+      window.history.replaceState({}, '', newUrl);
+    },
+    [searchTerm, statusFilter, communityFilter, pagination.page]
+  );
+
+  // Accept overrides so callers can pass newest values immediately and avoid stale state
+  const fetchMentors = useCallback(
+    async (
+      pageOverride?: number,
+      communityOverride?: string | null,
+      searchOverride?: string | null,
+      statusOverride?: string | null,
+      options?: { skipCache?: boolean }
+    ) => {
+      // Don't fetch before mount/auth
+      if (!mounted) return;
+      setLoading(true);
+      try {
+        const pageToUse = pageOverride ?? pagination.page;
+        const communityToUse = communityOverride ?? communityFilter;
+        const searchToUse = searchOverride ?? searchTerm;
+        const statusToUse = statusOverride ?? statusFilter;
+
+        // Update URL params to reflect current filters
+        updateUrlParams({
+          search: searchToUse,
+          status: statusToUse,
+          community: communityToUse,
+          page: pageToUse,
+        });
+
+        const params = new URLSearchParams({
+          role: 'MENTOR',
+          page: pageToUse.toString(),
+          limit: pagination.limit.toString(),
+        });
+
+        if (searchToUse) params.set('search', searchToUse);
+        if (statusToUse && statusToUse !== 'all') params.set('status', statusToUse);
+
+        if (communityToUse && communityToUse !== 'all') {
+          const selected = communities.find(
+            (c) => c._id === communityToUse || c.slug === communityToUse
+          );
+          if (selected) params.set('community', selected.slug);
+        }
+
+        // Use caching for GET requests unless explicitly skipped (e.g., after mutations)
+        const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`, {
+          useCache: !options?.skipCache,
+        });
+        if (response.data) {
+          setMentors(response.data.users || []);
+          setPagination(response.data.pagination);
+        }
+      } catch (error) {
+        console.error('Failed to fetch mentors:', error);
+        toast.error('Failed to load mentors');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      mounted,
+      pagination.page,
+      pagination.limit,
+      searchTerm,
+      statusFilter,
+      communityFilter,
+      communities,
+      updateUrlParams,
+    ]
+  );
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await apiClient.get<CommunityOption[]>('/communities');
+      if (response.data && Array.isArray(response.data)) {
+        setCommunities(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch communities:', error);
     }
-
-    fetchMentors();
-    fetchCommunities();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, router]);
+  };
 
   useEffect(() => {
-    if ((detailsSubForm === 'approve' || detailsSubForm === 'reject') && detailsModal.mentor) {
-      fetchCommunities();
-    }
-  }, [detailsSubForm]);
+    void fetchCommunities();
+  }, []);
 
   // Reset to page 1 when filters change (debounce search)
   useEffect(() => {
@@ -133,61 +252,17 @@ export default function MentorsPage() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, statusFilter, communityFilter, mounted]);
 
-  const fetchMentors = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        role: 'MENTOR',
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-      });
-
-      if (searchTerm) {
-        params.append('search', searchTerm);
-      }
-
-      if (statusFilter !== 'all') {
-        params.append('status', statusFilter);
-      }
-
-      if (communityFilter !== 'all') {
-        // Find the community by slug or ID
-        const selectedCommunity = communities.find(
-          (c) => c._id === communityFilter || c.slug === communityFilter
-        );
-        if (selectedCommunity) {
-          params.append('community', selectedCommunity.slug);
-        }
-      }
-
-      const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
-      if (response.data) {
-        setMentors(response.data.users || []);
-        setPagination(response.data.pagination);
-      }
-    } catch (error) {
-      console.error('Failed to fetch mentors:', error);
-      toast.error('Failed to load mentors');
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, pagination.limit, searchTerm, statusFilter, communityFilter, communities]);
-
-  const fetchCommunities = async () => {
-    try {
-      const response = await apiClient.get<CommunityOption[]>('/communities');
-      if (response.data && Array.isArray(response.data)) {
-        setCommunities(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch communities:', error);
-    }
-  };
-
   // Refetch when filters or pagination changes
   useEffect(() => {
     if (!mounted) return;
-    fetchMentors();
+
+    if (!isAuthenticated()) {
+      router.replace('/login');
+      return;
+    }
+
+    // initial load and subsequent refetches — intentionally ignore returned promise
+    void fetchMentors();
   }, [mounted, fetchMentors]);
 
   const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
@@ -232,7 +307,7 @@ export default function MentorsPage() {
         customMessage: payload?.customMessage || undefined,
         communityIds: payload?.communityIds ?? [],
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor approved successfully');
     } catch (error) {
@@ -256,7 +331,7 @@ export default function MentorsPage() {
           'We have decided not to move forward with your application at this time.',
         communityId: payload?.communityId?.trim() || undefined,
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor rejected successfully');
     } catch (error) {
@@ -287,7 +362,7 @@ export default function MentorsPage() {
         description: editDescription.trim() || undefined,
         socialLinks: Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
       });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       closeDetailsModal();
       toast.success('Mentor updated successfully');
     } catch (error) {
@@ -307,7 +382,7 @@ export default function MentorsPage() {
       console.log('Delete reason:', reason);
       await apiClient.delete(`/users/${getMentorId(deleteModal.mentor)}`);
       setDeleteModal({ isOpen: false, mentor: null });
-      await fetchMentors();
+      await fetchMentors(undefined, undefined, undefined, undefined, { skipCache: true });
       toast.success('Mentor deleted successfully');
     } catch (error) {
       console.error('Failed to delete mentor:', error);
@@ -360,7 +435,7 @@ export default function MentorsPage() {
           </div>
           <button
             type="button"
-            onClick={fetchMentors}
+            onClick={() => void fetchMentors()}
             disabled={loading}
             className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
@@ -404,7 +479,10 @@ export default function MentorsPage() {
               placeholder="Search by name, email, or GitHub..."
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                const v = e.target.value;
+                setSearchTerm(v);
+                setPagination((prev) => ({ ...prev, page: 1 }));
+                void fetchMentors(1, undefined, v);
               }}
               className="input pl-10"
             />
@@ -412,7 +490,10 @@ export default function MentorsPage() {
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value);
+              const v = e.target.value;
+              setStatusFilter(v);
+              setPagination((prev) => ({ ...prev, page: 1 }));
+              void fetchMentors(1, undefined, undefined, v);
             }}
             className="select w-40"
           >
@@ -425,13 +506,17 @@ export default function MentorsPage() {
           <select
             value={communityFilter}
             onChange={(e) => {
-              setCommunityFilter(e.target.value);
+              const val = e.target.value;
+              setCommunityFilter(val);
+              setPagination((prev) => ({ ...prev, page: 1 }));
+              // pass the new community and current search/status to avoid stale state
+              void fetchMentors(1, val, searchTerm, statusFilter);
             }}
             className="select w-48"
           >
             <option value="all">All Communities</option>
             {communities.map((community) => (
-              <option key={community._id} value={community._id}>
+              <option key={community.slug} value={community.slug}>
                 {community.name}
               </option>
             ))}
