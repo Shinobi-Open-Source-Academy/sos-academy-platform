@@ -13,7 +13,7 @@ export const envConfig = {
   mongodb: {
     uri: getEnvValue(
       'MONGODB_URI',
-      'mongodb+srv://pac_sensei:Z1lqLfR0qmtHnhU9@production.hidv43t.mongodb.net/sos-academy'
+      'mongodb://localhost:27017/sos-academy'
     ),
   },
   jwt: {
