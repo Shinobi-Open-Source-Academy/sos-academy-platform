@@ -336,7 +336,7 @@ export default function AvailabilityPage() {
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.6fr] gap-6">
           <div className="space-y-6">
             <div className="card p-5 space-y-4">
-              <div className="flex flex-wrap items-end gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="min-w-[220px]">
                   <label className="text-xs text-zinc-500 uppercase tracking-widest">Mentor</label>
                   <select
@@ -355,25 +355,27 @@ export default function AvailabilityPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2 self-end">
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => setWeekStartDate(addDays(weekStartDate, -7))}
-                  >
-                    Prev
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => setWeekStartDate(addDays(weekStartDate, 7))}
-                  >
-                    Next
-                  </button>
-                </div>
+                <div>
+                  <label className="text-xs text-zinc-500 uppercase tracking-widest">
+                    date: {formatDate(weekStartDate)} - {formatDate(weekEndDate)}
+                  </label>
 
-                <div className="text-sm text-zinc-400 self-end pb-1">
-                  {formatDate(weekStartDate)} - {formatDate(weekEndDate)}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => setWeekStartDate(addDays(weekStartDate, -7))}
+                    >
+                      Prev
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => setWeekStartDate(addDays(weekStartDate, 7))}
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
