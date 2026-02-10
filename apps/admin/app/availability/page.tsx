@@ -387,19 +387,19 @@ export default function AvailabilityPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                     <input
                       type="date"
-                      className="input"
+                      className="input h-11 text-sm"
                       value={newSlotDate}
                       onChange={(event) => setNewSlotDate(event.target.value)}
                     />
                     <input
                       type="time"
-                      className="input"
+                      className="input h-11 text-sm"
                       value={newSlotStart}
                       onChange={(event) => setNewSlotStart(event.target.value)}
                     />
                     <input
                       type="time"
-                      className="input"
+                      className="input h-11 text-sm"
                       value={newSlotEnd}
                       onChange={(event) => setNewSlotEnd(event.target.value)}
                     />
@@ -419,14 +419,14 @@ export default function AvailabilityPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                     <input
                       type="date"
-                      className="input"
+                      className="input h-11 text-sm"
                       value={blockDate}
                       onChange={(event) => setBlockDate(event.target.value)}
                     />
                     <input
                       type="text"
                       placeholder="Reason (optional)"
-                      className="input"
+                      className="input h-11 text-sm"
                       value={blockReason}
                       onChange={(event) => setBlockReason(event.target.value)}
                     />
