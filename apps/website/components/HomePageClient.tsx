@@ -53,8 +53,8 @@ export default function HomePageClient() {
     sameAs: [
       'https://github.com/Shinobi-Open-Source-Academy',
       'https://x.com/SOSAcademy_',
-      'https://www.linkedin.com/company/shinobi-open-source-academy-sos-a',
-      'https://discord.gg/9Wgx7bCh',
+      'https://www.linkedin.com/company/shinobi-open-source-academy',
+      'https://discord.gg/X9PWySkvKM',
     ],
   };
 
