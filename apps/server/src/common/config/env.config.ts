@@ -1,5 +1,8 @@
 import { developmentEnv } from './development.env';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 // If environment variables are not set, use development environment values
 const getEnvValue = (key: string, defaultValue: string) => {
   return process.env[key] || developmentEnv[key] || defaultValue;
