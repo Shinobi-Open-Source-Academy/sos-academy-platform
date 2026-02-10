@@ -168,6 +168,10 @@ export default function MentorsPage() {
     }
   };
 
+  useEffect(() => {
+    void fetchCommunities();
+  }, []);
+
   // Reset to page 1 when filters change (debounce search)
   useEffect(() => {
     if (!mounted) return;
