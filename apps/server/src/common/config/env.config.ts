@@ -11,7 +11,10 @@ export const envConfig = {
   host: getEnvValue('HOST', '0.0.0.0'),
   appUrl: getEnvValue('APP_URL', ''), // e.g., https://api.yourdomain.com or left empty for auto-detection
   mongodb: {
-    uri: getEnvValue('MONGODB_URI', 'mongodb://localhost:27017/sos-academy'),
+    uri: getEnvValue(
+      'MONGODB_URI',
+      'mongodb+srv://pac_sensei:Z1lqLfR0qmtHnhU9@production.hidv43t.mongodb.net/sos-academy'
+    ),
   },
   jwt: {
     secret: getEnvValue('JWT_SECRET', 'default_jwt_secret_key_change_in_production'),

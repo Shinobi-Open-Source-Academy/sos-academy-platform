@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../lib/api-client';
 import { isAuthenticated } from '../../lib/auth';
+import MarkdownEditor, { markdownToHtml } from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
@@ -159,9 +160,12 @@ export default function BroadcastsPage() {
     setLoading(true);
 
     try {
+      // Convert markdown to HTML before sending
+      const htmlMessage = markdownToHtml(message);
+
       const payload: any = {
         subject,
-        message,
+        message: htmlMessage,
         recipientType,
       };
 
@@ -173,7 +177,8 @@ export default function BroadcastsPage() {
       }
 
       if (recipientType === 'SPECIFIC_USERS' && selectedUserIds.length > 0) {
-        payload.userIds = selectedUserIds;
+        // Ensure all IDs are strings
+        payload.userIds = selectedUserIds.map((id) => String(id));
       }
 
       if (recipientType === 'INACTIVE_USERS') {
@@ -240,9 +245,20 @@ export default function BroadcastsPage() {
     setScheduledAt('');
   };
 
-  const toggleUserSelection = (userId: string) => {
+  const getUserId = (user: User): string => {
+    if (typeof user._id === 'string') return user._id;
+    if (typeof user.id === 'string') return user.id;
+    if (user._id && typeof user._id === 'object' && 'toString' in user._id) {
+      return user._id.toString();
+    }
+    return '';
+  };
+
+  const toggleUserSelection = (userId: string | unknown) => {
+    // Ensure userId is a string
+    const idString = typeof userId === 'string' ? userId : String(userId);
     setSelectedUserIds((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      prev.includes(idString) ? prev.filter((id) => id !== idString) : [...prev, idString]
     );
   };
 
@@ -320,9 +336,12 @@ export default function BroadcastsPage() {
     setLoading(true);
 
     try {
+      // Convert markdown to HTML before sending
+      const htmlMessage = markdownToHtml(message);
+
       const payload: any = {
         subject,
-        message,
+        message: htmlMessage,
         recipientType,
       };
 
@@ -334,7 +353,8 @@ export default function BroadcastsPage() {
       }
 
       if (recipientType === 'SPECIFIC_USERS' && selectedUserIds.length > 0) {
-        payload.userIds = selectedUserIds;
+        // Ensure all IDs are strings
+        payload.userIds = selectedUserIds.map((id) => String(id));
       }
 
       if (recipientType === 'INACTIVE_USERS') {
@@ -455,12 +475,11 @@ export default function BroadcastsPage() {
               <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
                 Message *
               </label>
-              <textarea
+              <MarkdownEditor
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="input"
-                rows={6}
-                placeholder="Enter your message here. HTML is supported."
+                onChange={setMessage}
+                placeholder="Enter your message here. Markdown is supported."
+                rows={8}
                 required
               />
             </div>
@@ -537,27 +556,30 @@ export default function BroadcastsPage() {
                     padding: '0.5rem',
                   }}
                 >
-                  {users.map((user) => (
-                    <label
-                      key={user._id || user.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '0.5rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedUserIds.includes(user._id || user.id || '')}
-                        onChange={() => toggleUserSelection(user._id || user.id || '')}
-                        style={{ marginRight: '0.5rem' }}
-                      />
-                      <span>
-                        {user.name} ({user.email})
-                      </span>
-                    </label>
-                  ))}
+                  {users.map((user) => {
+                    const userId = getUserId(user);
+                    return (
+                      <label
+                        key={userId}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '0.5rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedUserIds.includes(userId)}
+                          onChange={() => toggleUserSelection(userId)}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <span>
+                          {user.name} ({user.email})
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
                 {selectedUserIds.length > 0 && (
                   <small style={{ color: '#9e9e9e', display: 'block', marginTop: '0.5rem' }}>
@@ -855,12 +877,11 @@ export default function BroadcastsPage() {
                   <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">
                     Message *
                   </label>
-                  <textarea
+                  <MarkdownEditor
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="input"
-                    rows={6}
-                    placeholder="Enter your message here. HTML is supported."
+                    onChange={setMessage}
+                    placeholder="Enter your message here. Markdown is supported."
+                    rows={8}
                     required
                   />
                 </div>
@@ -948,27 +969,30 @@ export default function BroadcastsPage() {
                         padding: '0.5rem',
                       }}
                     >
-                      {users.map((user) => (
-                        <label
-                          key={user._id || user.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '0.5rem',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedUserIds.includes(user._id || user.id || '')}
-                            onChange={() => toggleUserSelection(user._id || user.id || '')}
-                            style={{ marginRight: '0.5rem' }}
-                          />
-                          <span>
-                            {user.name} ({user.email})
-                          </span>
-                        </label>
-                      ))}
+                      {users.map((user) => {
+                        const userId = getUserId(user);
+                        return (
+                          <label
+                            key={userId}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '0.5rem',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedUserIds.includes(userId)}
+                              onChange={() => toggleUserSelection(userId)}
+                              style={{ marginRight: '0.5rem' }}
+                            />
+                            <span>
+                              {user.name} ({user.email})
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                     {selectedUserIds.length > 0 && (
                       <small style={{ color: '#9e9e9e', display: 'block', marginTop: '0.5rem' }}>

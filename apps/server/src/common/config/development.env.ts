@@ -3,7 +3,7 @@
 export const developmentEnv = {
   PORT: '4200',
   NODE_ENV: 'development',
-  MONGODB_URI: 'mongodb://localhost:27017/sos-academy',
+  // MONGODB_URI: 'mongodb://localhost:27017/sos-academy',
   JWT_SECRET: 'dev_jwt_secret_key',
   JWT_EXPIRATION: '1d',
   CORS_ORIGIN: 'http://localhost:3000,http://localhost:3001',
