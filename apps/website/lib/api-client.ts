@@ -84,6 +84,22 @@ export async function getUpcomingEvents(): Promise<UpcomingEvent[]> {
   }
 }
 
+export async function getUpcomingEventsByCommunity(slug: string): Promise<UpcomingEvent[]> {
+  try {
+    const response = await fetch(`${API_URL}/calendar/events/upcoming/community/${slug}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return [];
+    }
+    return response.json();
+  } catch {
+    return [];
+  }
+}
+
 export interface Mentor {
   id: string;
   name: string;

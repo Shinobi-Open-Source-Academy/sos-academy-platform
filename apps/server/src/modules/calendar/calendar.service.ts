@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Community } from '../community/schemas/community.schema';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
 import { UpdateCalendarEventDto } from './dto/update-calendar-event.dto';
 import { CalendarEvent, CalendarEventDocument } from './schemas/calendar-event.schema';
@@ -8,7 +9,8 @@ import { CalendarEvent, CalendarEventDocument } from './schemas/calendar-event.s
 @Injectable()
 export class CalendarService {
   constructor(
-    @InjectModel(CalendarEvent.name) private calendarEventModel: Model<CalendarEventDocument>
+    @InjectModel(CalendarEvent.name) private calendarEventModel: Model<CalendarEventDocument>,
+    @InjectModel(Community.name) private communityModel: Model<Community>
   ) {}
 
   async create(createCalendarEventDto: CreateCalendarEventDto): Promise<CalendarEvent> {
@@ -36,6 +38,32 @@ export class CalendarService {
       .find({
         isActive: true,
         startTime: { $gte: now },
+      })
+      .populate('community', 'name slug')
+      .sort({ startTime: 1 })
+      .limit(limit)
+      .select(
+        'title description startTime endTime eventType meetingLink location community isFeatured'
+      )
+      .exec();
+  }
+
+  /**
+   * Get upcoming events for a specific community by slug
+   */
+  async findUpcomingByCommunitySlug(slug: string, limit = 5): Promise<CalendarEvent[]> {
+    const community = await this.communityModel.findOne({ slug }).select('_id').lean().exec();
+
+    if (!community) {
+      return [];
+    }
+
+    const now = new Date();
+    return this.calendarEventModel
+      .find({
+        isActive: true,
+        startTime: { $gte: now },
+        community: community._id,
       })
       .populate('community', 'name slug')
       .sort({ startTime: 1 })
