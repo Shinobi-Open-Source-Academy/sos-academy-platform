@@ -9,36 +9,13 @@ import DeleteModal from '../../components/DeleteModal';
 import QuickActionsMenu from '../../components/QuickActionsMenu';
 import Sidebar from '../../components/Sidebar';
 
+import type { MemberSummary, PaginatedUsers } from '@sos-academy/shared';
+
 export const dynamic = 'force-dynamic';
-
-interface Member {
-  id?: string;
-  _id?: string;
-  name: string;
-  email: string;
-  githubProfile?: {
-    login: string;
-    htmlUrl: string;
-    avatarUrl?: string;
-  };
-  communities?: (string | { name: string; slug: string })[];
-  status: string;
-  createdAt: string;
-}
-
-interface PaginatedResponse {
-  users: Member[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    pages: number;
-  };
-}
 
 export default function MembersPage() {
   const router = useRouter();
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<MemberSummary[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,10 +23,12 @@ export default function MembersPage() {
   const [communities, setCommunities] = useState<{ name: string; slug: string }[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [bulkUpdating, setBulkUpdating] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; member: Member | null }>({
-    isOpen: false,
-    member: null,
-  });
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; member: MemberSummary | null }>(
+    {
+      isOpen: false,
+      member: null,
+    }
+  );
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -103,7 +82,9 @@ export default function MembersPage() {
         params.append('community', communityFilter);
       }
 
-      const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
+      const response = await apiClient.get<PaginatedUsers<MemberSummary>>(
+        `/users/admin/users?${params}`
+      );
       if (response.data) {
         setMembers(response.data.users || []);
         setPagination(response.data.pagination);
@@ -133,8 +114,8 @@ export default function MembersPage() {
     }
   };
 
-  const getMemberId = (member: Member): string => {
-    return member.id || member._id || '';
+  const getMemberId = (member: MemberSummary): string => {
+    return member._id || member.id || '';
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -449,9 +430,9 @@ export default function MembersPage() {
                             )}
                           </div>
                         </td>
-                        <td className="px-5 py-4">{getStatusBadge(member.status)}</td>
+                        <td className="px-5 py-4">{getStatusBadge(member.status || 'PENDING')}</td>
                         <td className="px-5 py-4 text-sm text-zinc-500">
-                          {formatDate(member.createdAt)}
+                          {member.createdAt ? formatDate(member.createdAt) : '-'}
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center justify-end">

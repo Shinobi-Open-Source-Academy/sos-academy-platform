@@ -10,29 +10,17 @@ import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 
-interface CalendarEvent {
-  _id: string;
-  title: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  eventType: string;
-  meetingLink?: string;
-  location?: string;
-  organizer?: { name: string };
-  community?: { name: string };
-}
-
-type TabType = 'upcoming' | 'past' | 'all';
-
+import type { CalendarEventDetail } from '@sos-academy/shared';
 import {
   CALENDAR_EVENT_TYPE_COLORS as EVENT_TYPE_COLORS,
   CALENDAR_EVENT_TYPE_LABELS as EVENT_TYPE_LABELS,
 } from '@sos-academy/shared';
 
+type TabType = 'upcoming' | 'past' | 'all';
+
 export default function EventsPage() {
   const router = useRouter();
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<CalendarEventDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -55,7 +43,7 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const response = await apiClient.get<CalendarEvent[]>('/calendar/events');
+      const response = await apiClient.get<CalendarEventDetail[]>('/calendar/events');
       setEvents(response.data || []);
     } catch (error) {
       console.error('Failed to fetch events:', error);
