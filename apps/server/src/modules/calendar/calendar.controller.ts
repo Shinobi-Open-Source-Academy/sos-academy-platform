@@ -31,6 +31,14 @@ export class CalendarController {
     return this.calendarService.findUpcoming(5);
   }
 
+  @Get('events/upcoming/community/:slug')
+  @ApiOperation({ summary: 'Get upcoming events for a community' })
+  @ApiParam({ name: 'slug', description: 'Community slug' })
+  @ApiResponse({ status: 200, description: 'List of upcoming events for community' })
+  async findUpcomingByCommunity(@Param('slug') slug: string) {
+    return this.calendarService.findUpcomingByCommunitySlug(slug, 5);
+  }
+
   @Get('events/:id')
   @ApiOperation({ summary: 'Get event by ID' })
   @ApiParam({ name: 'id', description: 'Event ID' })

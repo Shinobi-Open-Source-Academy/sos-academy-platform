@@ -9,55 +9,12 @@ import DeleteModal from '../../components/DeleteModal';
 import QuickActionsMenu from '../../components/QuickActionsMenu';
 import Sidebar from '../../components/Sidebar';
 
+import type { MentorSummary, PaginatedUsers } from '@sos-academy/shared';
+
 export const dynamic = 'force-dynamic';
 
-interface Mentor {
-  _id?: string;
-  id?: string;
-  name: string;
-  email: string;
-  expertise?: string;
-  motivation?: string;
-  title?: string;
-  description?: string;
-  socialLinks?: {
-    github?: string;
-    linkedin?: string;
-    twitter?: string;
-    website?: string;
-  };
-  githubProfile?: {
-    login: string;
-    htmlUrl: string;
-    avatarUrl?: string;
-  };
-  communities?: { name: string; slug: string }[];
-  status: string;
-  createdAt: string;
-}
-
-/** Get a string user id from API response (DTO returns `id`, raw may have `_id` as string or object). */
-function getMentorId(mentor: Mentor): string {
-  const id = mentor.id ?? mentor._id;
-  if (typeof id === 'string') return id;
-  if (
-    id != null &&
-    typeof id === 'object' &&
-    typeof (id as { toString?: () => string }).toString === 'function'
-  ) {
-    return (id as { toString: () => string }).toString();
-  }
-  return '';
-}
-
-interface PaginatedResponse {
-  users: Mentor[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    pages: number;
-  };
+function getMentorId(mentor: MentorSummary): string {
+  return mentor._id || mentor.id || '';
 }
 
 interface CommunityOption {
@@ -68,17 +25,22 @@ interface CommunityOption {
 
 export default function MentorsPage() {
   const router = useRouter();
-  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [mentors, setMentors] = useState<MentorSummary[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [communityFilter, setCommunityFilter] = useState<string>('all');
-  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; mentor: Mentor | null }>({
-    isOpen: false,
-    mentor: null,
-  });
-  const [detailsModal, setDetailsModal] = useState<{ isOpen: boolean; mentor: Mentor | null }>({
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; mentor: MentorSummary | null }>(
+    {
+      isOpen: false,
+      mentor: null,
+    }
+  );
+  const [detailsModal, setDetailsModal] = useState<{
+    isOpen: boolean;
+    mentor: MentorSummary | null;
+  }>({
     isOpen: false,
     mentor: null,
   });
@@ -160,7 +122,9 @@ export default function MentorsPage() {
         }
       }
 
-      const response = await apiClient.get<PaginatedResponse>(`/users/admin/users?${params}`);
+      const response = await apiClient.get<PaginatedUsers<MentorSummary>>(
+        `/users/admin/users?${params}`
+      );
       if (response.data) {
         setMentors(response.data.users || []);
         setPagination(response.data.pagination);
@@ -190,7 +154,7 @@ export default function MentorsPage() {
     fetchMentors();
   }, [mounted, fetchMentors]);
 
-  const openDetailsModal = (mentor: Mentor, subForm?: 'approve' | 'reject' | 'edit') => {
+  const openDetailsModal = (mentor: MentorSummary, subForm?: 'approve' | 'reject' | 'edit') => {
     setDetailsModal({ isOpen: true, mentor });
     setDetailsSubForm(subForm ?? null);
     setApproveCustomMessage('');
@@ -540,9 +504,9 @@ export default function MentorsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-5 py-4">{getStatusBadge(mentor.status)}</td>
+                      <td className="px-5 py-4">{getStatusBadge(mentor.status || 'PENDING')}</td>
                       <td className="px-5 py-4 text-sm text-zinc-500">
-                        {formatDate(mentor.createdAt)}
+                        {mentor.createdAt ? formatDate(mentor.createdAt) : '-'}
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-2">
@@ -910,7 +874,7 @@ export default function MentorsPage() {
                       </h3>
                       <p className="text-sm text-zinc-400 mono">{detailsModal.mentor.email}</p>
                     </div>
-                    {getStatusBadge(detailsModal.mentor.status)}
+                    {getStatusBadge(detailsModal.mentor.status || 'PENDING')}
                   </div>
 
                   {/* GitHub */}
@@ -1060,7 +1024,10 @@ export default function MentorsPage() {
                   {/* Applied Date */}
                   <div className="pt-2 border-t border-white/[0.06]">
                     <p className="text-xs text-zinc-600">
-                      Applied on {formatDate(detailsModal.mentor.createdAt)}
+                      Applied on{' '}
+                      {detailsModal.mentor.createdAt
+                        ? formatDate(detailsModal.mentor.createdAt)
+                        : '-'}
                     </p>
                   </div>
                 </div>

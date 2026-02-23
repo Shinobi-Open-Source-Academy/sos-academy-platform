@@ -181,9 +181,9 @@ export default function HomePageClient() {
                     >
                       {community.icon}
                     </div>
-                    <span className="text-xs text-gray-500">
+                    {/* <span className="text-xs text-gray-500">
                       {community.meetingDay} {community.meetingTime}
-                    </span>
+                    </span> */}
                   </div>
                   <h3 className="text-lg font-semibold mb-2 group-hover:text-gray-300 transition-colors">
                     {community.name}
