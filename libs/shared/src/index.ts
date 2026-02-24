@@ -9,4 +9,3 @@ export * from './lib/interfaces/user.interface';
 export * from './lib/interfaces/project.interface';
 export * from './lib/interfaces/community.interface';
 export * from './lib/interfaces/calendar-event.interface';
-export * from './lib/interfaces/api-types';

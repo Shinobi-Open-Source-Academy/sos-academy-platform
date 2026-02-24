@@ -10,17 +10,42 @@ import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 
-import type { CalendarEventDetail } from '@sos-academy/shared';
-import {
-  CALENDAR_EVENT_TYPE_COLORS as EVENT_TYPE_COLORS,
-  CALENDAR_EVENT_TYPE_LABELS as EVENT_TYPE_LABELS,
-} from '@sos-academy/shared';
+interface CalendarEvent {
+  _id: string;
+  title: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  eventType: string;
+  meetingLink?: string;
+  location?: string;
+  organizer?: { name: string };
+  community?: { name: string };
+}
 
 type TabType = 'upcoming' | 'past' | 'all';
 
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  WEEKLY_CALL: 'Weekly Call',
+  PROJECT_REVIEW: 'Project Review',
+  MENTORSHIP_SESSION: 'Mentorship',
+  MENTOR_1V1: '1v1 Session',
+  COMMUNITY_MEETING: 'Community',
+  SPECIAL_EVENT: 'Special Event',
+};
+
+const EVENT_TYPE_COLORS: Record<string, string> = {
+  WEEKLY_CALL: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
+  PROJECT_REVIEW: 'border-violet-500/30 bg-violet-500/10 text-violet-400',
+  MENTORSHIP_SESSION: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+  MENTOR_1V1: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400',
+  COMMUNITY_MEETING: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
+  SPECIAL_EVENT: 'border-rose-500/30 bg-rose-500/10 text-rose-400',
+};
+
 export default function EventsPage() {
   const router = useRouter();
-  const [events, setEvents] = useState<CalendarEventDetail[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -43,7 +68,7 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const response = await apiClient.get<CalendarEventDetail[]>('/calendar/events');
+      const response = await apiClient.get<CalendarEvent[]>('/calendar/events');
       setEvents(response.data || []);
     } catch (error) {
       console.error('Failed to fetch events:', error);
