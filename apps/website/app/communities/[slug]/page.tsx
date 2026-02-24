@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { getCommunityBySlug } from '../../../lib/api-client';
 import CommunityClient from './community-client';
 
+// Note: We can't generate static params since we need to fetch from API
+// Next.js will handle dynamic routes
+
 export async function generateMetadata({
   params,
 }: {

@@ -10,12 +10,20 @@ import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 
-import type {
-  BroadcastSummary,
-  CommunitySummary,
-  RecipientType,
-  UserSummary,
-} from '@sos-academy/shared';
+interface Community {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+interface User {
+  _id: string | { toString: () => string } | unknown;
+  id?: string;
+  name: string;
+  email: string;
+}
+
+type RecipientType = 'ALL_USERS' | 'COMMUNITY' | 'MENTORS' | 'INACTIVE_USERS' | 'SPECIFIC_USERS';
 
 const DURATIONS = [
   { value: 15, label: '15 min' },
@@ -23,16 +31,38 @@ const DURATIONS = [
   { value: 60, label: '1 hour' },
 ];
 
+interface Broadcast {
+  _id: string;
+  subject: string;
+  message: string;
+  recipientType: RecipientType;
+  communitySlug?: string;
+  userIds?: string[];
+  inactiveDays?: string;
+  sentCount: number;
+  totalRecipients?: number;
+  scheduled: boolean;
+  completed: boolean;
+  sentAt?: string;
+  createdAt: string;
+  eventTitle?: string;
+  eventStartTime?: string;
+  eventEndTime?: string;
+  eventDuration?: string;
+  eventMeetingLink?: string;
+  eventDescription?: string;
+}
+
 export default function BroadcastsPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [retriggering, setRetriggering] = useState<string | null>(null);
-  const [communities, setCommunities] = useState<CommunitySummary[]>([]);
-  const [users, setUsers] = useState<UserSummary[]>([]);
-  const [broadcasts, setBroadcasts] = useState<BroadcastSummary[]>([]);
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [retriggerModal, setRetriggerModal] = useState<BroadcastSummary | null>(null);
+  const [retriggerModal, setRetriggerModal] = useState<Broadcast | null>(null);
   const [sendingBroadcastId, setSendingBroadcastId] = useState<string | null>(null);
 
   // Form state
@@ -74,7 +104,7 @@ export default function BroadcastsPage() {
 
     const pollInterval = setInterval(async () => {
       try {
-        const response = await apiClient.get<BroadcastSummary>(`/broadcast/${sendingBroadcastId}`);
+        const response = await apiClient.get<Broadcast>(`/broadcast/${sendingBroadcastId}`);
         const broadcast = response.data;
 
         if (!broadcast) return;
@@ -100,7 +130,7 @@ export default function BroadcastsPage() {
 
   const fetchCommunities = async () => {
     try {
-      const response = await apiClient.get<CommunitySummary[]>('/communities');
+      const response = await apiClient.get<Community[]>('/communities');
       setCommunities(response.data || []);
     } catch (error) {
       console.error('Failed to fetch communities:', error);
@@ -109,9 +139,7 @@ export default function BroadcastsPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await apiClient.get<{ users: UserSummary[] }>(
-        '/users/admin/users?limit=100'
-      );
+      const response = await apiClient.get<{ users: User[] }>('/users/admin/users?limit=100');
       setUsers(response.data?.users || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -120,7 +148,7 @@ export default function BroadcastsPage() {
 
   const fetchBroadcasts = async () => {
     try {
-      const response = await apiClient.get<BroadcastSummary[]>('/broadcast?limit=50');
+      const response = await apiClient.get<Broadcast[]>('/broadcast?limit=50');
       setBroadcasts(response.data || []);
     } catch (error) {
       console.error('Failed to fetch broadcasts:', error);
@@ -217,8 +245,16 @@ export default function BroadcastsPage() {
     setScheduledAt('');
   };
 
-  const getUserId = (user: UserSummary): string => {
-    return user._id || user.id || '';
+  const getUserId = (user: User): string => {
+    if (typeof user._id === 'string') return user._id;
+    if (typeof user.id === 'string') return user.id;
+    if (user._id && typeof user._id === 'object' && user._id !== null && 'toString' in user._id) {
+      return (user._id as { toString: () => string }).toString();
+    }
+    if (user._id) {
+      return String(user._id);
+    }
+    return '';
   };
 
   const toggleUserSelection = (userId: string | unknown) => {
@@ -229,7 +265,7 @@ export default function BroadcastsPage() {
     );
   };
 
-  const openRetriggerModal = async (broadcast: BroadcastSummary) => {
+  const openRetriggerModal = async (broadcast: Broadcast) => {
     // Pre-fill form with broadcast data
     setSubject(broadcast.subject);
     setMessage(broadcast.message);
@@ -375,7 +411,7 @@ export default function BroadcastsPage() {
     });
   };
 
-  const getRecipientLabel = (broadcast: BroadcastSummary) => {
+  const getRecipientLabel = (broadcast: Broadcast) => {
     switch (broadcast.recipientType) {
       case 'ALL_USERS':
         return 'All Active Users';

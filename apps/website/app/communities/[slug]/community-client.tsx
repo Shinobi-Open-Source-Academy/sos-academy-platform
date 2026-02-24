@@ -2,16 +2,13 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { CALENDAR_EVENT_TYPE_LABELS } from '@sos-academy/shared';
 import {
   getCommunityBySlug,
   getProjectStats,
   getProjects,
-  getUpcomingEventsByCommunity,
   type Community,
   type ProjectStats,
   type ProjectsResponse,
-  type UpcomingEvent,
 } from '../../../lib/api-client';
 import { COMMUNITIES } from '../../../lib/data';
 import CodeBackground from '../../../components/CodeBackground';
@@ -38,8 +35,6 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
     limit: 10,
     pages: 0,
   });
-  const [events, setEvents] = useState<UpcomingEvent[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('rank');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -66,25 +61,6 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
 
     fetchCommunity();
   }, [slug]);
-
-  // Fetch upcoming events for this community
-  useEffect(() => {
-    if (!community) return;
-
-    async function fetchEvents() {
-      setEventsLoading(true);
-      try {
-        const data = await getUpcomingEventsByCommunity(slug);
-        setEvents(data);
-      } catch (err) {
-        console.error('Error fetching community events:', err);
-      } finally {
-        setEventsLoading(false);
-      }
-    }
-
-    fetchEvents();
-  }, [slug, community]);
 
   // Fetch projects separately with pagination
   useEffect(() => {
@@ -367,125 +343,6 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                   <div className="text-sm text-gray-400">Active Projects</div>
                 </div>
               </div>
-
-              {/* Upcoming Events Section */}
-              <section className="mb-12">
-                <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
-                {eventsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                    <p className="mt-3 text-sm text-gray-400">Loading events...</p>
-                  </div>
-                ) : events.length > 0 ? (
-                  <div className="space-y-4">
-                    {events.map((event) => {
-                      const startDate = new Date(event.startTime);
-                      const endDate = new Date(event.endTime);
-                      const isToday = startDate.toDateString() === new Date().toDateString();
-                      const isTomorrow =
-                        startDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
-
-                      const dayLabel = isToday
-                        ? 'Today'
-                        : isTomorrow
-                          ? 'Tomorrow'
-                          : startDate.toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                            });
-
-                      const timeRange = `${startDate.toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })} – ${endDate.toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}`;
-
-                      return (
-                        <div
-                          key={event._id}
-                          className="border border-white/10 p-5 hover:border-white/20 transition-colors group"
-                        >
-                          <div className="flex items-start gap-5">
-                            {/* Date block */}
-                            <div
-                              className="flex-shrink-0 w-14 text-center border border-white/10 py-2 px-1"
-                              style={{
-                                borderColor: isToday ? `${communityColor}50` : undefined,
-                              }}
-                            >
-                              <div
-                                className="text-xs font-medium uppercase tracking-wide"
-                                style={{
-                                  color: isToday ? communityColor : '#9ca3af',
-                                }}
-                              >
-                                {startDate.toLocaleDateString('en-US', {
-                                  month: 'short',
-                                })}
-                              </div>
-                              <div className="text-xl font-bold">{startDate.getDate()}</div>
-                            </div>
-
-                            {/* Event details */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold truncate">{event.title}</h3>
-                                {event.isFeatured && (
-                                  <span
-                                    className="text-[10px] font-bold px-1.5 py-0.5 border"
-                                    style={{
-                                      borderColor: `${communityColor}40`,
-                                      color: communityColor,
-                                      backgroundColor: `${communityColor}10`,
-                                    }}
-                                  >
-                                    FEATURED
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-400">
-                                <span>{dayLabel}</span>
-                                <span className="text-gray-600">·</span>
-                                <span>{timeRange}</span>
-                                <span className="text-gray-600">·</span>
-                                <span>
-                                  {CALENDAR_EVENT_TYPE_LABELS[event.eventType] || event.eventType}
-                                </span>
-                              </div>
-                              {event.description && (
-                                <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                                  {event.description}
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Action */}
-                            {event.meetingLink && (
-                              <a
-                                href={event.meetingLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-shrink-0 self-center text-sm font-medium px-4 py-2 border border-white/10 text-gray-300 hover:text-white hover:border-white/30 transition-colors"
-                              >
-                                Join
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="border border-white/10 p-6 text-center">
-                    <p className="text-gray-500 text-sm">
-                      No upcoming events scheduled for this community
-                    </p>
-                  </div>
-                )}
-              </section>
 
               {/* Mentors Section */}
               <section className="mb-12">
