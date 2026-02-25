@@ -20,21 +20,59 @@ export interface RequestConfig {
   headers?: Record<string, string>;
   body?: unknown;
   timeout?: number;
+  useCache?: boolean;
 }
 
 class ApiClient {
   private baseUrl: string;
   private defaultTimeout: number;
+  private cache: Map<string, { data: ApiResponse<unknown>; timestamp: number }>;
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
 
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
     this.defaultTimeout = 10000;
+    this.cache = new Map();
+  }
+
+  /**
+   * Clear all cached data
+   */
+  clearCache() {
+    this.cache.clear();
+  }
+
+  /**
+   * Clear cache for a specific endpoint
+   */
+  clearCacheForEndpoint(endpoint: string) {
+    const url = `${this.baseUrl}${endpoint}`;
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(url)) {
+        this.cache.delete(key);
+      }
+    }
   }
 
   private async request<T>(endpoint: string, config: RequestConfig = {}): Promise<ApiResponse<T>> {
-    const { method = 'GET', headers = {}, body, timeout = this.defaultTimeout } = config;
+    const {
+      method = 'GET',
+      headers = {},
+      body,
+      timeout = this.defaultTimeout,
+      useCache = false,
+    } = config;
 
     const url = `${this.baseUrl}${endpoint}`;
+
+    // Check cache for GET requests when caching is enabled
+    if (method === 'GET' && useCache) {
+      const cached = this.cache.get(url);
+      if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+        return Promise.resolve(cached.data as ApiResponse<T>);
+      }
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -62,11 +100,18 @@ class ApiClient {
         throw error;
       }
 
-      return {
+      const result: ApiResponse<T> = {
         data,
         status: response.status,
         success: true,
       };
+
+      // Cache GET responses when caching is enabled
+      if (method === 'GET' && useCache) {
+        this.cache.set(url, { data: result, timestamp: Date.now() });
+      }
+
+      return result;
     } catch (error) {
       clearTimeout(timeoutId);
 

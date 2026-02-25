@@ -57,3 +57,4 @@ out
 
 ## turbo builds
 *.turbo
+apps/admin/tsconfig.tsbuildinfo
