@@ -20,6 +20,6 @@
     "dotenv": "^17.2.3"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^5.0.6"
   }
 }
