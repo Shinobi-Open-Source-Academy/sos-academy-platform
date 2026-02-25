@@ -14,10 +14,14 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+import { AuthProvider } from './providers/AuthProvider';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="antialiased text-slate-50 bg-slate-950">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

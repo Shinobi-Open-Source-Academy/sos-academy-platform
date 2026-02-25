@@ -1,17 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ComingSoon } from '../components/ComingSoon';
-import Sidebar from '../components/Sidebar';
-
-interface User {
-  name: string;
-  email: string;
-  avatar: string;
-  githubHandle: string;
-  community: string;
-}
+import { ComingSoon } from '../../components/ComingSoon';
+import Sidebar from '../../components/Sidebar';
+import { IUser } from '@sos-academy/shared';
 
 // Mock data for the dashboard
 const mockActivity = [
@@ -55,47 +47,20 @@ const mockStats = {
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [authState, setAuthState] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
-    'checking'
-  );
+  const [user, setUser] = useState<IUser | null>(null);
 
-  // Check auth and redirect if not authenticated
+  // Load user from localStorage
   useEffect(() => {
-    const token = localStorage.getItem('hacker_token');
     const userStr = localStorage.getItem('hacker_user');
-
-    if (!token || !userStr) {
-      setAuthState('unauthenticated');
-      router.replace('/login');
-      return;
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch {
+        setUser(null);
+        console.error('Failed to parse user data:', userStr);
+      }
     }
-
-    try {
-      setUser(JSON.parse(userStr));
-      setAuthState('authenticated');
-    } catch {
-      localStorage.removeItem('hacker_token');
-      localStorage.removeItem('hacker_user');
-      setAuthState('unauthenticated');
-      router.replace('/login');
-    }
-  }, [router]);
-
-  // Show loading while checking auth or redirecting
-  if (authState === 'checking' || authState === 'unauthenticated') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <span className="text-zinc-400 text-sm">
-            {authState === 'unauthenticated' ? 'Redirecting...' : 'Loading...'}
-          </span>
-        </div>
-      </div>
-    );
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-black flex">

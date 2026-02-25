@@ -15,11 +15,18 @@
     "seed:status": "ts-node -r tsconfig-paths/register src/seed.ts status"
   },
   "dependencies": {
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
     "@sos-academy/shared": "workspace:*",
-    "resend": "^6.6.0",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-jwt": "^4.0.1",
+    "resend": "^6.6.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "@types/passport-github2": "^1.2.9",
+    "@types/passport-jwt": "^4.0.1"
   }
 }

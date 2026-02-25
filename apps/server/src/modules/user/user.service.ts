@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserRole, UserStatus } from '@sos-academy/shared';
+import { IGitHubProfile, UserRole, UserStatus } from '@sos-academy/shared';
 import * as bcrypt from 'bcryptjs';
 import mongoose, { Model, Schema } from 'mongoose';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
@@ -73,7 +73,7 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string) {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -623,5 +623,54 @@ export class UserService {
       .exec();
 
     return { updated: result.modifiedCount };
+  }
+
+  /**
+   * Find or create user from GitHub profile
+   */
+  async findOrCreateFromGitHub(profile: IGitHubProfile): Promise<User> {
+    // Try with GitHub ID first
+    let user = await this.userModel
+      .findOne({
+        'githubProfile.githubId': profile.githubId,
+      })
+      .exec();
+
+    if (user) {
+      user.githubProfile = profile;
+      user.lastLoginAt = new Date();
+      return user.save();
+    }
+
+    // Try with email if GitHub ID not found
+    if (profile.email) {
+      user = await this.userModel.findOne({ email: profile.email }).exec();
+      if (user) {
+        user.githubProfile = profile;
+        user.lastLoginAt = new Date();
+        return user.save();
+      }
+    }
+
+    // Create new user if not found
+    const newUser = new this.userModel({
+      email: profile.email,
+      name: profile.login,
+      githubProfile: profile,
+      role: UserRole.MEMBER,
+      status: UserStatus.ACTIVE,
+      source: 'subscription',
+      lastLoginAt: new Date(),
+      isActive: true,
+    });
+
+    return newUser.save();
+  }
+
+  /**
+   * Update last login timestamp
+   */
+  async updateLastLogin(userId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { lastLoginAt: new Date() }).exec();
   }
 }
