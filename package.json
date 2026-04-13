@@ -114,7 +114,7 @@
     "class-validator": "^0.14.2",
     "css-select": "^5.1.0",
     "dotenv": "^17.2.3",
-    "handlebars": "^4.7.8",
+    "handlebars": "^4.7.9",
     "mongoose": "^8.14.2",
     "next": "16.1.1",
     "nodemailer": "^7.0.11",
