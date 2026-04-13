@@ -96,7 +96,7 @@
     }
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs-modules/mailer": "^2.3.4",
     "@nestjs/cli": "^10.0.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^4.0.2",
