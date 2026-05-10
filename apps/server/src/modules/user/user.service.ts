@@ -180,13 +180,46 @@ export class UserService {
   async applyAsMentor(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
-    // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      // Guard: application already under review
+      if (
+        existingUser.status === UserStatus.APPLIED_MENTOR ||
+        existingUser.status === UserStatus.PENDING_REVIEW
+      ) {
+        throw new ConflictException('A mentor application for this email is already under review');
+      }
+
+      // Guard: already an active mentor
+      if (existingUser.role === UserRole.MENTOR && existingUser.status === UserStatus.ACTIVE) {
+        throw new ConflictException('This user is already an active mentor');
+      }
+
+      // Upgrade existing user to mentor applicant — preserve communities, skills, etc.
+      existingUser.role = UserRole.MENTOR;
+      existingUser.status = UserStatus.APPLIED_MENTOR;
+      existingUser.source = 'mentor-application';
+      if (expertise) existingUser.expertise = expertise;
+      if (motivation) existingUser.motivation = motivation;
+      if (name) existingUser.name = name;
+
+      const updatedUser = await existingUser.save();
+
+      if (githubHandle) {
+        this.enrichUserWithGitHub(updatedUser._id.toString(), githubHandle, email);
+      }
+
+      this.emailService
+        .sendMentorApplicationConfirmation(email, existingUser.name ?? name)
+        .catch((error) => {
+          console.error('Failed to send mentor application email:', error);
+        });
+
+      return updatedUser;
     }
 
-    // Create mentor application
+    // New user — create mentor application
     const newMentor = new this.userModel({
       email,
       name,
@@ -199,12 +232,10 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
       this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
-    // Send confirmation email (non-blocking)
     this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
       console.error('Failed to send mentor application email:', error);
     });
@@ -252,7 +283,13 @@ export class UserService {
 
     user.status = UserStatus.ACTIVE;
     user.isActive = true;
-    user.communities = communityObjectIds as typeof user.communities;
+
+    // Merge new community IDs into existing communities — preserves a member's existing communities
+    if (communityObjectIds.length > 0) {
+      const existingIds = new Set(user.communities.map((id) => id.toString()));
+      const toAdd = communityObjectIds.filter((id) => !existingIds.has(id.toString()));
+      user.communities = [...user.communities, ...toAdd] as typeof user.communities;
+    }
 
     const savedUser = await user.save();
 
@@ -286,17 +323,21 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    user.status = UserStatus.REJECTED;
+    // Rejected mentors always become active hackers (preserves existing communities)
+    user.role = UserRole.MEMBER;
+    user.status = UserStatus.ACTIVE;
+    user.isActive = true;
 
-    // Optionally assign to a community as a member (hacker)
+    // Optionally assign to a specific community
     if (dto.communityId && mongoose.Types.ObjectId.isValid(dto.communityId)) {
       const communityIdStr = dto.communityId;
       const community = await this.communityModel.findById(communityIdStr).exec();
       if (community) {
-        user.role = UserRole.MEMBER;
-        user.communities = [new mongoose.Types.ObjectId(communityIdStr) as any];
-        user.status = UserStatus.ACTIVE;
-        user.isActive = true;
+        const communityObjId = new mongoose.Types.ObjectId(communityIdStr) as any;
+        const alreadyInCommunity = user.communities.some((id) => id.toString() === communityIdStr);
+        if (!alreadyInCommunity) {
+          user.communities = [...user.communities, communityObjId] as typeof user.communities;
+        }
         await this.communityModel
           .findByIdAndUpdate(communityIdStr, { $addToSet: { members: user._id } })
           .exec();
@@ -379,13 +420,46 @@ export class UserService {
   async createMentorApplication(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
-    // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      // Guard: application already under review
+      if (
+        existingUser.status === UserStatus.APPLIED_MENTOR ||
+        existingUser.status === UserStatus.PENDING_REVIEW
+      ) {
+        throw new ConflictException('A mentor application for this email is already under review');
+      }
+
+      // Guard: already an active mentor
+      if (existingUser.role === UserRole.MENTOR && existingUser.status === UserStatus.ACTIVE) {
+        throw new ConflictException('This user is already an active mentor');
+      }
+
+      // Upgrade existing user to mentor applicant — preserve communities, skills, etc.
+      existingUser.role = UserRole.MENTOR;
+      existingUser.status = UserStatus.APPLIED_MENTOR;
+      existingUser.source = 'mentor-application';
+      if (expertise) existingUser.expertise = expertise;
+      if (motivation) existingUser.motivation = motivation;
+      if (name) existingUser.name = name;
+
+      const updatedUser = await existingUser.save();
+
+      if (githubHandle) {
+        this.enrichUserWithGitHub(updatedUser._id.toString(), githubHandle, email);
+      }
+
+      this.emailService
+        .sendMentorApplicationConfirmation(email, existingUser.name ?? name)
+        .catch((error) => {
+          console.error('Failed to send mentor application email:', error);
+        });
+
+      return updatedUser;
     }
 
-    // Create mentor application
+    // New user — create mentor application
     const newMentor = new this.userModel({
       email,
       name,
@@ -398,12 +472,10 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
       this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
-    // Send confirmation email (non-blocking)
     this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
       console.error('Failed to send mentor application email:', error);
     });
