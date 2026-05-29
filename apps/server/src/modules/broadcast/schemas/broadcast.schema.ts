@@ -69,6 +69,16 @@ export class Broadcast {
   @Prop({ type: Date, default: Date.now })
   sentAt?: Date;
 
+  @Prop({
+    type: [{ email: String, name: String, reason: String }],
+    default: [],
+    _id: false,
+  })
+  failedRecipients: { email: string; name?: string; reason?: string }[];
+
+  @Prop({ default: 0 })
+  failedCount: number;
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   createdBy?: MongooseSchema.Types.ObjectId;
 }

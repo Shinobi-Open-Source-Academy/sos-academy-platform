@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import { Model } from 'mongoose';
@@ -85,7 +85,7 @@ export class BroadcastService {
       }
 
       let sentCount = 0;
-      const errors: string[] = [];
+      const failedRecipients: { email: string; name?: string; reason?: string }[] = [];
 
       // Send emails with progress updates
       for (let i = 0; i < recipients.length; i++) {
@@ -103,23 +103,24 @@ export class BroadcastService {
             );
           }
         } catch (error) {
-          const errorMsg = `Failed to send to ${recipient.email}: ${error instanceof Error ? error.message : String(error)}`;
-          this.logger.error(errorMsg);
-          errors.push(errorMsg);
+          const reason = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to send to ${recipient.email}: ${reason}`);
+          failedRecipients.push({ email: recipient.email, name: (recipient as any).name, reason });
         }
       }
 
-      if (errors.length > 0) {
+      if (failedRecipients.length > 0) {
         this.logger.warn(
-          `Broadcast ${broadcastId} completed with ${errors.length} errors:`,
-          errors
+          `Broadcast ${broadcastId} completed with ${failedRecipients.length} failures`
         );
       }
 
-      // Final update
+      // Final update — persist failures for potential retry
       broadcast.sentCount = sentCount;
       broadcast.completed = true;
       broadcast.sentAt = new Date();
+      broadcast.failedRecipients = failedRecipients;
+      broadcast.failedCount = failedRecipients.length;
       await broadcast.save();
 
       this.logger.log(
@@ -218,6 +219,69 @@ export class BroadcastService {
       sent: 0,
       scheduled: false,
       id: savedBroadcast._id.toString(),
+      totalRecipients: recipients.length,
+    };
+  }
+
+  async retryFailed(
+    id: string
+  ): Promise<{ sent: number; scheduled: boolean; id: string; totalRecipients: number }> {
+    const original = await this.broadcastModel.findById(id).exec();
+    if (!original) {
+      throw new NotFoundException(`Broadcast with ID ${id} not found`);
+    }
+
+    if (!original.failedRecipients?.length) {
+      throw new BadRequestException('No failed recipients to retry');
+    }
+
+    // Build recipient list directly from stored failures — no extra DB round-trip
+    const recipients = original.failedRecipients.map((r) => ({
+      email: r.email,
+      name: r.name ?? '',
+    })) as User[];
+
+    // Reconstruct the DTO from the original broadcast
+    const dto: CreateBroadcastDto = {
+      subject: original.subject,
+      message: original.message,
+      recipientType: original.recipientType,
+      communitySlug: original.communitySlug,
+      userIds: original.userIds,
+      inactiveDays: original.inactiveDays,
+      eventTitle: original.eventTitle,
+      eventStartTime: original.eventStartTime ? String(original.eventStartTime) : undefined,
+      eventDuration: original.eventDuration ? String(original.eventDuration) : undefined,
+      eventMeetingLink: original.eventMeetingLink,
+      eventDescription: original.eventDescription,
+    };
+
+    // New broadcast doc for clean audit trail
+    const retryBroadcast = new this.broadcastModel({
+      ...dto,
+      eventEndTime: original.eventEndTime,
+      sentCount: 0,
+      totalRecipients: recipients.length,
+      completed: false,
+      failedRecipients: [],
+      failedCount: 0,
+    });
+    const saved = await retryBroadcast.save();
+
+    setImmediate(() => {
+      this.sendBroadcastEmailsAsync(saved._id.toString(), recipients, dto).catch((error) => {
+        this.logger.error(`Failed to send retry broadcast emails for ${saved._id}:`, error);
+      });
+    });
+
+    this.logger.log(
+      `Retry broadcast created with ID ${saved._id}, retrying ${recipients.length} failed recipients`
+    );
+
+    return {
+      sent: 0,
+      scheduled: false,
+      id: saved._id.toString(),
       totalRecipients: recipients.length,
     };
   }
