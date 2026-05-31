@@ -24,26 +24,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // CORS — read directly from process.env at runtime to avoid any module-evaluation timing issues
-  const rawOrigins = process.env.CORS_ORIGIN ?? envConfig.cors.origin;
-  const allowedOrigins = rawOrigins
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean);
-  Logger.log(`CORS allowed origins (${allowedOrigins.length}): ${allowedOrigins.join(' | ')}`);
-
-  app.enableCors({
-    origin: (origin, callback) => {
-      // Allow server-to-server / curl requests with no Origin header
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      Logger.warn(`CORS blocked: ${origin}`);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    },
-    credentials: true,
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  });
+  // TODO: re-enable origin allowlist once CORS env var is confirmed in prod
+  app.enableCors({ origin: true, credentials: true });
 
   // Session middleware — MongoDB-backed, httpOnly cookie
   const isProd = envConfig.nodeEnv === 'production';
