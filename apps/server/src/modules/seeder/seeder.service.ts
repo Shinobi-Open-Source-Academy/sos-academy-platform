@@ -499,48 +499,43 @@ export class SeederService {
    * Upsert missing communities - checks which communities from seed data are missing and adds them
    */
   async upsertMissingCommunities(): Promise<SeedingResult> {
-    try {
-      this.logger.log('Checking for missing communities...');
+    this.logger.log('Checking for missing communities...');
 
-      // Get all existing communities by slug
-      const existingCommunities = await this.communityModel
-        .find({})
-        .select('slug kage')
-        .lean()
-        .exec();
-      const existingSlugs = new Set(existingCommunities.map((c) => c.slug));
+    // Get all existing communities by both slug and name
+    const existingCommunities = await this.communityModel
+      .find({})
+      .select('slug name kage')
+      .lean()
+      .exec();
+    const existingSlugs = new Set(existingCommunities.map((c) => c.slug));
+    const existingNames = new Set(existingCommunities.map((c) => c.name));
 
-      // Find missing communities
-      const missingCommunities = this.COMMUNITIES_DATA.filter(
-        (community) => !existingSlugs.has(community.slug)
-      );
+    // A community is only truly missing if neither its slug nor its name exists
+    const missingCommunities = this.COMMUNITIES_DATA.filter(
+      (community) => !existingSlugs.has(community.slug) && !existingNames.has(community.name)
+    );
 
-      if (missingCommunities.length === 0) {
-        this.logger.log('All communities from seed data already exist. No missing communities.');
-        return {
-          success: true,
-          count: 0,
-          message: 'All communities already exist',
-        };
-      }
+    if (missingCommunities.length === 0) {
+      this.logger.log('All communities from seed data already exist. No missing communities.');
+      return {
+        success: true,
+        count: 0,
+        message: 'All communities already exist',
+      };
+    }
 
-      this.logger.log(`Found ${missingCommunities.length} missing community/communities:`);
-      for (const community of missingCommunities) {
-        this.logger.log(`   - ${community.name} (slug: ${community.slug})`);
-      }
+    this.logger.log(`Found ${missingCommunities.length} missing community/communities:`);
+    for (const community of missingCommunities) {
+      this.logger.log(`   - ${community.name} (slug: ${community.slug})`);
+    }
 
-      // Upsert each missing community
-      let createdCount = 0;
-      let updatedCount = 0;
+    let createdCount = 0;
+    let skippedCount = 0;
 
-      for (const communityData of missingCommunities) {
-        const existingCommunity = existingCommunities.find((c) => c.slug === communityData.slug);
-        const wasCreated = !existingCommunity;
+    for (const communityData of missingCommunities) {
+      try {
+        const tempKageId = new this.communityModel()._id;
 
-        // Get or create a temporary ObjectId for kage (required field)
-        const tempKageId = existingCommunity?.kage || new this.communityModel()._id;
-
-        // Upsert: update if exists (by slug), create if not
         const result = await this.communityModel.findOneAndUpdate(
           { slug: communityData.slug },
           {
@@ -565,29 +560,30 @@ export class SeederService {
           }
         );
 
-        if (wasCreated) {
-          createdCount++;
-          this.logger.log(`   ✓ Created: ${result.name} (slug: ${result.slug})`);
+        createdCount++;
+        this.logger.log(`   ✓ Created: ${result.name} (slug: ${result.slug})`);
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
+          skippedCount++;
+          this.logger.warn(
+            `   ⚠ Skipped: ${communityData.name} already exists (duplicate key). Moving on.`
+          );
         } else {
-          updatedCount++;
-          this.logger.log(`   ✓ Updated: ${result.name} (slug: ${result.slug})`);
+          this.logger.error(
+            `   ✗ Failed to create ${communityData.name}:`,
+            (error as Error).message
+          );
         }
       }
-
-      const totalCount = createdCount + updatedCount;
-      this.logger.log(
-        `Successfully upserted ${totalCount} community/communities (${createdCount} created, ${updatedCount} updated)`
-      );
-
-      return {
-        success: true,
-        count: totalCount,
-        message: `Upserted ${totalCount} community/communities (${createdCount} created, ${updatedCount} updated)`,
-      };
-    } catch (error) {
-      this.logger.error('Error upserting missing communities:', (error as Error).message);
-      throw error;
     }
+
+    this.logger.log(`Done: ${createdCount} created, ${skippedCount} skipped (already exist)`);
+
+    return {
+      success: true,
+      count: createdCount,
+      message: `Upserted ${createdCount} community/communities (${skippedCount} skipped as already existing)`,
+    };
   }
 
   /**
