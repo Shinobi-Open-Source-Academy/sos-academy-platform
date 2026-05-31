@@ -5,12 +5,12 @@ import CodeBackground from './CodeBackground';
 import Footer from './Footer';
 import HeroGrid from './HeroGrid';
 import JoinModal from './JoinModal';
-import MentorsSection from './MentorsSection';
+import MentorsCarousel from './MentorsCarousel';
 import Navbar from './Navbar';
 import SpotlightCard from './SpotlightCard';
 import UpcomingEvents from './UpcomingEvents';
 import { COMMUNITIES, COMPANIES, FEATURES, PROJECTS, SITE_CONFIG } from '../lib/data';
-import { getActiveMentors, getRandomMentors, Mentor } from '../lib/api-client';
+import { getActiveMentors, Mentor } from '../lib/api-client';
 
 export default function HomePageClient() {
   const [joinModalOpen, setJoinModalOpen] = useState(false);
@@ -29,8 +29,7 @@ export default function HomePageClient() {
     const fetchMentors = async () => {
       try {
         const allMentors = await getActiveMentors();
-        const randomMentors = getRandomMentors(allMentors, 4);
-        setMentors(randomMentors);
+        setMentors(allMentors);
       } catch (error) {
         console.error('Failed to fetch mentors:', error);
       } finally {
@@ -256,7 +255,7 @@ export default function HomePageClient() {
             </p>
           </div>
 
-          <MentorsSection mentors={mentors} loading={loadingMentors} />
+          <MentorsCarousel mentors={mentors} loading={loadingMentors} />
 
           <div className="text-center mt-8">
             <a
