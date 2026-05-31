@@ -288,6 +288,35 @@ export class EmailService {
    * @param subject Email subject
    * @param html HTML content
    */
+  async sendAdminInviteEmail(to: string, name: string, inviteUrl: string): Promise<void> {
+    const html = `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#e4e4e7">
+        <h2 style="color:#ffffff">You've been invited to SOS Academy Admin</h2>
+        <p>Hi ${name},</p>
+        <p>You have been invited to access the SOS Academy admin panel.</p>
+        <p>Click the button below to set your password and activate your account. This link expires in <strong>72 hours</strong>.</p>
+        <p style="margin:32px 0">
+          <a href="${inviteUrl}" style="background:#ffffff;color:#000000;padding:12px 24px;text-decoration:none;font-weight:600;display:inline-block">
+            Accept Invite &amp; Set Password
+          </a>
+        </p>
+        <p style="color:#71717a;font-size:13px">If you weren't expecting this, you can safely ignore this email.</p>
+        <p style="color:#71717a;font-size:12px">Or copy this link: ${inviteUrl}</p>
+      </div>`;
+    await this.sendSimpleEmail(to, "You're invited to SOS Academy Admin", html);
+  }
+
+  async sendAdminPromotionEmail(to: string, name: string): Promise<void> {
+    const html = `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#e4e4e7">
+        <h2 style="color:#ffffff">You now have admin access</h2>
+        <p>Hi ${name},</p>
+        <p>Your account has been promoted to admin on SOS Academy. You can log in with your existing credentials.</p>
+        <p style="color:#71717a;font-size:13px">If this was unexpected, contact your platform administrator.</p>
+      </div>`;
+    await this.sendSimpleEmail(to, 'Your SOS Academy admin access', html);
+  }
+
   async sendSimpleEmail(to: string, subject: string, html: string): Promise<void> {
     try {
       const { data, error } = await this.resend.emails.send({

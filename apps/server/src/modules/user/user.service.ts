@@ -2,17 +2,21 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import mongoose, { Model, Schema } from 'mongoose';
+import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
 import { GitHubService } from '../github/github.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
@@ -27,6 +31,8 @@ import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
@@ -592,22 +598,98 @@ export class UserService {
   /**
    * Invite a new admin — super admin only
    */
-  async inviteAdmin(dto: InviteAdminDto): Promise<{ id: string; name: string; email: string }> {
-    const existing = await this.userModel.findOne({ email: dto.email }).exec();
-    if (existing) throw new ConflictException('A user with this email already exists');
+  async inviteAdmin(
+    dto: InviteAdminDto
+  ): Promise<{ id: string; name: string; email: string; promoted: boolean }> {
+    const existing = await this.userModel.findOne({ email: dto.email }).select('+password').exec();
 
-    const hashed = await this.hashPassword(dto.password);
+    if (existing) {
+      // Promote existing user directly — they already have a password
+      if (existing.isSuperAdmin) {
+        throw new ConflictException('This user is already the super admin');
+      }
+
+      const updated = await this.userModel
+        .findByIdAndUpdate(
+          existing._id,
+          { role: UserRole.KAGE, status: UserStatus.ACTIVE, isActive: true, isSuperAdmin: false },
+          { new: true }
+        )
+        .exec();
+
+      this.emailService
+        .sendAdminPromotionEmail(existing.email, existing.name)
+        .catch((e) => this.logger?.warn?.(`Promotion email failed: ${e.message}`));
+
+      return {
+        id: (updated._id as any).toString(),
+        name: updated.name,
+        email: updated.email,
+        promoted: true,
+      };
+    }
+
+    // New user — create with INVITED status, generate one-time token
+    if (!dto.name) {
+      throw new ConflictException('A name is required when inviting a new admin');
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiry = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 hours
+
     const admin = await this.userModel.create({
       name: dto.name,
       email: dto.email,
-      password: hashed,
       role: UserRole.KAGE,
-      status: UserStatus.ACTIVE,
-      isActive: true,
+      status: UserStatus.INVITED,
+      isActive: false,
       isSuperAdmin: false,
+      inviteToken: tokenHash,
+      inviteTokenExpiry: expiry,
     });
 
-    return { id: (admin._id as any).toString(), name: admin.name, email: admin.email };
+    const inviteUrl = `${envConfig.admin.url}/accept-invite?token=${rawToken}`;
+    await this.emailService.sendAdminInviteEmail(dto.email, dto.name, inviteUrl);
+
+    return {
+      id: (admin._id as any).toString(),
+      name: admin.name,
+      email: admin.email,
+      promoted: false,
+    };
+  }
+
+  /**
+   * Accept an admin invite — verifies token, sets password, activates account
+   */
+  async acceptInvite(dto: AcceptInviteDto): Promise<void> {
+    const tokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+
+    const admin = await this.userModel
+      .findOne({
+        inviteToken: tokenHash,
+        inviteTokenExpiry: { $gt: new Date() },
+        role: UserRole.KAGE,
+      })
+      .select('+inviteToken inviteTokenExpiry')
+      .exec();
+
+    if (!admin) {
+      throw new UnauthorizedException('Invalid or expired invite link');
+    }
+
+    const hashedPassword = await this.hashPassword(dto.password);
+
+    await this.userModel
+      .findByIdAndUpdate(admin._id, {
+        password: hashedPassword,
+        status: UserStatus.ACTIVE,
+        isActive: true,
+        inviteToken: null,
+        inviteTokenExpiry: null,
+      })
+      .exec();
   }
 
   /**

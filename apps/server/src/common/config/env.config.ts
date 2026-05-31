@@ -30,6 +30,7 @@ export const envConfig = {
     level: env('LOG_LEVEL', 'debug'),
   },
   admin: {
+    url: env('ADMIN_URL', 'http://localhost:3001'),
     email: env('ADMIN_EMAIL', 'admin@shinobi-open-source.academy'),
     password: env('ADMIN_PASSWORD', 'admin123'),
   },

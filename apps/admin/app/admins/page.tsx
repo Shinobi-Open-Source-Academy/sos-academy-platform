@@ -27,7 +27,6 @@ export default function AdminsPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
-  const [invitePassword, setInvitePassword] = useState('');
   const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
@@ -50,16 +49,18 @@ export default function AdminsPage() {
     e.preventDefault();
     setInviting(true);
     try {
-      await apiClient.post('/users/admin/admins/invite', {
+      const res = await apiClient.post<{ promoted: boolean }>('/users/admin/admins/invite', {
         name: inviteName,
         email: inviteEmail,
-        password: invitePassword,
       });
-      toast.success('Admin invited successfully');
+      toast.success(
+        res.data?.promoted
+          ? 'User promoted to admin'
+          : "Invite sent — they'll receive an email to set their password"
+      );
       setShowInvite(false);
       setInviteName('');
       setInviteEmail('');
-      setInvitePassword('');
       fetchAdmins();
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Failed to invite admin');
@@ -123,8 +124,12 @@ export default function AdminsPage() {
           {/* Invite form */}
           {showInvite && (
             <div className="card p-6 mb-6 border border-white/10">
-              <h2 className="text-sm font-semibold text-white mb-4">Invite New Admin</h2>
-              <form onSubmit={handleInvite} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <h2 className="text-sm font-semibold text-white mb-1">Invite New Admin</h2>
+              <p className="text-xs text-zinc-500 mb-4">
+                New users will receive an email to set their own password. Existing users are
+                promoted directly.
+              </p>
+              <form onSubmit={handleInvite} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="invite-name" className="block text-xs text-zinc-400 mb-1">
                     Full name
@@ -132,7 +137,6 @@ export default function AdminsPage() {
                   <input
                     id="invite-name"
                     type="text"
-                    required
                     minLength={2}
                     value={inviteName}
                     onChange={(e) => setInviteName(e.target.value)}
@@ -154,22 +158,7 @@ export default function AdminsPage() {
                     placeholder="jane@example.com"
                   />
                 </div>
-                <div>
-                  <label htmlFor="invite-password" className="block text-xs text-zinc-400 mb-1">
-                    Password
-                  </label>
-                  <input
-                    id="invite-password"
-                    type="password"
-                    required
-                    minLength={8}
-                    value={invitePassword}
-                    onChange={(e) => setInvitePassword(e.target.value)}
-                    className="input w-full"
-                    placeholder="Min. 8 characters"
-                  />
-                </div>
-                <div className="sm:col-span-3 flex justify-end">
+                <div className="sm:col-span-2 flex justify-end">
                   <button
                     type="submit"
                     disabled={inviting}

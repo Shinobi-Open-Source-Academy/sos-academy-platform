@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { apiClient } from '../../lib/api-client';
+import PasswordInput from '../../components/PasswordInput';
 import { useAuth } from '../../context/AuthContext';
+import { apiClient } from '../../lib/api-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,21 +107,15 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="Enter your password"
-                autoComplete="current-password"
-              />
-            </div>
+            <PasswordInput
+              id="password"
+              label="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
 
             {error && (
               <div className="flex items-center gap-3 p-3 border border-red-500/30 bg-red-500/10">

@@ -27,6 +27,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRole, UserStatus } from '@sos-academy/shared';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
@@ -191,6 +192,13 @@ export class UserController {
 
   // ── Admin auth ──────────────────────────────────────────────────────────────
 
+  @Post('admin/accept-invite')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Accept admin invite — set password and activate account' })
+  async acceptInvite(@Body() dto: AcceptInviteDto) {
+    await this.userService.acceptInvite(dto);
+  }
+
   @Post('admin/login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Admin login — sets session cookie' })
@@ -248,7 +256,6 @@ export class UserController {
   }
 
   @Get('admin/users')
-  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Get users with pagination and filters' })
   @ApiOkResponse({ description: 'Users retrieved successfully', type: [UserResponseDto] })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
