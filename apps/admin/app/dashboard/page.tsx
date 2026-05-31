@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated } from '../../lib/auth';
+import { useRequireAuth } from '../../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
@@ -44,25 +43,13 @@ const StatCard = ({
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
+  const { loading: authLoading } = useRequireAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
-    }
-
-    fetchStats();
-  }, [mounted, router]);
+    if (!authLoading) fetchStats();
+  }, [authLoading]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -76,7 +63,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (!mounted || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex items-center gap-3">

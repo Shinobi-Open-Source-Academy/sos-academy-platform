@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
-import { isAuthenticated } from '../../../lib/auth';
+import { useRequireAuth } from '../../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
@@ -97,11 +97,6 @@ export default function CreateEventPage() {
 
   useEffect(() => {
     if (!mounted) {
-      return;
-    }
-
-    if (!isAuthenticated()) {
-      router.replace('/login');
       return;
     }
 

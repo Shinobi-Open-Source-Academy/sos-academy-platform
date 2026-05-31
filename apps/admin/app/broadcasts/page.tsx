@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated } from '../../lib/auth';
+import { useRequireAuth } from '../../context/AuthContext';
 import MarkdownEditor, { markdownToHtml } from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 
@@ -56,6 +56,7 @@ interface Broadcast {
 }
 
 export default function BroadcastsPage() {
+  useRequireAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -89,11 +90,6 @@ export default function BroadcastsPage() {
 
   useEffect(() => {
     if (!mounted) return;
-
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
-    }
 
     fetchCommunities();
     fetchBroadcasts();

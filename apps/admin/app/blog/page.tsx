@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated } from '../../lib/auth';
+import { useRequireAuth } from '../../context/AuthContext';
 import MarkdownEditor from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 
@@ -198,6 +198,7 @@ function UserPicker({
 }
 
 export default function BlogPage() {
+  useRequireAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -212,7 +213,6 @@ export default function BlogPage() {
 
   useEffect(() => {
     setMounted(true);
-    if (!isAuthenticated()) router.replace('/login');
   }, [router]);
 
   const fetchPosts = useCallback(async () => {
