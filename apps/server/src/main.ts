@@ -1,8 +1,8 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import session from 'express-session';
 import { AppModule } from './app.module';
 import { envConfig } from './common/config/env.config';
 import { SeederService } from './modules/seeder/seeder.service';
@@ -24,9 +24,26 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // CORS — allow frontend origins and include credentials for session cookies
-  const allowedOrigins = envConfig.cors.origin.split(',').map((o) => o.trim());
-  app.enableCors({ origin: allowedOrigins, credentials: true });
+  // CORS — read directly from process.env at runtime to avoid any module-evaluation timing issues
+  const rawOrigins = process.env.CORS_ORIGIN ?? envConfig.cors.origin;
+  const allowedOrigins = rawOrigins
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  Logger.log(`CORS allowed origins (${allowedOrigins.length}): ${allowedOrigins.join(' | ')}`);
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow server-to-server / curl requests with no Origin header
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      Logger.warn(`CORS blocked: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
+    credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
 
   // Session middleware — MongoDB-backed, httpOnly cookie
   const isProd = envConfig.nodeEnv === 'production';
