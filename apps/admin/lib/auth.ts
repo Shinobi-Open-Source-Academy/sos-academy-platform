@@ -1,25 +1,9 @@
-/**
- * Simple admin authentication
- */
+import { apiClient } from './api-client';
 
-const AUTH_KEY = 'admin_authenticated';
-
-export const setAuthenticated = (value: boolean) => {
-  if (value) {
-    localStorage.setItem(AUTH_KEY, 'true');
-  } else {
-    localStorage.removeItem(AUTH_KEY);
+export async function logout() {
+  try {
+    await apiClient.post('/users/admin/logout');
+  } finally {
+    window.location.href = '/login';
   }
-};
-
-export const isAuthenticated = (): boolean => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  return localStorage.getItem(AUTH_KEY) === 'true';
-};
-
-export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
-  window.location.href = '/login';
-};
+}
