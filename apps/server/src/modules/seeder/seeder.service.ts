@@ -694,6 +694,7 @@ export class SeederService {
         role: UserRole.KAGE,
         status: UserStatus.ACTIVE,
         isActive: true,
+        isSuperAdmin: true,
         bio: 'Platform Administrator',
         skills: ['Platform Management', 'User Administration'],
         interests: ['Open Source', 'Community Building'],
