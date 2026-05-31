@@ -16,10 +16,13 @@
   },
   "dependencies": {
     "@sos-academy/shared": "workspace:*",
-    "resend": "^6.6.0",
-    "dotenv": "^17.2.3"
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express-session": "^1.19.0",
+    "resend": "^6.6.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "@types/express-session": "^1.19.0"
   }
 }

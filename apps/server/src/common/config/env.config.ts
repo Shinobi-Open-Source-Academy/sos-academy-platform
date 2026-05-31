@@ -1,3 +1,11 @@
+import { config as loadDotenv } from 'dotenv';
+import { join } from 'path';
+
+// Load .env before anything reads process.env.
+// Two paths cover ts-node (cwd = apps/server) and compiled dist/ execution.
+loadDotenv({ path: join(process.cwd(), '../../.env') });
+loadDotenv({ path: join(__dirname, '../../../../../../.env') });
+
 const env = (key: string, fallback = '') => process.env[key] ?? fallback;
 
 export const envConfig = {
@@ -5,6 +13,9 @@ export const envConfig = {
   nodeEnv: env('NODE_ENV', 'development'),
   host: env('HOST', '0.0.0.0'),
   appUrl: env('APP_URL', ''),
+  session: {
+    secret: env('SESSION_SECRET', 'change-this-secret-in-production'),
+  },
   mongodb: {
     uri: env('MONGODB_URI', 'mongodb://localhost:27017/sos-academy'),
   },
@@ -13,7 +24,7 @@ export const envConfig = {
     expiresIn: env('JWT_EXPIRATION', '1d'),
   },
   cors: {
-    origin: env('CORS_ORIGIN', 'http://localhost:3000'),
+    origin: env('CORS_ORIGIN', 'http://localhost:3000,http://localhost:3001'),
   },
   logging: {
     level: env('LOG_LEVEL', 'debug'),

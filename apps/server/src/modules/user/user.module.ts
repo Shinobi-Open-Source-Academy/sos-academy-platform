@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
+import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
 import { Community, CommunitySchema } from '../community/schemas/community.schema';
 import { EmailModule } from '../email/email.module';
 import { GitHubModule } from '../github/github.module';
@@ -17,7 +19,7 @@ import { UserService } from './user.service';
     GitHubModule,
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, AdminSessionGuard, SuperAdminGuard],
   exports: [MongooseModule, UserService],
 })
 export class UserModule {}

@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -12,6 +13,7 @@ import { Community, CommunityDocument } from '../community/schemas/community.sch
 import { EmailService } from '../email/email.service';
 import { GitHubService } from '../github/github.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -502,36 +504,127 @@ export class UserService {
   }
 
   /**
-   * Admin login - verify against database user with hashed password
+   * Admin login — sets server-side session on success
    */
-  async adminLogin(adminLoginDto: AdminLoginDto): Promise<{ success: boolean; message: string }> {
+  async adminLogin(
+    adminLoginDto: AdminLoginDto,
+    req: any
+  ): Promise<{
+    success: boolean;
+    isSuperAdmin: boolean;
+    admin: { id: string; name: string; email: string };
+  }> {
     const { email, password } = adminLoginDto;
 
-    // Find admin user in database
     const adminUser = await this.userModel
-      .findOne({
-        email: email,
-        role: UserRole.KAGE,
-        status: UserStatus.ACTIVE,
-      })
-      .select('+password')
+      .findOne({ email, role: UserRole.KAGE, status: UserStatus.ACTIVE })
+      .select('+password isSuperAdmin name email')
       .exec();
 
-    if (!adminUser) {
+    if (!adminUser || !(await bcrypt.compare(password, adminUser.password))) {
       throw new UnauthorizedException('Invalid admin credentials');
     }
 
-    // Verify password against hashed password
-    const isPasswordValid = await bcrypt.compare(password, adminUser.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid admin credentials');
-    }
+    req.session.adminId = (adminUser._id as any).toString();
+    req.session.isSuperAdmin = adminUser.isSuperAdmin ?? false;
 
     return {
       success: true,
-      message: 'Login successful',
+      isSuperAdmin: adminUser.isSuperAdmin ?? false,
+      admin: { id: req.session.adminId, name: adminUser.name, email: adminUser.email },
     };
+  }
+
+  /**
+   * Destroy the current admin session (logout)
+   */
+  async adminLogout(req: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      req.session.destroy((err: Error) => (err ? reject(err) : resolve()));
+    });
+  }
+
+  /**
+   * Return the currently authenticated admin from session
+   */
+  async getAdminMe(
+    req: any
+  ): Promise<{ id: string; name: string; email: string; isSuperAdmin: boolean }> {
+    const adminUser = await this.userModel.findById(req.session.adminId).exec();
+    if (!adminUser) throw new UnauthorizedException('Session expired');
+    return {
+      id: (adminUser._id as any).toString(),
+      name: adminUser.name,
+      email: adminUser.email,
+      isSuperAdmin: req.session.isSuperAdmin ?? false,
+    };
+  }
+
+  /**
+   * List all admin (KAGE) accounts — super admin only
+   */
+  async listAdmins(): Promise<
+    {
+      id: string;
+      name: string;
+      email: string;
+      status: string;
+      isSuperAdmin: boolean;
+      createdAt: Date;
+    }[]
+  > {
+    const admins = await this.userModel
+      .find({ role: UserRole.KAGE })
+      .select('name email status isSuperAdmin createdAt')
+      .lean()
+      .exec();
+
+    return admins.map((a: any) => ({
+      id: a._id.toString(),
+      name: a.name,
+      email: a.email,
+      status: a.status,
+      isSuperAdmin: a.isSuperAdmin ?? false,
+      createdAt: a.createdAt,
+    }));
+  }
+
+  /**
+   * Invite a new admin — super admin only
+   */
+  async inviteAdmin(dto: InviteAdminDto): Promise<{ id: string; name: string; email: string }> {
+    const existing = await this.userModel.findOne({ email: dto.email }).exec();
+    if (existing) throw new ConflictException('A user with this email already exists');
+
+    const hashed = await this.hashPassword(dto.password);
+    const admin = await this.userModel.create({
+      name: dto.name,
+      email: dto.email,
+      password: hashed,
+      role: UserRole.KAGE,
+      status: UserStatus.ACTIVE,
+      isActive: true,
+      isSuperAdmin: false,
+    });
+
+    return { id: (admin._id as any).toString(), name: admin.name, email: admin.email };
+  }
+
+  /**
+   * Revoke an admin's access — super admin only, cannot self-revoke or revoke super admin
+   */
+  async revokeAdmin(targetId: string, currentAdminId: string): Promise<void> {
+    if (targetId === currentAdminId) {
+      throw new ForbiddenException('Cannot revoke your own access');
+    }
+    const target = await this.userModel.findById(targetId).exec();
+    if (!target) throw new NotFoundException('Admin not found');
+    if (target.role !== UserRole.KAGE) throw new NotFoundException('Admin not found');
+    if (target.isSuperAdmin) throw new ForbiddenException('Cannot revoke the super admin');
+
+    await this.userModel
+      .findByIdAndUpdate(targetId, { status: UserStatus.INACTIVE, isActive: false })
+      .exec();
   }
 
   /**
