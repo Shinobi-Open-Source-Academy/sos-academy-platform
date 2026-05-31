@@ -10,10 +10,14 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
+import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
 import {
   ApiBody,
   ApiOkResponse,
@@ -23,7 +27,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRole, UserStatus } from '@sos-academy/shared';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -161,6 +167,7 @@ export class UserController {
   }
 
   @Put(':id/approve')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Approve mentor application' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiBody({ type: ApproveMentorDto, required: false })
@@ -172,6 +179,7 @@ export class UserController {
   }
 
   @Put(':id/reject')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Reject mentor application' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiBody({ type: RejectMentorDto })
@@ -182,18 +190,45 @@ export class UserController {
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
 
-  // Admin endpoints
+  // ── Admin auth ──────────────────────────────────────────────────────────────
+
+  @Post('admin/accept-invite')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Accept admin invite — set password and activate account' })
+  async acceptInvite(@Body() dto: AcceptInviteDto) {
+    await this.userService.acceptInvite(dto);
+  }
+
   @Post('admin/login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Admin login' })
+  @ApiOperation({ summary: 'Admin login — sets session cookie' })
   @ApiBody({ type: AdminLoginDto })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async adminLogin(@Body() adminLoginDto: AdminLoginDto) {
-    return this.userService.adminLogin(adminLoginDto);
+  async adminLogin(@Body() adminLoginDto: AdminLoginDto, @Req() req: any) {
+    return this.userService.adminLogin(adminLoginDto, req);
   }
 
+  @Post('admin/logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AdminSessionGuard)
+  @ApiOperation({ summary: 'Admin logout — destroys session' })
+  async adminLogout(@Req() req: any) {
+    await this.userService.adminLogout(req);
+  }
+
+  @Get('admin/me')
+  @UseGuards(AdminSessionGuard)
+  @ApiOperation({ summary: 'Get current authenticated admin' })
+  @ApiResponse({ status: 200, description: 'Current admin info' })
+  async getAdminMe(@Req() req: any) {
+    return this.userService.getAdminMe(req);
+  }
+
+  // ── Admin-protected data endpoints ──────────────────────────────────────────
+
   @Get('admin/stats')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Get admin dashboard statistics' })
   @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
   async getAdminStats() {
@@ -201,23 +236,23 @@ export class UserController {
   }
 
   @Get('admin/pending-mentors')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Get pending mentor applications' })
   @ApiResponse({ status: 200, description: 'Pending mentors retrieved successfully' })
   async getPendingMentors(): Promise<UserResponseDto[]> {
     const users = await this.userService.getPendingMentors();
     // biome-ignore lint/suspicious/noExplicitAny: mongoose document typing complexity
-    const dtos: UserResponseDto[] = users.map((user: any) => new UserResponseDto(user));
-    return dtos;
+    return users.map((user: any) => new UserResponseDto(user));
   }
 
   @Get('admin/pending-members')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Get pending member registrations' })
   @ApiResponse({ status: 200, description: 'Pending members retrieved successfully' })
   async getPendingMembers(): Promise<UserResponseDto[]> {
     const users = await this.userService.getPendingMembers();
     // biome-ignore lint/suspicious/noExplicitAny: mongoose document typing complexity
-    const dtos: UserResponseDto[] = users.map((user: any) => new UserResponseDto(user));
-    return dtos;
+    return users.map((user: any) => new UserResponseDto(user));
   }
 
   @Get('admin/users')
@@ -235,14 +270,38 @@ export class UserController {
       limit: limit ?? 20,
     });
 
-    const userDtos: UserResponseDto[] = result.users.map(
-      // biome-ignore lint/suspicious/noExplicitAny: user object from DB
-      (user: any) => new UserResponseDto(user)
-    );
     return {
-      users: userDtos,
+      // biome-ignore lint/suspicious/noExplicitAny: user object from DB
+      users: result.users.map((user: any) => new UserResponseDto(user)),
       pagination: result.pagination,
     };
+  }
+
+  // ── Super-admin only ─────────────────────────────────────────────────────────
+
+  @Get('admin/admins')
+  @UseGuards(SuperAdminGuard)
+  @ApiOperation({ summary: 'List all admin accounts — super admin only' })
+  async listAdmins() {
+    return this.userService.listAdmins();
+  }
+
+  @Post('admin/admins/invite')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(SuperAdminGuard)
+  @ApiOperation({ summary: 'Invite a new admin — super admin only' })
+  @ApiBody({ type: InviteAdminDto })
+  async inviteAdmin(@Body() dto: InviteAdminDto) {
+    return this.userService.inviteAdmin(dto);
+  }
+
+  @Delete('admin/admins/:id')
+  @UseGuards(SuperAdminGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Revoke an admin account — super admin only' })
+  @ApiParam({ name: 'id', description: 'Admin user ID' })
+  async revokeAdmin(@Param('id') id: string, @Req() req: any) {
+    await this.userService.revokeAdmin(id, req.session.adminId);
   }
 
   /**
@@ -251,6 +310,7 @@ export class UserController {
    * @returns {Promise<{users: UserResponseDto[], pagination: PaginationResponseDto}>}
    */
   @Put('bulk/status')
+  @UseGuards(AdminSessionGuard)
   @ApiOperation({ summary: 'Bulk update user status' })
   @ApiBody({ type: BulkUpdateStatusDto })
   @ApiOkResponse({ description: 'Users updated successfully' })

@@ -47,6 +47,7 @@ class ApiClient {
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
+        credentials: 'include', // send session cookie on every request
       });
 
       clearTimeout(timeoutId);

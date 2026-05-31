@@ -1,6 +1,8 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import { AppModule } from './app.module';
 import { envConfig } from './common/config/env.config';
 import { SeederService } from './modules/seeder/seeder.service';
@@ -22,8 +24,30 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // allow all origins for now
-  app.enableCors();
+  // CORS — allow frontend origins and include credentials for session cookies
+  const allowedOrigins = envConfig.cors.origin.split(',').map((o) => o.trim());
+  app.enableCors({ origin: allowedOrigins, credentials: true });
+
+  // Session middleware — MongoDB-backed, httpOnly cookie
+  const isProd = envConfig.nodeEnv === 'production';
+  app.use(
+    session({
+      secret: envConfig.session.secret,
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+        mongoUrl: envConfig.mongodb.uri,
+        ttl: 24 * 60 * 60, // 24 hours
+        autoRemove: 'native',
+      }),
+      cookie: {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      },
+    })
+  );
 
   // Configure API prefix
   app.setGlobalPrefix('api');

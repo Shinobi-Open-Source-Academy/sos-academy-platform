@@ -3,9 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { logout } from '../../lib/auth';
+import { useAuth } from '../../context/AuthContext';
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  child?: string;
+  icon: React.ReactNode;
+}
+
+const navigation: NavItem[] = [
   {
     name: 'Dashboard',
     href: '/dashboard',
@@ -87,6 +94,26 @@ const navigation = [
     ),
   },
   {
+    name: 'Blog',
+    href: '/blog',
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <title>blog</title>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"
+        />
+      </svg>
+    ),
+  },
+  {
     name: 'Events',
     href: '/events',
     child: '/new',
@@ -109,8 +136,30 @@ const navigation = [
   },
 ];
 
+const adminNavItem: NavItem = {
+  name: 'Admins',
+  href: '/admins',
+  icon: (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <title>admins</title>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+      />
+    </svg>
+  ),
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
+  const { admin, logout } = useAuth();
 
   return (
     <div className="w-56 bg-[#0a0a0a] border-r border-white/[0.06] flex flex-col h-screen sticky top-0">
@@ -134,7 +183,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-3">
         <div className="space-y-0.5">
-          {navigation.map((item) => {
+          {[...navigation, ...(admin?.isSuperAdmin ? [adminNavItem] : [])].map((item) => {
             const isActive =
               pathname === item.href ||
               (item?.child ? pathname === item.href + item?.child : false);

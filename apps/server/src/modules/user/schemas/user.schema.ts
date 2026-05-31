@@ -95,6 +95,15 @@ export class User {
   @Prop({ default: false, required: false })
   isActive: boolean;
 
+  @Prop({ default: false, required: false })
+  isSuperAdmin: boolean;
+
+  @Prop({ required: false, select: false })
+  inviteToken?: string;
+
+  @Prop({ required: false })
+  inviteTokenExpiry?: Date;
+
   @Prop({ required: false })
   bio: string;
 

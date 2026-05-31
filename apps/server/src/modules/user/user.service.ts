@@ -1,17 +1,23 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserRole, UserStatus } from '@sos-academy/shared';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import mongoose, { Model, Schema } from 'mongoose';
+import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
 import { GitHubService } from '../github/github.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
+import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,6 +31,8 @@ import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Community.name) private communityModel: Model<CommunityDocument>,
@@ -180,13 +188,46 @@ export class UserService {
   async applyAsMentor(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
-    // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      // Guard: application already under review
+      if (
+        existingUser.status === UserStatus.APPLIED_MENTOR ||
+        existingUser.status === UserStatus.PENDING_REVIEW
+      ) {
+        throw new ConflictException('A mentor application for this email is already under review');
+      }
+
+      // Guard: already an active mentor
+      if (existingUser.role === UserRole.MENTOR && existingUser.status === UserStatus.ACTIVE) {
+        throw new ConflictException('This user is already an active mentor');
+      }
+
+      // Upgrade existing user to mentor applicant — preserve communities, skills, etc.
+      existingUser.role = UserRole.MENTOR;
+      existingUser.status = UserStatus.APPLIED_MENTOR;
+      existingUser.source = 'mentor-application';
+      if (expertise) existingUser.expertise = expertise;
+      if (motivation) existingUser.motivation = motivation;
+      if (name) existingUser.name = name;
+
+      const updatedUser = await existingUser.save();
+
+      if (githubHandle) {
+        this.enrichUserWithGitHub(updatedUser._id.toString(), githubHandle, email);
+      }
+
+      this.emailService
+        .sendMentorApplicationConfirmation(email, existingUser.name ?? name)
+        .catch((error) => {
+          console.error('Failed to send mentor application email:', error);
+        });
+
+      return updatedUser;
     }
 
-    // Create mentor application
+    // New user — create mentor application
     const newMentor = new this.userModel({
       email,
       name,
@@ -199,12 +240,10 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
       this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
-    // Send confirmation email (non-blocking)
     this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
       console.error('Failed to send mentor application email:', error);
     });
@@ -252,7 +291,13 @@ export class UserService {
 
     user.status = UserStatus.ACTIVE;
     user.isActive = true;
-    user.communities = communityObjectIds as typeof user.communities;
+
+    // Merge new community IDs into existing communities — preserves a member's existing communities
+    if (communityObjectIds.length > 0) {
+      const existingIds = new Set(user.communities.map((id) => id.toString()));
+      const toAdd = communityObjectIds.filter((id) => !existingIds.has(id.toString()));
+      user.communities = [...user.communities, ...toAdd] as typeof user.communities;
+    }
 
     const savedUser = await user.save();
 
@@ -286,17 +331,21 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    user.status = UserStatus.REJECTED;
+    // Rejected mentors always become active hackers (preserves existing communities)
+    user.role = UserRole.MEMBER;
+    user.status = UserStatus.ACTIVE;
+    user.isActive = true;
 
-    // Optionally assign to a community as a member (hacker)
+    // Optionally assign to a specific community
     if (dto.communityId && mongoose.Types.ObjectId.isValid(dto.communityId)) {
       const communityIdStr = dto.communityId;
       const community = await this.communityModel.findById(communityIdStr).exec();
       if (community) {
-        user.role = UserRole.MEMBER;
-        user.communities = [new mongoose.Types.ObjectId(communityIdStr) as any];
-        user.status = UserStatus.ACTIVE;
-        user.isActive = true;
+        const communityObjId = new mongoose.Types.ObjectId(communityIdStr) as any;
+        const alreadyInCommunity = user.communities.some((id) => id.toString() === communityIdStr);
+        if (!alreadyInCommunity) {
+          user.communities = [...user.communities, communityObjId] as typeof user.communities;
+        }
         await this.communityModel
           .findByIdAndUpdate(communityIdStr, { $addToSet: { members: user._id } })
           .exec();
@@ -379,13 +428,46 @@ export class UserService {
   async createMentorApplication(mentorApplicationDto: MentorApplicationDto): Promise<User> {
     const { email, name, expertise, githubHandle, motivation } = mentorApplicationDto;
 
-    // Check if user already exists
     const existingUser = await this.userModel.findOne({ email }).exec();
+
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      // Guard: application already under review
+      if (
+        existingUser.status === UserStatus.APPLIED_MENTOR ||
+        existingUser.status === UserStatus.PENDING_REVIEW
+      ) {
+        throw new ConflictException('A mentor application for this email is already under review');
+      }
+
+      // Guard: already an active mentor
+      if (existingUser.role === UserRole.MENTOR && existingUser.status === UserStatus.ACTIVE) {
+        throw new ConflictException('This user is already an active mentor');
+      }
+
+      // Upgrade existing user to mentor applicant — preserve communities, skills, etc.
+      existingUser.role = UserRole.MENTOR;
+      existingUser.status = UserStatus.APPLIED_MENTOR;
+      existingUser.source = 'mentor-application';
+      if (expertise) existingUser.expertise = expertise;
+      if (motivation) existingUser.motivation = motivation;
+      if (name) existingUser.name = name;
+
+      const updatedUser = await existingUser.save();
+
+      if (githubHandle) {
+        this.enrichUserWithGitHub(updatedUser._id.toString(), githubHandle, email);
+      }
+
+      this.emailService
+        .sendMentorApplicationConfirmation(email, existingUser.name ?? name)
+        .catch((error) => {
+          console.error('Failed to send mentor application email:', error);
+        });
+
+      return updatedUser;
     }
 
-    // Create mentor application
+    // New user — create mentor application
     const newMentor = new this.userModel({
       email,
       name,
@@ -398,12 +480,10 @@ export class UserService {
 
     const savedMentor = await newMentor.save();
 
-    // Fetch GitHub profile + send org invitation asynchronously (non-blocking)
     if (githubHandle) {
       this.enrichUserWithGitHub(savedMentor._id.toString(), githubHandle, email);
     }
 
-    // Send confirmation email (non-blocking)
     this.emailService.sendMentorApplicationConfirmation(email, name).catch((error) => {
       console.error('Failed to send mentor application email:', error);
     });
@@ -430,36 +510,203 @@ export class UserService {
   }
 
   /**
-   * Admin login - verify against database user with hashed password
+   * Admin login — sets server-side session on success
    */
-  async adminLogin(adminLoginDto: AdminLoginDto): Promise<{ success: boolean; message: string }> {
+  async adminLogin(
+    adminLoginDto: AdminLoginDto,
+    req: any
+  ): Promise<{
+    success: boolean;
+    isSuperAdmin: boolean;
+    admin: { id: string; name: string; email: string };
+  }> {
     const { email, password } = adminLoginDto;
 
-    // Find admin user in database
     const adminUser = await this.userModel
-      .findOne({
-        email: email,
-        role: UserRole.KAGE,
-        status: UserStatus.ACTIVE,
-      })
-      .select('+password')
+      .findOne({ email, role: UserRole.KAGE, status: UserStatus.ACTIVE })
+      .select('+password isSuperAdmin name email')
       .exec();
 
-    if (!adminUser) {
+    if (!adminUser || !(await bcrypt.compare(password, adminUser.password))) {
       throw new UnauthorizedException('Invalid admin credentials');
     }
 
-    // Verify password against hashed password
-    const isPasswordValid = await bcrypt.compare(password, adminUser.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid admin credentials');
-    }
+    req.session.adminId = (adminUser._id as any).toString();
+    req.session.isSuperAdmin = adminUser.isSuperAdmin ?? false;
 
     return {
       success: true,
-      message: 'Login successful',
+      isSuperAdmin: adminUser.isSuperAdmin ?? false,
+      admin: { id: req.session.adminId, name: adminUser.name, email: adminUser.email },
     };
+  }
+
+  /**
+   * Destroy the current admin session (logout)
+   */
+  async adminLogout(req: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      req.session.destroy((err: Error) => (err ? reject(err) : resolve()));
+    });
+  }
+
+  /**
+   * Return the currently authenticated admin from session
+   */
+  async getAdminMe(
+    req: any
+  ): Promise<{ id: string; name: string; email: string; isSuperAdmin: boolean }> {
+    const adminUser = await this.userModel.findById(req.session.adminId).exec();
+    if (!adminUser) throw new UnauthorizedException('Session expired');
+    return {
+      id: (adminUser._id as any).toString(),
+      name: adminUser.name,
+      email: adminUser.email,
+      isSuperAdmin: req.session.isSuperAdmin ?? false,
+    };
+  }
+
+  /**
+   * List all admin (KAGE) accounts — super admin only
+   */
+  async listAdmins(): Promise<
+    {
+      id: string;
+      name: string;
+      email: string;
+      status: string;
+      isSuperAdmin: boolean;
+      createdAt: Date;
+    }[]
+  > {
+    const admins = await this.userModel
+      .find({ role: UserRole.KAGE })
+      .select('name email status isSuperAdmin createdAt')
+      .lean()
+      .exec();
+
+    return admins.map((a: any) => ({
+      id: a._id.toString(),
+      name: a.name,
+      email: a.email,
+      status: a.status,
+      isSuperAdmin: a.isSuperAdmin ?? false,
+      createdAt: a.createdAt,
+    }));
+  }
+
+  /**
+   * Invite a new admin — super admin only
+   */
+  async inviteAdmin(
+    dto: InviteAdminDto
+  ): Promise<{ id: string; name: string; email: string; promoted: boolean }> {
+    const existing = await this.userModel.findOne({ email: dto.email }).select('+password').exec();
+
+    if (existing) {
+      // Promote existing user directly — they already have a password
+      if (existing.isSuperAdmin) {
+        throw new ConflictException('This user is already the super admin');
+      }
+
+      const updated = await this.userModel
+        .findByIdAndUpdate(
+          existing._id,
+          { role: UserRole.KAGE, status: UserStatus.ACTIVE, isActive: true, isSuperAdmin: false },
+          { new: true }
+        )
+        .exec();
+
+      this.emailService
+        .sendAdminPromotionEmail(existing.email, existing.name)
+        .catch((e) => this.logger?.warn?.(`Promotion email failed: ${e.message}`));
+
+      return {
+        id: (updated._id as any).toString(),
+        name: updated.name,
+        email: updated.email,
+        promoted: true,
+      };
+    }
+
+    // New user — create with INVITED status, generate one-time token
+    if (!dto.name) {
+      throw new ConflictException('A name is required when inviting a new admin');
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiry = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 hours
+
+    const admin = await this.userModel.create({
+      name: dto.name,
+      email: dto.email,
+      role: UserRole.KAGE,
+      status: UserStatus.INVITED,
+      isActive: false,
+      isSuperAdmin: false,
+      inviteToken: tokenHash,
+      inviteTokenExpiry: expiry,
+    });
+
+    const inviteUrl = `${envConfig.admin.url}/accept-invite?token=${rawToken}`;
+    await this.emailService.sendAdminInviteEmail(dto.email, dto.name, inviteUrl);
+
+    return {
+      id: (admin._id as any).toString(),
+      name: admin.name,
+      email: admin.email,
+      promoted: false,
+    };
+  }
+
+  /**
+   * Accept an admin invite — verifies token, sets password, activates account
+   */
+  async acceptInvite(dto: AcceptInviteDto): Promise<void> {
+    const tokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+
+    const admin = await this.userModel
+      .findOne({
+        inviteToken: tokenHash,
+        inviteTokenExpiry: { $gt: new Date() },
+        role: UserRole.KAGE,
+      })
+      .select('+inviteToken inviteTokenExpiry')
+      .exec();
+
+    if (!admin) {
+      throw new UnauthorizedException('Invalid or expired invite link');
+    }
+
+    const hashedPassword = await this.hashPassword(dto.password);
+
+    await this.userModel
+      .findByIdAndUpdate(admin._id, {
+        password: hashedPassword,
+        status: UserStatus.ACTIVE,
+        isActive: true,
+        inviteToken: null,
+        inviteTokenExpiry: null,
+      })
+      .exec();
+  }
+
+  /**
+   * Revoke an admin's access — super admin only, cannot self-revoke or revoke super admin
+   */
+  async revokeAdmin(targetId: string, currentAdminId: string): Promise<void> {
+    if (targetId === currentAdminId) {
+      throw new ForbiddenException('Cannot revoke your own access');
+    }
+    const target = await this.userModel.findById(targetId).exec();
+    if (!target) throw new NotFoundException('Admin not found');
+    if (target.role !== UserRole.KAGE) throw new NotFoundException('Admin not found');
+    if (target.isSuperAdmin) throw new ForbiddenException('Cannot revoke the super admin');
+
+    await this.userModel
+      .findByIdAndUpdate(targetId, { status: UserStatus.INACTIVE, isActive: false })
+      .exec();
   }
 
   /**

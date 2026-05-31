@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated } from '../../lib/auth';
+import { useRequireAuth } from '../../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
@@ -44,6 +44,7 @@ const EVENT_TYPE_COLORS: Record<string, string> = {
 };
 
 export default function EventsPage() {
+  useRequireAuth();
   const router = useRouter();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,11 +58,6 @@ export default function EventsPage() {
 
   useEffect(() => {
     if (!mounted) return;
-
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
-    }
 
     fetchEvents();
   }, [mounted, router]);

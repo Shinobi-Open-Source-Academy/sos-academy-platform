@@ -3,24 +3,32 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import PasswordInput from '../../components/PasswordInput';
+import { useAuth } from '../../context/AuthContext';
 import { apiClient } from '../../lib/api-client';
-import { isAuthenticated, setAuthenticated } from '../../lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+interface LoginResponse {
+  success: boolean;
+  isSuperAdmin: boolean;
+  admin: { id: string; name: string; email: string };
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const { admin, loading: authLoading, refresh } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Redirect to dashboard if already authenticated
+  // Redirect to dashboard if session already active
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (!authLoading && admin) {
       router.replace('/dashboard');
     }
-  }, [router]);
+  }, [authLoading, admin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,16 +36,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await apiClient.post<{ success: boolean; message: string }>(
-        '/users/admin/login',
-        {
-          email,
-          password,
-        }
-      );
-
+      const response = await apiClient.post<LoginResponse>('/users/admin/login', {
+        email,
+        password,
+      });
       if (response.data?.success) {
-        setAuthenticated(true);
+        await refresh(); // pull fresh session into context
         router.push('/dashboard');
       }
       // biome-ignore lint/suspicious/noExplicitAny: catch block error type
@@ -103,21 +107,15 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="Enter your password"
-                autoComplete="current-password"
-              />
-            </div>
+            <PasswordInput
+              id="password"
+              label="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
 
             {error && (
               <div className="flex items-center gap-3 p-3 border border-red-500/30 bg-red-500/10">

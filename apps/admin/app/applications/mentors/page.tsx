@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../lib/api-client';
-import { isAuthenticated } from '../../../lib/auth';
+import { useRequireAuth } from '../../../context/AuthContext';
 import DeleteModal from '../../components/DeleteModal';
 import QuickActionsMenu from '../../components/QuickActionsMenu';
 import Sidebar from '../../components/Sidebar';
@@ -67,6 +67,7 @@ interface CommunityOption {
 }
 
 export default function MentorsPage() {
+  useRequireAuth();
   const router = useRouter();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
@@ -103,11 +104,6 @@ export default function MentorsPage() {
 
   useEffect(() => {
     if (!mounted) return;
-
-    if (!isAuthenticated()) {
-      router.replace('/login');
-      return;
-    }
 
     fetchMentors();
     fetchCommunities();

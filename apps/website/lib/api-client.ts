@@ -105,27 +105,32 @@ export interface Mentor {
   communities?: { name: string; slug: string }[];
 }
 
+let _mentorsCache: { data: Mentor[]; at: number } | null = null;
+const MENTORS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 export async function getActiveMentors(): Promise<Mentor[]> {
+  if (_mentorsCache && Date.now() - _mentorsCache.at < MENTORS_CACHE_TTL) {
+    return _mentorsCache.data;
+  }
   try {
     const response = await fetch(
       `${API_URL}/users/admin/users?role=MENTOR&status=ACTIVE&limit=100`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store', // Always fetch fresh data on client-side
       }
     );
     if (!response.ok) {
       console.error('Failed to fetch mentors:', response.status, response.statusText);
-      return [];
+      return _mentorsCache?.data ?? [];
     }
     const data = await response.json();
-    const mentors = data.users || [];
-    console.log(`Fetched ${mentors.length} active mentors`);
+    const mentors: Mentor[] = data.users || [];
+    _mentorsCache = { data: mentors, at: Date.now() };
     return mentors;
   } catch (error) {
     console.error('Error fetching mentors:', error);
-    return [];
+    return _mentorsCache?.data ?? [];
   }
 }
 

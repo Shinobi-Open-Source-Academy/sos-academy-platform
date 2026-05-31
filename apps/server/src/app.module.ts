@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { databaseConfig } from './common/config/database.config';
 
+import { BlogModule } from './modules/blog/blog.module';
 import { BroadcastModule } from './modules/broadcast/broadcast.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { CommunityModule } from './modules/community/community.module';
@@ -27,6 +28,7 @@ import { UserModule } from './modules/user/user.module';
     CommunityModule,
     CalendarModule,
     BroadcastModule,
+    BlogModule,
     SeederModule,
   ],
   controllers: [AppController],

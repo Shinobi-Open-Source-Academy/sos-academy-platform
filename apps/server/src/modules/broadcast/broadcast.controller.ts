@@ -63,4 +63,12 @@ export class BroadcastController {
   async retriggerBroadcast(@Param('id') id: string, @Body() updates?: Partial<CreateBroadcastDto>) {
     return this.broadcastService.retriggerBroadcast(id, updates || {});
   }
+
+  @Post(':id/retry-failed')
+  @ApiOperation({ summary: 'Retry sending to recipients who failed in a previous broadcast' })
+  @ApiParam({ name: 'id', description: 'Broadcast ID whose failures to retry' })
+  @ApiResponse({ status: 201, description: 'Retry broadcast queued successfully' })
+  async retryFailed(@Param('id') id: string) {
+    return this.broadcastService.retryFailed(id);
+  }
 }
