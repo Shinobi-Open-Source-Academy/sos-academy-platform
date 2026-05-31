@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import PasswordInput from '../../components/PasswordInput';
 import { apiClient, ApiError } from '../../lib/api-client';
 
@@ -10,7 +10,22 @@ export const dynamic = 'force-dynamic';
 
 type Step = 'form' | 'success' | 'invalid';
 
+// Exported page wraps the content in Suspense — required by Next.js when useSearchParams is used
 export default function AcceptInvitePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-black">
+          <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin" />
+        </div>
+      }
+    >
+      <AcceptInviteContent />
+    </Suspense>
+  );
+}
+
+function AcceptInviteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
