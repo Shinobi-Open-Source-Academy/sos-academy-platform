@@ -1,7 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import { AppModule } from './app.module';
 import { envConfig } from './common/config/env.config';
@@ -26,28 +25,13 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Session middleware
+  // Session middleware (in-memory store — sessions reset on redeploy)
   const isProd = envConfig.nodeEnv === 'production';
-  let sessionStore: MongoStore | undefined;
-  try {
-    sessionStore = MongoStore.create({
-      mongoUrl: envConfig.mongodb.uri,
-      ttl: 24 * 60 * 60,
-      autoRemove: 'native',
-    });
-    Logger.log('Session store: MongoDB');
-  } catch (err) {
-    Logger.warn(
-      `MongoDB session store failed, falling back to memory store: ${(err as Error).message}`
-    );
-  }
-
   app.use(
     session({
       secret: envConfig.session.secret,
       resave: false,
       saveUninitialized: false,
-      ...(sessionStore ? { store: sessionStore } : {}),
       cookie: {
         httpOnly: true,
         secure: isProd,

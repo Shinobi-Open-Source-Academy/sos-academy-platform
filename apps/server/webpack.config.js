@@ -21,7 +21,9 @@ module.exports = (_, argv) => {
       path: outputPath,
       filename: outputFilename,
     },
-    externals: [nodeExternals()],
+    // Bundle express-session into the output so it's always available on GCP
+    // regardless of where node_modules is relative to the deployed bundle.
+    externals: [nodeExternals({ allowlist: ['express-session', /^express-session/] })],
     module: {
       rules: [
         {
