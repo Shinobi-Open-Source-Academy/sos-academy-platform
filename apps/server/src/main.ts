@@ -26,23 +26,33 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Session middleware — MongoDB-backed, httpOnly cookie
+  // Session middleware
   const isProd = envConfig.nodeEnv === 'production';
+  let sessionStore: MongoStore | undefined;
+  try {
+    sessionStore = MongoStore.create({
+      mongoUrl: envConfig.mongodb.uri,
+      ttl: 24 * 60 * 60,
+      autoRemove: 'native',
+    });
+    Logger.log('Session store: MongoDB');
+  } catch (err) {
+    Logger.warn(
+      `MongoDB session store failed, falling back to memory store: ${(err as Error).message}`
+    );
+  }
+
   app.use(
     session({
       secret: envConfig.session.secret,
       resave: false,
       saveUninitialized: false,
-      store: MongoStore.create({
-        mongoUrl: envConfig.mongodb.uri,
-        ttl: 24 * 60 * 60, // 24 hours
-        autoRemove: 'native',
-      }),
+      ...(sessionStore ? { store: sessionStore } : {}),
       cookie: {
         httpOnly: true,
         secure: isProd,
         sameSite: isProd ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        maxAge: 24 * 60 * 60 * 1000,
       },
     })
   );
