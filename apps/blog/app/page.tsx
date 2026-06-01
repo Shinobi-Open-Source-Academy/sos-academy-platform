@@ -5,7 +5,7 @@ import type { FloatingItem } from './components/CodeBackground';
 import CodeBackground from './components/CodeBackground';
 import HeroGrid from './components/HeroGrid';
 import Navbar from './components/Navbar';
-import { PostCard, type Post } from './components/PostCard';
+import { type Post, PostCard } from './components/PostCard';
 import SearchFilter from './components/SearchFilter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4200/api';
@@ -13,6 +13,7 @@ const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:300
 
 const BLOG_SNIPPETS: FloatingItem[] = [
   {
+    hasBackground: true,
     content: [
       { text: 'Building Scalable Systems', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'Learn how to leverage Rust for', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -25,6 +26,7 @@ const BLOG_SNIPPETS: FloatingItem[] = [
     ],
   },
   {
+    hasBackground: true,
     content: [
       { text: 'The Art of Open Source', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'Contributing to open source is', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -33,6 +35,7 @@ const BLOG_SNIPPETS: FloatingItem[] = [
     ],
   },
   {
+    hasBackground: true,
     content: [
       { text: 'Mastering Microservices', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'Breaking down monoliths into', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -41,6 +44,7 @@ const BLOG_SNIPPETS: FloatingItem[] = [
     ],
   },
   {
+    hasBackground: true,
     content: [
       { text: 'Community First Design', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'How to build products that', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -49,6 +53,7 @@ const BLOG_SNIPPETS: FloatingItem[] = [
     ],
   },
   {
+    hasBackground: true,
     content: [
       { text: 'Zero to Hero in Golang', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'A comprehensive guide to', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -57,6 +62,7 @@ const BLOG_SNIPPETS: FloatingItem[] = [
     ],
   },
   {
+    hasBackground: true,
     content: [
       { text: 'System Design 101', font: 'bold 16px Inter, sans-serif', color: '#fff' },
       { text: 'Core concepts for building', font: '12px Inter, sans-serif', color: '#9ca3af' },
@@ -155,7 +161,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white relative">
-      <CodeBackground items={BLOG_SNIPPETS} className="opacity-40" />
+      <CodeBackground items={BLOG_SNIPPETS} className="opacity-60" />
       <Navbar websiteUrl={WEBSITE_URL} />
 
       {/* Hero */}
