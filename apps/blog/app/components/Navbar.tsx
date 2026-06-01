@@ -27,7 +27,6 @@ export default function Navbar({ websiteUrl }: { websiteUrl: string }) {
               alt="SOS Academy"
               width={70}
               height={70}
-              style={{ height: 'auto' }}
               className="object-contain"
             />
           </Link>
