@@ -25,7 +25,6 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Session middleware (in-memory store — sessions reset on redeploy)
   const isProd = envConfig.nodeEnv === 'production';
   app.use(
     session({
