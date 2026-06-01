@@ -23,7 +23,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  app.enableCors();
+  app.enableCors({ origin: true, credentials: true });
 
   const isProd = envConfig.nodeEnv === 'production';
   app.use(
