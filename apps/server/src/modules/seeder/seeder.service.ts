@@ -140,6 +140,15 @@ export class SeederService {
         technologies: ['javascript', 'typescript', 'build-tool', 'bundler'],
         rank: ProjectRank.A,
       },
+      {
+        name: 'MeshCentral',
+        description:
+          'A complete web-based remote monitoring and management web site with agent-based desktop sessions',
+        githubRepo: 'https://github.com/Ylianst/MeshCentral',
+        url: 'https://github.com/Ylianst/MeshCentral',
+        technologies: ['javascript', 'nodejs', 'remote-management', 'self-hosted'],
+        rank: ProjectRank.A,
+      },
     ],
     suna: [
       {
@@ -350,6 +359,33 @@ export class SeederService {
         githubRepo: 'https://github.com/drupal/drupal',
         url: 'https://github.com/drupal/drupal',
         technologies: ['php', 'cms', 'content-management', 'drupal'],
+        rank: ProjectRank.A,
+      },
+      {
+        name: 'Dolibarr',
+        description:
+          'Dolibarr ERP CRM — modern open-source software to manage company activity: contacts, invoices, orders, stocks, accounting, and more',
+        githubRepo: 'https://github.com/Dolibarr/dolibarr',
+        url: 'https://www.dolibarr.org',
+        technologies: ['php', 'erp', 'crm', 'self-hosted'],
+        rank: ProjectRank.S,
+      },
+      {
+        name: 'Cypht',
+        description:
+          'Lightweight open-source webmail aggregator supporting IMAP/SMTP, JMAP, and Exchange Web Services',
+        githubRepo: 'https://github.com/cypht-org/cypht',
+        url: 'https://cypht.org',
+        technologies: ['php', 'javascript', 'webmail', 'imap'],
+        rank: ProjectRank.A,
+      },
+      {
+        name: 'Tiki Wiki CMS',
+        description:
+          'Comprehensive open-source web application for group collaboration, content management, and communication',
+        githubRepo: 'https://gitlab.com/tikiwiki/tiki',
+        url: 'https://tiki.org',
+        technologies: ['php', 'cms', 'wiki', 'collaboration'],
         rank: ProjectRank.A,
       },
     ],
