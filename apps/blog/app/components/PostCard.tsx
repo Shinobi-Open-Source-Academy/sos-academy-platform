@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import SpotlightCard from './SpotlightCard';
 
 interface PostAuthor {
   name: string;
@@ -38,7 +39,7 @@ export function PostCard({ post, large = false }: { post: Post; large?: boolean 
   const router = useRouter();
 
   return (
-    <div
+    <SpotlightCard
       role="link"
       tabIndex={0}
       onClick={() => router.push(`/${post.slug}`)}
@@ -119,6 +120,6 @@ export function PostCard({ post, large = false }: { post: Post; large?: boolean 
           )}
         </div>
       </div>
-    </div>
+    </SpotlightCard>
   );
 }

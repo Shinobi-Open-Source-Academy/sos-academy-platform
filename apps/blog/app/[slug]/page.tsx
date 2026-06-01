@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import CodeBackground from '../components/CodeBackground';
 import Navbar from '../components/Navbar';
 import Reactions from '../components/Reactions';
 import ViewTracker from '../components/ViewTracker';
@@ -161,7 +162,8 @@ export default async function PostPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      <CodeBackground />
       <Navbar websiteUrl={WEBSITE_URL} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-24 md:py-32">
