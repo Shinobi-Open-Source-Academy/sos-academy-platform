@@ -21,7 +21,7 @@ module.exports = (_, argv) => {
       path: outputPath,
       filename: outputFilename,
     },
-    externals: [nodeExternals()],
+    externals: [nodeExternals({ allowlist: ['express-session'] })],
     module: {
       rules: [
         {
