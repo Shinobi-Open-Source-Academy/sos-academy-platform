@@ -24,8 +24,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = envConfig.port;
 
-  // TODO: re-enable origin allowlist once CORS env var is confirmed in prod
-  app.enableCors({ origin: true, credentials: true });
+  app.enableCors();
 
   // Session middleware — MongoDB-backed, httpOnly cookie
   const isProd = envConfig.nodeEnv === 'production';
