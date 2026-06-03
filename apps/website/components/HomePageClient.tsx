@@ -9,7 +9,7 @@ import MentorsCarousel from './MentorsCarousel';
 import Navbar from './Navbar';
 import SpotlightCard from './SpotlightCard';
 import UpcomingEvents from './UpcomingEvents';
-import { COMMUNITIES, COMPANIES, FEATURES, PROJECTS, SITE_CONFIG } from '../lib/data';
+import { COMMUNITIES, COMPANIES, FEATURES, HOME_JSON_LD, PROJECTS, SITE_CONFIG } from '../lib/data';
 import { getActiveMentors, Mentor } from '../lib/api-client';
 
 export default function HomePageClient() {
@@ -39,29 +39,11 @@ export default function HomePageClient() {
     fetchMentors();
   }, []);
 
-  // Add JSON-LD structured data
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    name: 'Shinobi Open-Source Academy',
-    alternateName: 'SOS Academy',
-    url: 'https://shinobi-open-source.academy',
-    logo: 'https://shinobi-open-source.academy/shinobiLogo.png',
-    description: 'Learn through practical, collaborative open-source experience.',
-    email: 'contact@shinobi-open-source.academy',
-    sameAs: [
-      'https://github.com/Shinobi-Open-Source-Academy',
-      'https://x.com/SOSAcademy_',
-      'https://www.linkedin.com/company/shinobi-open-source-academy',
-      'https://discord.gg/X9PWySkvKM',
-    ],
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(HOME_JSON_LD) }}
       />
       <CodeBackground />
       <Navbar />

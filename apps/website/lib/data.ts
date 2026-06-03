@@ -309,3 +309,20 @@ export const NAV_LINKS = [
   { name: 'Mentors', href: '/mentors' },
   { name: 'Blog', href: 'https://blog.shinobi-open-source.academy' },
 ];
+
+export const HOME_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'EducationalOrganization',
+  name: SITE_CONFIG.fullName,
+  alternateName: SITE_CONFIG.name,
+  url: 'https://shinobi-open-source.academy',
+  logo: 'https://shinobi-open-source.academy/shinobiLogo.png',
+  description: 'Learn through practical, collaborative open-source experience.',
+  email: SITE_CONFIG.email,
+  sameAs: [
+    SITE_CONFIG.urls.github,
+    SITE_CONFIG.urls.twitter,
+    SITE_CONFIG.urls.linkedin,
+    SITE_CONFIG.urls.discord,
+  ],
+};
