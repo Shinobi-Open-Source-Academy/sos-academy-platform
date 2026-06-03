@@ -7,8 +7,8 @@ import MentorApplicationForm from '../../components/MentorApplicationForm';
 import MentorsCarousel from '../../components/MentorsCarousel';
 import Navbar from '../../components/Navbar';
 import SpotlightCard from '../../components/SpotlightCard';
+import { getActiveMentors, type Mentor } from '../../lib/api-client';
 import { COMMUNITIES, SITE_CONFIG } from '../../lib/data';
-import { getActiveMentors, Mentor } from '../../lib/api-client';
 
 const REQUIREMENTS = [
   {

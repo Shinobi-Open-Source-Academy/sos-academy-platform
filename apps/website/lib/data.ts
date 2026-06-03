@@ -307,5 +307,5 @@ export const NAV_LINKS = [
   { name: 'Communities', href: '#communities' },
   { name: 'Projects', href: '#projects' },
   { name: 'Mentors', href: '/mentors' },
-  { name: 'Blog', href: '/blog' },
+  { name: 'Blog', href: 'https://blog.shinobi-open-source.academy' },
 ];

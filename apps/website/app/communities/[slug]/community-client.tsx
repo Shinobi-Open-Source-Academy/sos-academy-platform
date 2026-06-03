@@ -2,19 +2,19 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import {
-  getCommunityBySlug,
-  getProjectStats,
-  getProjects,
-  type Community,
-  type ProjectStats,
-  type ProjectsResponse,
-} from '../../../lib/api-client';
-import { COMMUNITIES } from '../../../lib/data';
 import CodeBackground from '../../../components/CodeBackground';
 import Footer from '../../../components/Footer';
 import Navbar from '../../../components/Navbar';
 import SpotlightCard from '../../../components/SpotlightCard';
+import {
+  type Community,
+  getCommunityBySlug,
+  getProjectStats,
+  getProjects,
+  type ProjectStats,
+  type ProjectsResponse,
+} from '../../../lib/api-client';
+import { COMMUNITIES } from '../../../lib/data';
 
 interface CommunityClientProps {
   slug: string;
@@ -100,7 +100,9 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
 
     // Fetch stats for each project individually (non-blocking)
     for (const project of projects) {
-      if (!project._id || !project.githubRepo) continue;
+      if (!project._id || !project.githubRepo) {
+        continue;
+      }
 
       // Small delay to stagger requests and avoid rate limiting
       setTimeout(async () => {
