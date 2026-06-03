@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 import MentorCard from './MentorCard';
 import { Mentor } from '../lib/api-client';
 
@@ -189,14 +190,7 @@ export default function MentorsCarousel({ mentors, loading }: Props) {
           className="p-2 border border-white/10 hover:border-white/30 text-gray-400 hover:text-white transition-colors"
           aria-label="Previous mentor"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          <ChevronLeftIcon />
         </button>
 
         <div className="flex gap-1.5 items-center">
@@ -219,9 +213,7 @@ export default function MentorsCarousel({ mentors, loading }: Props) {
           className="p-2 border border-white/10 hover:border-white/30 text-gray-400 hover:text-white transition-colors"
           aria-label="Next mentor"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRightIcon />
         </button>
       </div>
     </div>

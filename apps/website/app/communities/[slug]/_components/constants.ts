@@ -1,3 +1,12 @@
+import type { SortOption } from './types';
+
+export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'rank', label: 'Sort by Rank' },
+  { value: 'latest', label: 'Sort by Latest Update' },
+  { value: 'stars', label: 'Sort by Stars' },
+  { value: 'name', label: 'Sort by Name' },
+];
+
 export const RANK_COLORS: Record<string, string> = {
   D: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
   C: 'border-blue-500/30 bg-blue-500/10 text-blue-400',

@@ -1,5 +1,7 @@
+import { ChevronDownIcon, ChevronUpIcon, XIcon } from '../../../../components/icons';
 import type { ProjectStats, ProjectsResponse } from '../../../../lib/api-client';
 import { ComingSoonOverlay } from './ComingSoonOverlay';
+import { SORT_OPTIONS } from './constants';
 import { ProjectCard } from './ProjectCard';
 import type { SortOption } from './types';
 
@@ -52,21 +54,7 @@ export function ProjectsSection({
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 aria-label="Clear search"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-label="Close"
-                >
-                  <title>Close</title>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <XIcon className="w-5 h-5" />
               </button>
             )}
           </div>
@@ -77,26 +65,14 @@ export function ProjectsSection({
               onChange={(e) => onSortByChange(e.target.value as SortOption)}
               className="px-4 py-2 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-white/20 transition-colors appearance-none cursor-pointer pr-8"
             >
-              <option value="rank">Sort by Rank</option>
-              <option value="latest">Sort by Latest Update</option>
-              <option value="stars">Sort by Stars</option>
-              <option value="name">Sort by Name</option>
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              <ChevronDownIcon className="w-5 h-5 text-gray-400" />
             </div>
           </div>
 
@@ -107,37 +83,9 @@ export function ProjectsSection({
             title={`Sort ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
           >
             {sortOrder === 'asc' ? (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="Sort ascending"
-              >
-                <title>Sort ascending</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 15l7-7 7 7"
-                />
-              </svg>
+              <ChevronUpIcon className="w-5 h-5" />
             ) : (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label="Sort descending"
-              >
-                <title>Sort descending</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              <ChevronDownIcon className="w-5 h-5" />
             )}
           </button>
         </div>
