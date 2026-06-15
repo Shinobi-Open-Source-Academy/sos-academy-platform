@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import CodeBackground from '../components/CodeBackground';
+import { formatDateLong } from '@sos-academy/shared';
+import { CodeBackground } from '@sos-academy/ui';
 import Navbar from '../components/Navbar';
 import Reactions from '../components/Reactions';
 import ViewTracker from '../components/ViewTracker';
@@ -133,14 +134,6 @@ export async function generateMetadata({
   };
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -236,7 +229,7 @@ export default async function PostPage({ params }: PageProps) {
                 <span className="font-medium text-zinc-300">{post.author?.name}</span>
               )}
               <span>·</span>
-              <span>{formatDate(post.publishedAt ?? post.createdAt)}</span>
+              <span>{formatDateLong(post.publishedAt ?? post.createdAt)}</span>
               <span>·</span>
               <span>{post.readingTime} min read</span>
               {post.views > 0 && (

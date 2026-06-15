@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { joinCommunity } from '../lib/api-client';
 import { COMMUNITIES } from '../lib/data';
 
+const SUCCESS_RESET_DELAY_MS = 5000;
+
 interface JoinModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,7 +42,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
       setTimeout(() => {
         onClose();
         resetForm();
-      }, 5000);
+      }, SUCCESS_RESET_DELAY_MS);
     } catch (_err) {
       setError('Failed to join. Please try again.');
     } finally {

@@ -1,7 +1,9 @@
 'use client';
 
 import { GitHubIcon, GlobeIcon, LinkedInIcon, TwitterIcon } from './icons';
-import SpotlightCard from './SpotlightCard';
+import { SpotlightCard } from '@sos-academy/ui';
+
+const MAX_EXPERTISE_SHOWN = 3;
 
 interface MentorSocials {
   github?: string;
@@ -112,7 +114,7 @@ export default function MentorCard({
         <div className="mt-auto space-y-1.5 w-full">
           {expertise.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {expertise.slice(0, 3).map((skill) => (
+              {expertise.slice(0, MAX_EXPERTISE_SHOWN).map((skill) => (
                 <span
                   key={skill}
                   className="text-[9px] px-1.5 py-0.5 border border-white/10 bg-white/5 text-gray-400"

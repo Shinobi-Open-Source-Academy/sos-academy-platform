@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import CodeBackground from './CodeBackground';
+
+import { CodeBackground, HeroGrid, SpotlightCard } from '@sos-academy/ui';
 import Footer from './Footer';
-import HeroGrid from './HeroGrid';
 import JoinModal from './JoinModal';
 import MentorsCarousel from './MentorsCarousel';
 import Navbar from './Navbar';
-import SpotlightCard from './SpotlightCard';
+
+const MAX_COMPANIES_SHOWN = 6;
 import UpcomingEvents from './UpcomingEvents';
-import { COMMUNITIES, COMPANIES, FEATURES, PROJECTS, SITE_CONFIG } from '../lib/data';
+import { COMMUNITIES, COMPANIES, FEATURES, HOME_JSON_LD, PROJECTS, SITE_CONFIG } from '../lib/data';
 import { getActiveMentors, Mentor } from '../lib/api-client';
 
 export default function HomePageClient() {
@@ -39,29 +40,11 @@ export default function HomePageClient() {
     fetchMentors();
   }, []);
 
-  // Add JSON-LD structured data
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    name: 'Shinobi Open-Source Academy',
-    alternateName: 'SOS Academy',
-    url: 'https://shinobi-open-source.academy',
-    logo: 'https://shinobi-open-source.academy/shinobiLogo.png',
-    description: 'Learn through practical, collaborative open-source experience.',
-    email: 'contact@shinobi-open-source.academy',
-    sameAs: [
-      'https://github.com/Shinobi-Open-Source-Academy',
-      'https://x.com/SOSAcademy_',
-      'https://www.linkedin.com/company/shinobi-open-source-academy',
-      'https://discord.gg/X9PWySkvKM',
-    ],
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(HOME_JSON_LD) }}
       />
       <CodeBackground />
       <Navbar />
@@ -106,7 +89,7 @@ export default function HomePageClient() {
                 Shipping 15,000+ PRs at forward-thinking companies
               </p>
               <div className="flex flex-wrap items-center justify-center gap-8">
-                {COMPANIES.slice(0, 6).map((company) => (
+                {COMPANIES.slice(0, MAX_COMPANIES_SHOWN).map((company) => (
                   <a
                     key={company.name}
                     href={company.url}

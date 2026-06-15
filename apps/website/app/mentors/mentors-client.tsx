@@ -1,53 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import CodeBackground from '../../components/CodeBackground';
+import { CodeBackground, SpotlightCard } from '@sos-academy/ui';
 import Footer from '../../components/Footer';
 import MentorApplicationForm from '../../components/MentorApplicationForm';
 import MentorsCarousel from '../../components/MentorsCarousel';
 import Navbar from '../../components/Navbar';
-import SpotlightCard from '../../components/SpotlightCard';
+import { getActiveMentors, type Mentor } from '../../lib/api-client';
+import {
+  AdjustmentsIcon,
+  ChatBubbleIcon,
+  ChevronDownIcon,
+  ClipboardListIcon,
+  TrendingUpIcon,
+} from '../../components/icons';
 import { COMMUNITIES, SITE_CONFIG } from '../../lib/data';
-import { getActiveMentors, Mentor } from '../../lib/api-client';
+import { REQUIREMENTS } from './_data';
 
-const REQUIREMENTS = [
-  {
-    icon: '🔥',
-    title: 'Outstanding Open-Source Impact',
-    description:
-      "We value meaningful contributions over years of experience. Show us projects you've impacted, PRs that made a difference, or communities you've helped grow.",
-  },
-  {
-    icon: '⏰',
-    title: 'At Least 4 Hours Per Week',
-    description:
-      'Commit to volunteering at least 4 hours weekly to guide hackers, review code, and participate in community activities.',
-  },
-  {
-    icon: '🎯',
-    title: 'Teaching & Communication',
-    description:
-      'Ability to explain complex concepts clearly, provide constructive feedback, and adapt your mentoring style to different skill levels.',
-  },
-  {
-    icon: '🤝',
-    title: 'Collaborative Spirit',
-    description:
-      'Enthusiasm for working with developers from diverse backgrounds and fostering an inclusive, supportive learning environment.',
-  },
-  {
-    icon: '📋',
-    title: 'Mission Assignment Skills',
-    description:
-      'Capability to identify appropriate challenges for hackers, break down complex projects into achievable missions, and track progress.',
-  },
-  {
-    icon: '🌟',
-    title: 'Any Tech Stack Welcome',
-    description:
-      "We welcome mentors from all technical backgrounds. We'll match you with communities and hackers based on your expertise.",
-  },
-];
+const HASH_SCROLL_DELAY_MS = 100;
 
 export default function MentorsClient() {
   const applyRef = useRef<HTMLDivElement>(null);
@@ -60,7 +30,7 @@ export default function MentorsClient() {
     if (window.location.hash === '#apply') {
       setTimeout(() => {
         applyRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, HASH_SCROLL_DELAY_MS);
     }
   }, []);
 
@@ -185,19 +155,7 @@ export default function MentorsClient() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
-                  <svg
-                    className="w-5 h-5 text-emerald-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                    />
-                  </svg>
+                  <TrendingUpIcon className="w-5 h-5 text-emerald-500" />
                 </div>
                 <h3 className="font-semibold text-white mb-2">Genin → Chunin</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -206,19 +164,7 @@ export default function MentorsClient() {
               </SpotlightCard>
               <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
                 <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
-                  <svg
-                    className="w-5 h-5 text-blue-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                    />
-                  </svg>
+                  <ClipboardListIcon className="w-5 h-5 text-blue-500" />
                 </div>
                 <h3 className="font-semibold text-white mb-2">Assign Missions</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -227,19 +173,7 @@ export default function MentorsClient() {
               </SpotlightCard>
               <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
                 <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
-                  <svg
-                    className="w-5 h-5 text-purple-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                    />
-                  </svg>
+                  <ChatBubbleIcon className="w-5 h-5 text-purple-500" />
                 </div>
                 <h3 className="font-semibold text-white mb-2">Code Reviews</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -248,19 +182,7 @@ export default function MentorsClient() {
               </SpotlightCard>
               <SpotlightCard className="border border-white/5 bg-black/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group">
                 <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
-                  <svg
-                    className="w-5 h-5 text-amber-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                    />
-                  </svg>
+                  <AdjustmentsIcon className="w-5 h-5 text-amber-500" />
                 </div>
                 <h3 className="font-semibold text-white mb-2">Shape Leaders</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -301,19 +223,7 @@ export default function MentorsClient() {
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                <ChevronDownIcon className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
               </div>
             </div>
             {selectedCommunity !== 'all' && (

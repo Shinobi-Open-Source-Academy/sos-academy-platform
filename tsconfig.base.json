@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@sos-academy/shared": ["libs/shared/dist/index"]
+      "@sos-academy/shared": ["libs/shared/dist/index"],
+      "@sos-academy/ui": ["libs/ui/index.tsx"]
     }
   },
   "exclude": ["node_modules", "tmp"]

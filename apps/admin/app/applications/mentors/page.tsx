@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { formatDate } from '@sos-academy/shared';
 import { apiClient } from '../../../lib/api-client';
 import { useRequireAuth } from '../../../context/AuthContext';
 import DeleteModal from '../../components/DeleteModal';
@@ -309,14 +310,6 @@ export default function MentorsPage() {
       console.error('Failed to delete mentor:', error);
       toast.error('Failed to delete mentor');
     }
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   const getStatusBadge = (status: string) => {

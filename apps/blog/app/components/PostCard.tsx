@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import SpotlightCard from './SpotlightCard';
+import { formatDate } from '@sos-academy/shared';
+import { SpotlightCard } from '@sos-academy/ui';
 
 interface PostAuthor {
   name: string;
@@ -25,14 +26,6 @@ export interface Post {
   views: number;
   totalReactions: number;
   createdAt: string;
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
 }
 
 export function PostCard({ post, large = false }: { post: Post; large?: boolean }) {
