@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
+const MAX_COMPANIES_SHOWN = 6;
 import CodeBackground from './CodeBackground';
 import Footer from './Footer';
 import HeroGrid from './HeroGrid';
@@ -88,7 +90,7 @@ export default function HomePageClient() {
                 Shipping 15,000+ PRs at forward-thinking companies
               </p>
               <div className="flex flex-wrap items-center justify-center gap-8">
-                {COMPANIES.slice(0, 6).map((company) => (
+                {COMPANIES.slice(0, MAX_COMPANIES_SHOWN).map((company) => (
                   <a
                     key={company.name}
                     href={company.url}

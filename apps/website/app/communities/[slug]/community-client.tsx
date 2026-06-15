@@ -17,6 +17,7 @@ import { COMMUNITIES } from '../../../lib/data';
 import { ComingSoonOverlay } from './_components/ComingSoonOverlay';
 import { CommunityMentorsSection } from './_components/CommunityMentorsSection';
 import { CommunityStats } from './_components/CommunityStats';
+import { DEFAULT_PAGE_LIMIT, STATS_STAGGER_MAX_MS } from './_components/constants';
 import { KageSection } from './_components/KageSection';
 import { ProjectsSection } from './_components/ProjectsSection';
 import type { SortOption } from './_components/types';
@@ -75,7 +76,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
           sortBy,
           order: sortOrder,
           page: currentPage,
-          limit: 10,
+          limit: DEFAULT_PAGE_LIMIT,
         });
         setProjects(response.projects);
         setPagination(response.pagination);
@@ -101,7 +102,7 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
         if (stats) {
           setProjectStats((prev) => ({ ...prev, [project._id]: stats }));
         }
-      }, Math.random() * 500);
+      }, Math.random() * STATS_STAGGER_MAX_MS);
     }
   }, [projects]);
 

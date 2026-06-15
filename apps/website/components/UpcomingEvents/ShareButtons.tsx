@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CalendarIcon, CheckIcon, CopyIcon, DownloadIcon, WhatsAppIcon } from '../icons';
+import { COPY_FEEDBACK_DURATION_MS } from './constants';
 import type { ShareButtonsProps } from './types';
 
 export function ShareButtons({
@@ -51,7 +52,7 @@ export function ShareButtons({
     try {
       await navigator.clipboard.writeText(meetingLink);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
     } catch (err) {
       console.error('Failed to copy:', err);
     }

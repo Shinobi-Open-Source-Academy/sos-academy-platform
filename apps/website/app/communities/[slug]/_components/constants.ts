@@ -1,5 +1,9 @@
 import type { SortOption } from './types';
 
+export const DEFAULT_PAGE_LIMIT = 10;
+export const STATS_STAGGER_MAX_MS = 500;
+export const MAX_TECHNOLOGIES_SHOWN = 4;
+
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'rank', label: 'Sort by Rank' },
   { value: 'latest', label: 'Sort by Latest Update' },

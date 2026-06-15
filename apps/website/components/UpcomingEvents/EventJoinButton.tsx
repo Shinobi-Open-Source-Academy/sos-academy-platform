@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { POLL_INTERVAL_MS } from './constants';
 import type { EventJoinButtonProps } from './types';
 
 export function EventJoinButton({ meetingLink, startTime }: EventJoinButtonProps) {
@@ -14,7 +15,7 @@ export function EventJoinButton({ meetingLink, startTime }: EventJoinButtonProps
     };
 
     checkTime();
-    const timer = setInterval(checkTime, 1000);
+    const timer = setInterval(checkTime, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [startTime]);
 
@@ -49,7 +50,7 @@ export function SmallEventJoinButton({ meetingLink, startTime }: EventJoinButton
     };
 
     checkTime();
-    const timer = setInterval(checkTime, 1000);
+    const timer = setInterval(checkTime, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [startTime]);
 

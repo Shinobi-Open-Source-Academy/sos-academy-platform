@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getUpcomingEvents, type UpcomingEvent } from '../../lib/api-client';
+import { MAX_EVENTS_SHOWN } from './constants';
 import { CalendarIcon, ClockIcon, UsersIcon } from '../icons';
 import SpotlightCard from '../SpotlightCard';
 import { Countdown } from './Countdown';
@@ -127,7 +128,7 @@ export default function UpcomingEvents() {
         </div>
         {events
           .filter((e) => e._id !== featuredEvent?._id)
-          .slice(0, 4)
+          .slice(0, MAX_EVENTS_SHOWN)
           .map((event, index) => (
             <div
               key={event._id}

@@ -1,7 +1,7 @@
 import { ClockIcon, StarIcon, UserGroupIcon } from '../../../../components/icons';
 import SpotlightCard from '../../../../components/SpotlightCard';
 import type { ProjectStats, ProjectsResponse } from '../../../../lib/api-client';
-import { RANK_COLORS, RANK_TOOLTIPS } from './constants';
+import { MAX_TECHNOLOGIES_SHOWN, RANK_COLORS, RANK_TOOLTIPS } from './constants';
 import { formatRelativeDate } from './utils';
 
 type Project = ProjectsResponse['projects'][number];
@@ -64,7 +64,7 @@ export function ProjectCard({ project, stats }: ProjectCardProps) {
 
         {project.technologies && project.technologies.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-            {project.technologies.slice(0, 4).map((tech) => (
+            {project.technologies.slice(0, MAX_TECHNOLOGIES_SHOWN).map((tech) => (
               <span
                 key={tech}
                 className="text-xs px-2 py-1 bg-white/5 border border-white/10 text-gray-400 hover:border-white/20 transition-colors"

@@ -18,6 +18,8 @@ import {
 import { COMMUNITIES, SITE_CONFIG } from '../../lib/data';
 import { REQUIREMENTS } from './_data';
 
+const HASH_SCROLL_DELAY_MS = 100;
+
 export default function MentorsClient() {
   const applyRef = useRef<HTMLDivElement>(null);
   const [allMentors, setAllMentors] = useState<Mentor[]>([]);
@@ -29,7 +31,7 @@ export default function MentorsClient() {
     if (window.location.hash === '#apply') {
       setTimeout(() => {
         applyRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, HASH_SCROLL_DELAY_MS);
     }
   }, []);
 

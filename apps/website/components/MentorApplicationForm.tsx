@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { applyAsMentor } from '../lib/api-client';
 import { CheckIcon, SpinnerIcon } from './icons';
 
+const SUCCESS_RESET_DELAY_MS = 5000;
+
 interface MentorApplicationFormProps {
   className?: string;
   onSuccess?: () => void;
@@ -38,7 +40,7 @@ export default function MentorApplicationForm({
       onSuccess?.();
       setTimeout(() => {
         resetForm();
-      }, 5000);
+      }, SUCCESS_RESET_DELAY_MS);
     } catch (_err) {
       setError('Failed to submit application. Please try again.');
     } finally {

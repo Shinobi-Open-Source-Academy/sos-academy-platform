@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { MS_PER_DAY, MS_PER_HOUR, MS_PER_MIN, MS_PER_SEC } from '../../lib/constants';
+import { POLL_INTERVAL_MS } from './constants';
 import type { CountdownProps } from './types';
 
 export function Countdown({ targetDate, onStatusChange }: CountdownProps) {
@@ -18,10 +20,10 @@ export function Countdown({ targetDate, onStatusChange }: CountdownProps) {
       }
 
       return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((difference % (1000 * 60)) / 1000),
+        days: Math.floor(difference / MS_PER_DAY),
+        hours: Math.floor((difference % MS_PER_DAY) / MS_PER_HOUR),
+        minutes: Math.floor((difference % MS_PER_HOUR) / MS_PER_MIN),
+        seconds: Math.floor((difference % MS_PER_MIN) / MS_PER_SEC),
         started: false,
       };
     };
@@ -38,7 +40,7 @@ export function Countdown({ targetDate, onStatusChange }: CountdownProps) {
         setHasStarted(result.started);
         onStatusChange?.(result.started);
       }
-    }, 1000);
+    }, POLL_INTERVAL_MS);
 
     return () => clearInterval(timer);
   }, [targetDate, onStatusChange, hasStarted]);
