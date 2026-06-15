@@ -4,34 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { EVENT_TYPE_OPTIONS } from '@sos-academy/shared';
 import { apiClient } from '../../../lib/api-client';
+import { DURATIONS } from '../../../lib/constants';
 import { useRequireAuth } from '../../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
-
-const EVENT_TYPES = [
-  { value: 'WEEKLY_CALL', label: 'Weekly Call', description: 'Regular community sync' },
-  { value: 'PROJECT_REVIEW', label: 'Project Review', description: 'Review ongoing projects' },
-  {
-    value: 'MENTORSHIP_SESSION',
-    label: 'Mentorship Session',
-    description: 'Group mentoring session',
-  },
-  { value: 'MENTOR_1V1', label: 'Mentor 1v1', description: 'One-on-one mentoring' },
-  {
-    value: 'COMMUNITY_MEETING',
-    label: 'Community Meeting',
-    description: 'General community discussion',
-  },
-  { value: 'SPECIAL_EVENT', label: 'Special Event', description: 'Workshops, talks, etc.' },
-];
-
-const DURATIONS = [
-  { value: 15, label: '15 min' },
-  { value: 30, label: '30 min' },
-  { value: 60, label: '1 hour' },
-];
 
 const getLocalTimezone = () => {
   try {
@@ -247,7 +226,7 @@ export default function CreateEventPage() {
                   Event Type
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {EVENT_TYPES.map((type) => (
+                  {EVENT_TYPE_OPTIONS.map((type) => (
                     <label
                       key={type.value}
                       className={`

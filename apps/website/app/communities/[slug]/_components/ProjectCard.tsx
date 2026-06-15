@@ -1,5 +1,5 @@
 import { ClockIcon, StarIcon, UserGroupIcon } from '../../../../components/icons';
-import SpotlightCard from '../../../../components/SpotlightCard';
+import { SpotlightCard } from '@sos-academy/ui';
 import type { ProjectStats, ProjectsResponse } from '../../../../lib/api-client';
 import { MAX_TECHNOLOGIES_SHOWN, RANK_COLORS, RANK_TOOLTIPS } from './constants';
 import { formatRelativeDate } from './utils';

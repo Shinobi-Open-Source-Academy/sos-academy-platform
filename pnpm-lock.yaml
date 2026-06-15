@@ -241,6 +241,9 @@ importers:
       '@sos-academy/shared':
         specifier: workspace:*
         version: link:../../libs/shared
+      '@sos-academy/ui':
+        specifier: workspace:*
+        version: link:../../libs/ui
 
   apps/hacker:
     dependencies:
@@ -278,8 +281,20 @@ importers:
       '@sos-academy/shared':
         specifier: workspace:*
         version: link:../../libs/shared
+      '@sos-academy/ui':
+        specifier: workspace:*
+        version: link:../../libs/ui
 
   libs/shared: {}
+
+  libs/ui:
+    dependencies:
+      react:
+        specifier: '*'
+        version: 19.0.0
+      react-dom:
+        specifier: '*'
+        version: 19.0.0(react@19.0.0)
 
 packages:
 

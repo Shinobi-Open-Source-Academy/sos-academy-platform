@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { getUpcomingEvents, type UpcomingEvent } from '../../lib/api-client';
-import { MAX_EVENTS_SHOWN } from './constants';
+import { EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '@sos-academy/shared';
 import { CalendarIcon, ClockIcon, UsersIcon } from '../icons';
-import SpotlightCard from '../SpotlightCard';
+import { SpotlightCard } from '@sos-academy/ui';
 import { Countdown } from './Countdown';
-import { EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from './constants';
+import { MAX_EVENTS_SHOWN } from './constants';
 import { EventJoinButton, SmallEventJoinButton } from './EventJoinButton';
 import { ShareButtons } from './ShareButtons';
 import { formatEventDate, formatEventTime, isEventToday } from './utils';

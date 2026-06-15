@@ -3,7 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { formatDateTime } from '@sos-academy/shared';
 import { apiClient } from '../../lib/api-client';
+import { DURATIONS } from '../../lib/constants';
 import { useRequireAuth } from '../../context/AuthContext';
 import MarkdownEditor, { markdownToHtml } from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
@@ -24,12 +26,6 @@ interface User {
 }
 
 type RecipientType = 'ALL_USERS' | 'COMMUNITY' | 'MENTORS' | 'INACTIVE_USERS' | 'SPECIFIC_USERS';
-
-const DURATIONS = [
-  { value: 15, label: '15 min' },
-  { value: 30, label: '30 min' },
-  { value: 60, label: '1 hour' },
-];
 
 interface Broadcast {
   _id: string;
@@ -429,16 +425,6 @@ export default function BroadcastsPage() {
     });
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
   const getRecipientLabel = (broadcast: Broadcast) => {
     switch (broadcast.recipientType) {
       case 'ALL_USERS':
@@ -818,8 +804,8 @@ export default function BroadcastsPage() {
                             <span>•</span>
                             <span>
                               {broadcast.sentAt
-                                ? formatDate(broadcast.sentAt)
-                                : formatDate(broadcast.createdAt)}
+                                ? formatDateTime(broadcast.sentAt)
+                                : formatDateTime(broadcast.createdAt)}
                             </span>
                             {broadcast.completed && (
                               <>

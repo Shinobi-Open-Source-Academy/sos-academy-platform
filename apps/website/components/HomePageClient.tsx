@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 
-const MAX_COMPANIES_SHOWN = 6;
-import CodeBackground from './CodeBackground';
+import { CodeBackground, HeroGrid, SpotlightCard } from '@sos-academy/ui';
 import Footer from './Footer';
-import HeroGrid from './HeroGrid';
 import JoinModal from './JoinModal';
 import MentorsCarousel from './MentorsCarousel';
 import Navbar from './Navbar';
-import SpotlightCard from './SpotlightCard';
+
+const MAX_COMPANIES_SHOWN = 6;
 import UpcomingEvents from './UpcomingEvents';
 import { COMMUNITIES, COMPANIES, FEATURES, HOME_JSON_LD, PROJECTS, SITE_CONFIG } from '../lib/data';
 import { getActiveMentors, Mentor } from '../lib/api-client';

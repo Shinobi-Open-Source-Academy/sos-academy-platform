@@ -10,29 +10,40 @@ export interface FloatingItem {
   hasBackground?: boolean;
 }
 
+const DEFAULT_ITEMS: FloatingItem[] = [
+  {
+    text: `function contribute() {
+  const impact = await fork()
+  return impact.merge()
+}`,
+    color: '#3178C6',
+  },
+  {
+    text: `fn build_community() {
+  let members = gather_ninjas();
+  members.empower()
+}`,
+    color: '#DEA584',
+  },
+  {
+    text: `func LearnAndGrow() {
+  skills := Practice()
+  return skills.Apply()
+}`,
+    color: '#00ADD8',
+  },
+  {
+    text: `def collaborate():
+  knowledge = learn()
+  return knowledge.share()`,
+    color: '#3776AB',
+  },
+];
+
 interface CodeBackgroundProps {
   items?: FloatingItem[];
   className?: string;
 }
-
-const DEFAULT_ITEMS: FloatingItem[] = [
-  {
-    text: 'function contribute() {\n  const impact = await fork()\n  return impact.merge()\n}',
-    color: '#3178C6',
-  },
-  {
-    text: 'fn build_community() {\n  let members = gather();\n  members.empower()\n}',
-    color: '#DEA584',
-  },
-  {
-    text: 'func LearnAndGrow() {\n  skills := Practice()\n  return skills.Apply()\n}',
-    color: '#00ADD8',
-  },
-  {
-    text: 'def collaborate():\n  knowledge = learn()\n  return knowledge.share()',
-    color: '#3776AB',
-  },
-];
 
 export default function CodeBackground({ items = DEFAULT_ITEMS, className }: CodeBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,7 +93,7 @@ export default function CodeBackground({ items = DEFAULT_ITEMS, className }: Cod
         if (item.hasBackground) {
           let maxWidth = 0;
           for (const line of lines) {
-            ctx.font = line.font || item.font || '14px "Courier New", monospace';
+            ctx.font = line.font ?? item.font ?? '14px "Courier New", monospace';
             const w = ctx.measureText(line.text).width;
             if (w > maxWidth) maxWidth = w;
           }
@@ -102,8 +113,8 @@ export default function CodeBackground({ items = DEFAULT_ITEMS, className }: Cod
         }
 
         lines.forEach((line, i) => {
-          ctx.fillStyle = line.color || item.color || '#fff';
-          ctx.font = line.font || item.font || '14px "Courier New", monospace';
+          ctx.fillStyle = line.color ?? item.color ?? '#fff';
+          ctx.font = line.font ?? item.font ?? '14px "Courier New", monospace';
           ctx.fillText(line.text, item.x, item.y + i * lineHeight + 6);
         });
 

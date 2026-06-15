@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import CodeBackground from '../../components/CodeBackground';
+import { CodeBackground, SpotlightCard } from '@sos-academy/ui';
 import Footer from '../../components/Footer';
 import MentorApplicationForm from '../../components/MentorApplicationForm';
 import MentorsCarousel from '../../components/MentorsCarousel';
 import Navbar from '../../components/Navbar';
-import SpotlightCard from '../../components/SpotlightCard';
 import { getActiveMentors, type Mentor } from '../../lib/api-client';
 import {
   AdjustmentsIcon,

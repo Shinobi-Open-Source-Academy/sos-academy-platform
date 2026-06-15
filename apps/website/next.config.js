@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@sos-academy/shared'],
+  transpilePackages: ['@sos-academy/shared', '@sos-academy/ui'],
   async redirects() {
     return [
       {
