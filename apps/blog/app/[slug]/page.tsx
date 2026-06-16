@@ -7,38 +7,10 @@ import { CodeBackground } from '@sos-academy/ui';
 import Navbar from '../components/Navbar';
 import Reactions from '../components/Reactions';
 import ViewTracker from '../components/ViewTracker';
+import type { Post } from '../_types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4200/api';
 const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:3000';
-
-interface Post {
-  _id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt?: string;
-  coverImage?: string;
-  author: {
-    name: string;
-    profilePicture?: string;
-    githubProfile?: { login: string; htmlUrl: string; avatarUrl: string };
-  };
-  tags: string[];
-  featured: boolean;
-  published: boolean;
-  publishedAt?: string;
-  readingTime: number;
-  views: number;
-  reactions: {
-    heart: number;
-    fire: number;
-    rocket: number;
-    clap: number;
-    mind_blown: number;
-  };
-  totalReactions: number;
-  createdAt: string;
-}
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
@@ -144,7 +116,7 @@ export default async function PostPage({ params }: PageProps) {
 
   if (!post || !post.published) notFound();
 
-  const html = markdownToHtml(post.content);
+  const html = markdownToHtml(post.content!);
 
   const initialReactions = post.reactions ?? {
     heart: 0,
