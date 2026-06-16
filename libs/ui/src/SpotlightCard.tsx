@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { type KeyboardEvent, type MouseEvent, useRef, useState } from 'react';
 
 type SpotlightCardProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -8,52 +8,44 @@ export default function SpotlightCard({
   children,
   className = '',
   style,
-  onMouseMove,
-  onMouseEnter,
-  onMouseLeave,
+  onClick,
+  onKeyDown,
+  tabIndex,
+  role,
   ...rest
 }: SpotlightCardProps) {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (divRef.current) {
-      const rect = divRef.current.getBoundingClientRect();
-      setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-    onMouseMove?.(e);
-  };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    setIsHovered(true);
-    onMouseEnter?.(e);
-  };
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    setIsHovered(false);
-    onMouseLeave?.(e);
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
   return (
     <div
-      ref={divRef}
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick as React.MouseEventHandler<HTMLDivElement>}
+      onKeyDown={onKeyDown as React.KeyboardEventHandler<HTMLDivElement>}
+      tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
+      role={onClick ? (role ?? 'button') : role}
       className={`relative overflow-hidden ${className}`}
       style={style}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       {...rest}
     >
-      {isHovered && (
-        <div
-          className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-300"
-          style={{
-            background: `radial-gradient(200px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.03), transparent 100%)`,
-          }}
-        />
-      )}
-      {children}
+      <div
+        className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 255, 255, 0.15), transparent 50%)`,
+        }}
+      />
+      <div className="relative z-10 h-full">{children}</div>
     </div>
   );
 }

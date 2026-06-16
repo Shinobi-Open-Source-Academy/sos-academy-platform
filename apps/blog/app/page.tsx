@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { CodeBackground, HeroGrid } from '@sos-academy/ui';
 import Navbar from './components/Navbar';
-import { type Post, PostCard } from './components/PostCard';
+import type { Post } from './_types';
+import { PostCard } from './components/PostCard';
 import SearchFilter from './components/SearchFilter';
 import { BLOG_SNIPPETS } from './_data';
 

@@ -4,20 +4,20 @@ import { useEffect, useState } from 'react';
 import { POLL_INTERVAL_MS } from './constants';
 import type { EventJoinButtonProps } from './types';
 
-export function EventJoinButton({ meetingLink, startTime }: EventJoinButtonProps) {
-  const [canJoin, setCanJoin] = useState(false);
+function useCanJoin(startTime: string): boolean {
+  const [canJoin, setCanJoin] = useState(() => Date.now() >= new Date(startTime).getTime());
 
   useEffect(() => {
-    const checkTime = () => {
-      const now = Date.now();
-      const start = new Date(startTime).getTime();
-      setCanJoin(now >= start);
-    };
-
-    checkTime();
-    const timer = setInterval(checkTime, POLL_INTERVAL_MS);
+    const check = () => setCanJoin(Date.now() >= new Date(startTime).getTime());
+    const timer = setInterval(check, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [startTime]);
+
+  return canJoin;
+}
+
+export function EventJoinButton({ meetingLink, startTime }: EventJoinButtonProps) {
+  const canJoin = useCanJoin(startTime);
 
   if (canJoin) {
     return (
@@ -40,19 +40,7 @@ export function EventJoinButton({ meetingLink, startTime }: EventJoinButtonProps
 }
 
 export function SmallEventJoinButton({ meetingLink, startTime }: EventJoinButtonProps) {
-  const [canJoin, setCanJoin] = useState(false);
-
-  useEffect(() => {
-    const checkTime = () => {
-      const now = Date.now();
-      const start = new Date(startTime).getTime();
-      setCanJoin(now >= start);
-    };
-
-    checkTime();
-    const timer = setInterval(checkTime, POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [startTime]);
+  const canJoin = useCanJoin(startTime);
 
   if (canJoin) {
     return (

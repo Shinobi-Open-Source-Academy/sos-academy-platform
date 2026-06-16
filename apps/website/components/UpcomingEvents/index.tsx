@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getUpcomingEvents, type UpcomingEvent } from '../../lib/api-client';
 import { EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '@sos-academy/shared';
 import { CalendarIcon, ClockIcon, UsersIcon } from '../icons';
-import { SpotlightCard } from '@sos-academy/ui';
+import { Skeleton, SpotlightCard } from '@sos-academy/ui';
 import { Countdown } from './Countdown';
 import { MAX_EVENTS_SHOWN } from './constants';
 import { EventJoinButton, SmallEventJoinButton } from './EventJoinButton';
@@ -26,12 +26,34 @@ export default function UpcomingEvents() {
 
   if (loading) {
     return (
-      <div className="mt-8 p-6 border border-white/5 bg-white/[0.02]">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse" />
-          <div className="h-4 w-32 bg-white/5 animate-pulse" />
+      <div className="mt-8 space-y-4">
+        <div className="border border-white/5 p-6 space-y-3">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-2 h-2 rounded-full" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-3.5 w-full" />
+          <Skeleton className="h-3.5 w-4/5" />
         </div>
-        <div className="h-4 w-64 bg-white/5 animate-pulse mt-2" />
+        <div className="border border-white/5 bg-white/[0.02] divide-y divide-white/5">
+          <div className="p-4 flex items-center gap-2">
+            <Skeleton className="w-2 h-2 rounded-full" />
+            <Skeleton className="h-3.5 w-28" />
+          </div>
+          {(['r0', 'r1', 'r2'] as const).map((k) => (
+            <div key={k} className="p-4 flex items-center gap-4">
+              <div className="text-center w-12 flex-shrink-0 space-y-1.5">
+                <Skeleton className="h-6 w-8 mx-auto" />
+                <Skeleton className="h-2.5 w-8 mx-auto" />
+              </div>
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <Skeleton className="h-3.5 w-3/4" />
+                <Skeleton className="h-2.5 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
