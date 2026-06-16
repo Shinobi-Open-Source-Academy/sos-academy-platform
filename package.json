@@ -121,7 +121,12 @@
       "@tootallnate/once": ">=2.0.1",
       "@isaacs/brace-expansion": ">=5.0.1",
       "serialize-javascript": ">=7.0.5",
-      "undici": ">=7.24.0"
+      "undici": ">=7.24.0",
+      "ws": ">=8.21.0",
+      "yaml@^2": ">=2.8.3",
+      "postcss": ">=8.5.10",
+      "webpack": ">=5.104.1",
+      "diff": ">=4.0.4"
     }
   },
   "dependencies": {
