@@ -150,7 +150,7 @@
     "dotenv": "^17.2.3",
     "handlebars": "^4.7.9",
     "mongoose": "^8.22.1",
-    "next": "16.2.6",
+    "next": "16.2.9",
     "nodemailer": "^8.0.11",
     "nth-check": "^2.1.1",
     "react": "19.0.0",
