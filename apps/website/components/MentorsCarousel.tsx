@@ -1,36 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Mentor } from '../lib/api-client';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 import MentorCard from './MentorCard';
-import { Mentor } from '../lib/api-client';
-
-const VISIBLE = 2;
-const INTERVAL_MS = 4000;
-const TRANSITION_MS = 500;
-
-function toCardProps(mentor: Mentor) {
-  const expertise = mentor.expertise
-    ? mentor.expertise
-        .split(',')
-        .map((e) => e.trim())
-        .filter(Boolean)
-    : [];
-  return {
-    name: mentor.name,
-    role: mentor.title || expertise[0] || 'Mentor',
-    image: mentor.githubProfile?.avatarUrl || '/images/mentor1.jpeg',
-    bio: mentor.description,
-    expertise,
-    socials: {
-      github: mentor.socialLinks?.github || mentor.githubProfile?.htmlUrl,
-      linkedin: mentor.socialLinks?.linkedin,
-      twitter: mentor.socialLinks?.twitter,
-      website: mentor.socialLinks?.website,
-    },
-    variant: 'full' as const,
-  };
-}
+import {
+  INTERVAL_MS,
+  MOBILE_BREAKPOINT,
+  TRANSITION_MS,
+  toCardProps,
+  VISIBLE,
+  VISIBLE_DESKTOP,
+  VISIBLE_MOBILE,
+} from './utils';
 
 interface Props {
   mentors: Mentor[];
@@ -38,6 +20,16 @@ interface Props {
 }
 
 export default function MentorsCarousel({ mentors, loading }: Props) {
+  const [visible, setVisible] = useState(VISIBLE_DESKTOP);
+
+  useEffect(() => {
+    const update = () =>
+      setVisible(window.innerWidth < MOBILE_BREAKPOINT ? VISIBLE_MOBILE : VISIBLE_DESKTOP);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   const n = mentors.length;
 
   // Track: [last VISIBLE clones] [...mentors] [first VISIBLE clones]
@@ -153,10 +145,10 @@ export default function MentorsCarousel({ mentors, loading }: Props) {
   }
 
   // ── Carousel math ─────────────────────────────────────────────────────────
-  // Container = C; each card = C/VISIBLE = C/2
-  // Track width (% of container) = total * 50
+  // Container = C; each card = C/visible
+  // Track width (% of container) = total * (100/visible)
   // translateX (% of track) = -idx * (100/total)
-  const trackW = `${total * 50}%`;
+  const trackW = `${total * (100 / visible)}%`;
   const translateX = `${-(idx * (100 / total))}%`;
 
   return (
