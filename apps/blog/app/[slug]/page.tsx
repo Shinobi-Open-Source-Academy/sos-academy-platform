@@ -1,13 +1,13 @@
-import { formatDateLong } from '@sos-academy/shared';
-import { CodeBackground } from '@sos-academy/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { Post } from '../_types';
+import { formatDateLong } from '@sos-academy/shared';
+import { CodeBackground } from '@sos-academy/ui';
 import Navbar from '../components/Navbar';
 import Reactions from '../components/Reactions';
 import ViewTracker from '../components/ViewTracker';
+import type { Post } from '../_types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4200/api';
 const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:3000';
