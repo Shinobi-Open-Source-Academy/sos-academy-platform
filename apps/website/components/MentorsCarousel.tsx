@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Mentor } from '../lib/api-client';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 import MentorCard from './MentorCard';
+import { MentorCardSkeleton } from './MentorCardSkeleton';
 import {
   INTERVAL_MS,
   MOBILE_BREAKPOINT,
@@ -107,26 +108,12 @@ export default function MentorsCarousel({ mentors, loading }: Props) {
     }
   }, [idx, n]);
 
-  // Reset position when mentor list changes (e.g. community filter)
-  useEffect(() => {
-    setIdx(VISIBLE);
-  }, [n]);
-
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto">
-        {[0, 1].map((i) => (
-          <div key={i} className="border border-white/5 h-40 bg-black/50 relative overflow-hidden">
-            <div className="absolute inset-y-0 left-0 w-[38%] bg-white/5 animate-pulse" />
-            <div className="relative z-20 h-full p-3 pl-[36%] flex flex-col gap-2">
-              <div className="h-4 w-24 bg-white/5 animate-pulse" />
-              <div className="h-3 w-20 bg-white/5 animate-pulse" />
-              <div className="h-3 w-full bg-white/5 animate-pulse" />
-              <div className="h-3 w-3/4 bg-white/5 animate-pulse" />
-            </div>
-          </div>
-        ))}
+        <MentorCardSkeleton />
+        <MentorCardSkeleton />
       </div>
     );
   }
@@ -186,9 +173,9 @@ export default function MentorsCarousel({ mentors, loading }: Props) {
         </button>
 
         <div className="flex gap-1.5 items-center">
-          {mentors.map((_, i) => (
+          {mentors.map((m, i) => (
             <button
-              key={i}
+              key={m.id}
               type="button"
               onClick={() => goToReal(i)}
               className={`rounded-full transition-all duration-300 ${

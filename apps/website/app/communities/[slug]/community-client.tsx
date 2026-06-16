@@ -90,10 +90,6 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
   }, [slug, community, searchQuery, sortBy, sortOrder, currentPage]);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, sortBy, sortOrder]);
-
-  useEffect(() => {
     if (!projects.length) return;
     for (const project of projects) {
       if (!project._id || !project.githubRepo) continue;
@@ -213,11 +209,18 @@ export default function CommunityClient({ slug }: CommunityClientProps) {
                   sortBy={sortBy}
                   sortOrder={sortOrder}
                   currentPage={currentPage}
-                  onSearchChange={setSearchQuery}
-                  onSortByChange={setSortBy}
-                  onSortOrderToggle={() =>
-                    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                  }
+                  onSearchChange={(q) => {
+                    setSearchQuery(q);
+                    setCurrentPage(1);
+                  }}
+                  onSortByChange={(s) => {
+                    setSortBy(s);
+                    setCurrentPage(1);
+                  }}
+                  onSortOrderToggle={() => {
+                    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+                    setCurrentPage(1);
+                  }}
                   onPageChange={setCurrentPage}
                 />
               </section>

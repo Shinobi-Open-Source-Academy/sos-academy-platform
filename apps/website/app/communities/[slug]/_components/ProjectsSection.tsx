@@ -1,4 +1,5 @@
 import { ChevronDownIcon, ChevronUpIcon, XIcon } from '../../../../components/icons';
+import { Skeleton } from '@sos-academy/ui';
 import type { ProjectStats, ProjectsResponse } from '../../../../lib/api-client';
 import { ComingSoonOverlay } from './ComingSoonOverlay';
 import { SORT_OPTIONS } from './constants';
@@ -92,9 +93,27 @@ export function ProjectsSection({
       </div>
 
       {projectsLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
-          <p className="mt-4 text-gray-400">Loading projects...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {(['p0', 'p1', 'p2', 'p3'] as const).map((k) => (
+            <div key={k} className="border border-white/5 p-6 space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-3.5 w-full" />
+                  <Skeleton className="h-3.5 w-3/4" />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <Skeleton className="h-3 w-14" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <div className="flex gap-2 pt-3 border-t border-white/5">
+                <Skeleton className="h-5 w-14" />
+                <Skeleton className="h-5 w-14" />
+                <Skeleton className="h-5 w-14" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : projects.length > 0 ? (
         <>
