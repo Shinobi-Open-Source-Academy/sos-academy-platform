@@ -91,8 +91,9 @@ jobs:
         run: pnpm test --passWithNoTests
 
   security:
-    name: Security Audit
+    name: Security Audit (informational)
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -112,6 +113,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run security audit
+      - name: Run security audit (moderate+, non-blocking)
         run: pnpm audit --audit-level=moderate
         continue-on-error: true
