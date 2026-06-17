@@ -18,7 +18,7 @@
 
 A modern platform built with Next.js, NestJS, and MongoDB that connects aspiring developers with experienced mentors and real-world open-source projects.
 
-## MVP Features 
+## MVP Features
 
 - **User Subscription**: Join communities with email and community selection
 - **Mentor Applications**: Apply to become a mentor with streamlined process
@@ -174,7 +174,7 @@ Admin panel will be available at:
 
 **Note**: The backend automatically checks and seeds the database on startup if it's empty. You can also manually seed using:
 ```sh
-npx nx run server:seed 
+npx nx run server:seed
 ```
 
 ### Available Scripts
