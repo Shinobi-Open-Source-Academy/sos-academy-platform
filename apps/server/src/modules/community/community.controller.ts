@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
 import { CommunityStatsDto } from './dto/community-stats.dto';
@@ -31,51 +31,36 @@ export class CommunityController {
     return this.communityService.getStats();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get community by ID' })
-  @ApiParam({ name: 'id', description: 'Community ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Community details',
-    type: Community,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Community not found',
-  })
-  async findById(@Param('id') id: string): Promise<Community | null> {
-    return this.communityService.findById(id);
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Get community by slug' })
+  @ApiParam({ name: 'slug', description: 'Community slug' })
+  @ApiResponse({ status: 200, description: 'Community details', type: Community })
+  @ApiResponse({ status: 404, description: 'Community not found' })
+  async findBySlug(@Param('slug') slug: string): Promise<Community> {
+    const community = await this.communityService.findBySlug(slug);
+    if (!community) throw new NotFoundException(`Community with slug "${slug}" not found`);
+    return community;
   }
 
   @Get('name/:name')
   @ApiOperation({ summary: 'Get community by name' })
   @ApiParam({ name: 'name', description: 'Community name' })
-  @ApiResponse({
-    status: 200,
-    description: 'Community details',
-    type: Community,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Community not found',
-  })
-  async findByName(@Param('name') name: string): Promise<Community | null> {
-    return this.communityService.findByName(name);
+  @ApiResponse({ status: 200, description: 'Community details', type: Community })
+  @ApiResponse({ status: 404, description: 'Community not found' })
+  async findByName(@Param('name') name: string): Promise<Community> {
+    const community = await this.communityService.findByName(name);
+    if (!community) throw new NotFoundException(`Community with name "${name}" not found`);
+    return community;
   }
 
-  @Get('slug/:slug')
-  @ApiOperation({ summary: 'Get community by slug' })
-  @ApiParam({ name: 'slug', description: 'Community slug' })
-  @ApiResponse({
-    status: 200,
-    description: 'Community details',
-    type: Community,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Community not found',
-  })
-  async findBySlug(@Param('slug') slug: string): Promise<Community | null> {
-    return this.communityService.findBySlug(slug);
+  @Get(':id')
+  @ApiOperation({ summary: 'Get community by ID' })
+  @ApiParam({ name: 'id', description: 'Community ID' })
+  @ApiResponse({ status: 200, description: 'Community details', type: Community })
+  @ApiResponse({ status: 404, description: 'Community not found' })
+  async findById(@Param('id') id: string): Promise<Community> {
+    const community = await this.communityService.findById(id);
+    if (!community) throw new NotFoundException(`Community with id "${id}" not found`);
+    return community;
   }
 }
