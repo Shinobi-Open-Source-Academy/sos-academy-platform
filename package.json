@@ -125,7 +125,7 @@
     "handlebars": "^4.7.8",
     "mongoose": "^8.14.2",
     "next": "16.1.1",
-    "nodemailer": "^8.0.11",
+    "nodemailer": "^9.0.1",
     "nth-check": "^2.1.1",
     "react": "19.0.0",
     "react-countup": "^6.5.3",
