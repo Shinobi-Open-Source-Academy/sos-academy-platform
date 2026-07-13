@@ -10,7 +10,7 @@ export function buildMentorEmbed(issue: OpenIssue | undefined): EmbedPayload {
 
   const handoutField = issue
     ? {
-        name: `🎯 Ready to hand out — ${issue.repo}`,
+        name: `🎯 Ready to hand out — ${issue.repo} (${issue.language})`,
         value: `[${issue.title}](${issue.url})\nDrop this in #general for a hacker to claim.`,
       }
     : {

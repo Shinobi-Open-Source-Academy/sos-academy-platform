@@ -9,7 +9,7 @@ const PROJECTS_URL = 'https://shinobi-open-source.academy/#projects';
 export function buildHackerEmbed(issue: OpenIssue | undefined): EmbedPayload {
   const pickField = issue
     ? {
-        name: `🎯 Today's Pick — ${issue.repo}`,
+        name: `🎯 Today's Pick — ${issue.repo} (${issue.language})`,
         value: `[${issue.title}](${issue.url})`,
       }
     : {

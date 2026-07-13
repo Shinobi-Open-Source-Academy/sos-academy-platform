@@ -70,8 +70,13 @@ and run `pnpm start:kunai-bot`, with the same env vars set on the host.
 
 ## How the daily content is built
 
-`src/reminders.ts` fetches up to 30 open, unassigned `good first issue`/`help wanted` issues
-across the repos in `src/data/projects.ts` (one GitHub API call, shared by both messages), then
-`src/content/hackerMessage.ts` and `src/content/mentorMessage.ts` each pick a different issue and
-pair it with rotating flavor text from `src/content/messagePools.ts`. If GitHub returns nothing
-(rate limit, no matches), both messages fall back to a generic prompt instead of failing.
+`src/github.ts` searches GitHub's live issue search API — no hardcoded repo list. For each
+language the Academy teaches (`src/data/languages.ts`: JavaScript, Python, Go, Java, Ruby, Rust,
+PHP), it fetches open, unassigned issues labeled `good first issue`/`help wanted` from
+actively-starred repos (`stars:>200`, `archived:false`), sorted by most recently updated. That's
+one search request per language, merged into a single pool for the day.
+
+`src/reminders.ts` picks two different issues from that pool, then `src/content/hackerMessage.ts`
+and `src/content/mentorMessage.ts` pair each with rotating flavor text from
+`src/content/messagePools.ts`. If GitHub returns nothing for every language (rate limit, no
+matches), both messages fall back to a generic prompt instead of failing.
