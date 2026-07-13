@@ -306,9 +306,18 @@ export const NAV_LINKS = [
   { name: 'About', href: '#about' },
   { name: 'Communities', href: '#communities' },
   { name: 'Projects', href: '#projects' },
+];
+
+// External/companion platforms in the SOS Academy ecosystem (excludes the
+// Hacker platform, which is added separately since its URL is env-driven).
+export const NAV_PLATFORM_LINKS = [
   { name: 'Mentors', href: '/mentors' },
   { name: 'Blog', href: 'https://blog.shinobi-open-source.academy' },
 ];
+
+export const NAV_RESOURCE_LINKS = [{ name: 'Privacy Policy', href: '/privacy' }];
+
+export const ALL_NAV_LINKS = [...NAV_LINKS, ...NAV_PLATFORM_LINKS, ...NAV_RESOURCE_LINKS];
 
 export const HOME_JSON_LD = {
   '@context': 'https://schema.org',

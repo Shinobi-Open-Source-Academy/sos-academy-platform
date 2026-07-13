@@ -2,10 +2,127 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { NAV_LINKS, SITE_CONFIG } from '../lib/data';
-import { GitHubIcon } from './icons';
+import {
+  ALL_NAV_LINKS,
+  NAV_LINKS,
+  NAV_PLATFORM_LINKS,
+  NAV_RESOURCE_LINKS,
+  SITE_CONFIG,
+} from '../lib/data';
+import {
+  ChevronDownIcon,
+  GitHubIcon,
+  NewspaperIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
+} from './icons';
 
 const HACKER_URL = process.env.NEXT_PUBLIC_HACKER_URL || 'http://localhost:3002';
+
+interface NavDropdownLink {
+  name: string;
+  href: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconTint: string;
+}
+
+// Presentation metadata (icon, blurb, accent tint) for the nav dropdowns.
+// Hrefs stay sourced from lib/data.ts so links have one place of truth.
+const PLATFORM_META: Record<string, Omit<NavDropdownLink, 'name' | 'href'>> = {
+  Mentors: {
+    description: 'Meet our Senseis',
+    icon: UserGroupIcon,
+    iconTint: 'text-emerald-400',
+  },
+  Blog: {
+    description: 'Stories & updates',
+    icon: NewspaperIcon,
+    iconTint: 'text-blue-400',
+  },
+  'Start Hacking': {
+    description: 'Sign in with GitHub',
+    icon: GitHubIcon,
+    iconTint: 'text-purple-400',
+  },
+};
+
+const RESOURCE_META: Record<string, Omit<NavDropdownLink, 'name' | 'href'>> = {
+  'Privacy Policy': {
+    description: 'How we handle your data',
+    icon: ShieldCheckIcon,
+    iconTint: 'text-teal-400',
+  },
+};
+
+const PLATFORM_DROPDOWN_LINKS: NavDropdownLink[] = [
+  ...NAV_PLATFORM_LINKS,
+  { name: 'Start Hacking', href: `${HACKER_URL}/login` },
+].map((link) => ({ ...link, ...PLATFORM_META[link.name] }));
+
+const RESOURCE_DROPDOWN_LINKS: NavDropdownLink[] = NAV_RESOURCE_LINKS.map((link) => ({
+  ...link,
+  ...RESOURCE_META[link.name],
+}));
+
+interface NavDropdownProps {
+  label: string;
+  links: NavDropdownLink[];
+}
+
+function NavDropdown({ label, links }: NavDropdownProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors py-2"
+        aria-expanded={open}
+      >
+        {label}
+        <ChevronDownIcon
+          className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <div
+        className={`absolute top-full right-0 pt-2 transition-all duration-150 ${
+          open ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-1 invisible'
+        }`}
+      >
+        <div className="w-80 rounded-xl border border-white/10 bg-black/95 backdrop-blur-xl shadow-2xl shadow-black/60 overflow-hidden">
+          <div className="px-4 pt-3 pb-1">
+            <p className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
+              {label}
+            </p>
+          </div>
+          <div className="py-1">
+            {links.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="group relative flex items-center overflow-hidden px-4 py-3.5 transition-colors hover:bg-white/[0.05]"
+              >
+                <link.icon
+                  className={`pointer-events-none absolute -right-3 top-1/2 h-14 w-14 -translate-y-1/2 opacity-[0.08] transition-opacity duration-200 group-hover:opacity-[0.16] ${link.iconTint}`}
+                />
+                <div className="relative min-w-0">
+                  <p className="text-sm font-medium text-white">{link.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{link.description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -71,23 +188,19 @@ export default function Navbar() {
                   {link.name}
                 </a>
               ))}
-              <div className="flex items-center gap-3">
-                <a
-                  href={`${HACKER_URL}/login`}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all"
-                  title="Start hacking with GitHub"
-                >
-                  <GitHubIcon className="w-4 h-4" />
-                  <span>Hack</span>
-                </a>
-                <button
-                  onClick={handleJoinClick}
-                  className="px-4 py-2 text-sm bg-white text-black hover:bg-gray-200 transition-colors"
-                  type="button"
-                >
-                  Join Academy
-                </button>
+
+              <div className="flex items-center gap-6">
+                <NavDropdown label="Platforms" links={PLATFORM_DROPDOWN_LINKS} />
+                <NavDropdown label="Resources" links={RESOURCE_DROPDOWN_LINKS} />
               </div>
+
+              <button
+                onClick={handleJoinClick}
+                className="px-4 py-2 text-sm bg-white text-black hover:bg-gray-200 transition-colors"
+                type="button"
+              >
+                Join Academy
+              </button>
             </div>
 
             {/* Mobile Hamburger Button */}
@@ -141,7 +254,7 @@ export default function Navbar() {
           <div className="relative h-full flex flex-col pt-20 px-6">
             {/* Nav Links - Centered */}
             <nav className="flex flex-col items-center justify-center flex-1 gap-1">
-              {NAV_LINKS.map((link, index) => (
+              {ALL_NAV_LINKS.map((link, index) => (
                 <a
                   key={link.name}
                   href={link.href.startsWith('#') ? `/${link.href}` : link.href}
@@ -167,7 +280,9 @@ export default function Navbar() {
                   mobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                 }`}
                 style={{
-                  transitionDelay: mobileMenuOpen ? `${100 + NAV_LINKS.length * 60 + 50}ms` : '0ms',
+                  transitionDelay: mobileMenuOpen
+                    ? `${100 + ALL_NAV_LINKS.length * 60 + 50}ms`
+                    : '0ms',
                 }}
               >
                 <p className="text-xs text-gray-500 text-center">{SITE_CONFIG.tagline}</p>
@@ -180,7 +295,7 @@ export default function Navbar() {
                 }`}
                 style={{
                   transitionDelay: mobileMenuOpen
-                    ? `${100 + NAV_LINKS.length * 60 + 100}ms`
+                    ? `${100 + ALL_NAV_LINKS.length * 60 + 100}ms`
                     : '0ms',
                 }}
               >
