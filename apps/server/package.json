@@ -17,7 +17,7 @@
   "dependencies": {
     "@sos-academy/shared": "workspace:*",
     "connect-mongo": "^6.0.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.2",
     "express-session": "^1.19.0",
     "resend": "^6.6.0"
   },
