@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { NAV_LINKS, SITE_CONFIG } from '../lib/data';
+import { ALL_NAV_LINKS, SITE_CONFIG } from '../lib/data';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -53,7 +53,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm">Navigation</h3>
             <ul className="space-y-2">
-              {NAV_LINKS.map((link) => (
+              {ALL_NAV_LINKS.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

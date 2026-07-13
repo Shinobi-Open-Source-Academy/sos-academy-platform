@@ -1,15 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { NAV_LINKS, SITE_CONFIG } from '../lib/data';
-import { GitHubIcon } from './icons';
+import { useEffect, useRef, useState } from 'react';
+import { ALL_NAV_LINKS, NAV_LINKS, NAV_RESOURCE_LINKS, SITE_CONFIG } from '../lib/data';
+import { ChevronDownIcon, GitHubIcon } from './icons';
 
 const HACKER_URL = process.env.NEXT_PUBLIC_HACKER_URL || 'http://localhost:3002';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const resourcesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
+        setResourcesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,6 +83,37 @@ export default function Navbar() {
                   {link.name}
                 </a>
               ))}
+
+              <div className="relative" ref={resourcesRef}>
+                <button
+                  type="button"
+                  onClick={() => setResourcesOpen((open) => !open)}
+                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors"
+                  aria-expanded={resourcesOpen}
+                >
+                  Resources
+                  <ChevronDownIcon
+                    className={`w-3.5 h-3.5 transition-transform ${resourcesOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {resourcesOpen && (
+                  <div className="absolute top-full right-0 pt-3 z-[110]">
+                    <div className="w-48 py-2 bg-black border border-white/10 shadow-xl">
+                      {NAV_RESOURCE_LINKS.map((link) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          onClick={() => setResourcesOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          {link.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-3">
                 <a
                   href={`${HACKER_URL}/login`}
@@ -141,7 +184,7 @@ export default function Navbar() {
           <div className="relative h-full flex flex-col pt-20 px-6">
             {/* Nav Links - Centered */}
             <nav className="flex flex-col items-center justify-center flex-1 gap-1">
-              {NAV_LINKS.map((link, index) => (
+              {ALL_NAV_LINKS.map((link, index) => (
                 <a
                   key={link.name}
                   href={link.href.startsWith('#') ? `/${link.href}` : link.href}
@@ -167,7 +210,9 @@ export default function Navbar() {
                   mobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                 }`}
                 style={{
-                  transitionDelay: mobileMenuOpen ? `${100 + NAV_LINKS.length * 60 + 50}ms` : '0ms',
+                  transitionDelay: mobileMenuOpen
+                    ? `${100 + ALL_NAV_LINKS.length * 60 + 50}ms`
+                    : '0ms',
                 }}
               >
                 <p className="text-xs text-gray-500 text-center">{SITE_CONFIG.tagline}</p>
@@ -180,7 +225,7 @@ export default function Navbar() {
                 }`}
                 style={{
                   transitionDelay: mobileMenuOpen
-                    ? `${100 + NAV_LINKS.length * 60 + 100}ms`
+                    ? `${100 + ALL_NAV_LINKS.length * 60 + 100}ms`
                     : '0ms',
                 }}
               >

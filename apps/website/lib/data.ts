@@ -307,8 +307,14 @@ export const NAV_LINKS = [
   { name: 'Communities', href: '#communities' },
   { name: 'Projects', href: '#projects' },
   { name: 'Mentors', href: '/mentors' },
-  { name: 'Blog', href: 'https://blog.shinobi-open-source.academy' },
 ];
+
+export const NAV_RESOURCE_LINKS = [
+  { name: 'Blog', href: 'https://blog.shinobi-open-source.academy' },
+  { name: 'Privacy Policy', href: '/privacy' },
+];
+
+export const ALL_NAV_LINKS = [...NAV_LINKS, ...NAV_RESOURCE_LINKS];
 
 export const HOME_JSON_LD = {
   '@context': 'https://schema.org',
