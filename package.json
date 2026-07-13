@@ -63,7 +63,7 @@
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "autoprefixer": "^10.4.21",
-    "babel-jest": "^29.7.0",
+    "babel-jest": "^30.4.1",
     "concurrently": "^9.2.1",
     "copy-webpack-plugin": "^11.0.0",
     "husky": "^9.1.7",
