@@ -3,11 +3,11 @@
 Discord bot for the SOS Academy server. Every day at ~9am (UTC by default) it posts:
 
 - **#general** (public) — a "daily mission" for hackers: a rotating motivational intro, a live
-  open "good first issue"/"help wanted" issue pulled from the Academy's featured project repos,
-  and a rotating OSS contribution tip.
+open "good first issue"/"help wanted" issue pulled from the Academy's featured project repos,
+and a rotating OSS contribution tip.
 - **#mentors** (private) — a "Sensei briefing" for mentors: 3 randomly-picked action items
-  (check in on a quiet hacker, review a PR, shout out a contribution, etc.) plus a live issue
-  they can hand out to a hacker in #general.
+(check in on a quiet hacker, review a PR, shout out a contribution, etc.) plus a live issue
+they can hand out to a hacker in #general.
 
 Content pools live in `src/content/messagePools.ts` — edit freely, no code changes needed to
 tweak wording.
@@ -18,13 +18,13 @@ You've already created the app in the [Developer Portal](https://discord.com/dev
 (General Information tab). Next:
 
 1. **Bot tab** → Reset/copy the **Token**. This is `DISCORD_BOT_TOKEN` — treat it like a password.
-   - No privileged intents are required (the bot only sends messages, it never reads them).
+  - No privileged intents are required (the bot only sends messages, it never reads them).
 2. **OAuth2 → URL Generator**:
-   - Scopes: `bot`
-   - Bot Permissions: `View Channels`, `Send Messages`, `Embed Links`
-   - Open the generated URL and invite the bot to the SOS Academy server.
+  - Scopes: `bot`
+  - Bot Permissions: `View Channels`, `Send Messages`, `Embed Links`
+  - Open the generated URL and invite the bot to the SOS Academy server.
 3. In Discord, enable **Developer Mode** (User Settings → Advanced), then right-click
-   `#general` and the private `#mentors` channel → **Copy Channel ID** for the env vars below.
+  `#general` and the private `#mentors` channel → **Copy Channel ID** for the env vars below.
 
 ## 2. Configure environment variables
 

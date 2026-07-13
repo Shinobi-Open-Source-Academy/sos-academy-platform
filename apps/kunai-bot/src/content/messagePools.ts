@@ -1,10 +1,10 @@
 export const HACKER_INTROS = [
-  "🌅 Rise and grind, hackers — today's mission briefing has landed.",
-  "🥷 A true shinobi trains daily. Here's today's objective.",
-  "⚡ New day, new jutsu to master. Let's get to work.",
-  '🎯 Your daily contribution quest awaits, Genin.',
-  '🔥 Consistency beats intensity — one PR at a time.',
-  "📜 Scroll unsealed: today's path to leveling up your open-source skills.",
+  "Rise and grind, hackers — today's mission briefing has landed.",
+  "A true shinobi trains daily. Here's today's objective.",
+  "New day, new jutsu to master. Let's get to work.",
+  'Your daily contribution quest awaits.',
+  'Consistency beats intensity — one PR at a time.',
+  "Scroll unsealed: today's path to leveling up your open-source skills.",
 ];
 
 export const HACKER_TIPS = [

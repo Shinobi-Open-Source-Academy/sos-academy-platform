@@ -11,9 +11,12 @@ async function main() {
   client.once('ready', async () => {
     try {
       await runDailyReminders(client, runtime);
+      process.exitCode = 0;
+    } catch (error) {
+      console.error('[kunai-bot] send-now failed:', error);
+      process.exitCode = 1;
     } finally {
       client.destroy();
-      process.exit(0);
     }
   });
 
