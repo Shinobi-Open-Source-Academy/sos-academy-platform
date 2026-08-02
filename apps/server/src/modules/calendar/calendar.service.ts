@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
 import { UpdateCalendarEventDto } from './dto/update-calendar-event.dto';
+import { NotesBotService } from './notesbot.service';
 import { CalendarEvent, CalendarEventDocument } from './schemas/calendar-event.schema';
 
 @Injectable()
 export class CalendarService {
+  private readonly logger = new Logger(CalendarService.name);
+
   constructor(
-    @InjectModel(CalendarEvent.name) private calendarEventModel: Model<CalendarEventDocument>
+    @InjectModel(CalendarEvent.name) private calendarEventModel: Model<CalendarEventDocument>,
+    private notesBotService: NotesBotService
   ) {}
 
   async create(createCalendarEventDto: CreateCalendarEventDto): Promise<CalendarEvent> {
@@ -116,5 +120,56 @@ END:VCALENDAR`;
       googleCalendarLink,
       icalLink,
     };
+  }
+
+  /**
+   * Update event with NotesBot callId
+   */
+  async updateCallId(id: string, callId: string): Promise<CalendarEvent> {
+    const event = await this.calendarEventModel.findById(id);
+
+    if (!event) {
+      throw new NotFoundException(`Calendar event with ID ${id} not found`);
+    }
+
+    if (!this.notesBotService.validateCallId(callId)) {
+      throw new Error('Invalid callId format');
+    }
+
+    event.callId = callId;
+    event.summaryStatus = 'pending';
+    return event.save();
+  }
+
+  /**
+   * Fetch summary from NotesBot and update event
+   */
+  async fetchAndStoreSummary(id: string): Promise<CalendarEvent> {
+    const event = await this.calendarEventModel.findById(id);
+
+    if (!event) {
+      throw new NotFoundException(`Calendar event with ID ${id} not found`);
+    }
+
+    if (!event.callId) {
+      throw new Error('Event has no callId. Please set callId first.');
+    }
+
+    try {
+      this.logger.log(`Fetching summary for event ${id} with callId ${event.callId}`);
+      const summary = await this.notesBotService.fetchSummary(event.callId);
+
+      event.summary = summary;
+      event.summaryStatus = 'available';
+      const updatedEvent = await event.save();
+
+      this.logger.log(`Summary successfully fetched and stored for event ${id}`);
+      return updatedEvent;
+    } catch (error) {
+      this.logger.error(`Failed to fetch summary for event ${id}: ${error}`);
+      event.summaryStatus = 'error';
+      await event.save();
+      throw error;
+    }
   }
 }
