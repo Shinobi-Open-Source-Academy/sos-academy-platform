@@ -25,6 +25,8 @@ pnpm seed:admin
 ADMIN_EMAIL=admin@shinobi-open-source.academy
 ADMIN_PASSWORD=admin123
 CORS_ORIGIN=http://localhost:3000,http://localhost:3001
+NOTESBOT_API_URL=https://api.notesbot.io/v1
+NOTESBOT_API_KEY=your-notesbot-api-key
 ```
 
 **Admin `.env.local` (this folder):**
@@ -33,6 +35,10 @@ NEXT_PUBLIC_API_URL=http://localhost:4200/api
 ```
 
 > ⚠️ Admin credentials go in **backend** `.env` only, NOT here!
+
+**Environment Variables:**
+- `NOTESBOT_API_URL` - NotesBot API base URL (default: https://api.notesbot.io/v1)
+- `NOTESBOT_API_KEY` - NotesBot API authentication key (required for calendar integration)
 
 ## Features
 
