@@ -76,6 +76,19 @@ export class CalendarEvent {
 
   @Prop({ default: false })
   isFeatured: boolean;
+
+  @Prop()
+  callId: string;
+
+  @Prop()
+  summary: string;
+
+  @Prop({
+    type: String,
+    enum: ['none', 'pending', 'available', 'error'],
+    default: 'none',
+  })
+  summaryStatus: 'none' | 'pending' | 'available' | 'error';
 }
 
 export const CalendarEventSchema = SchemaFactory.createForClass(CalendarEvent);
