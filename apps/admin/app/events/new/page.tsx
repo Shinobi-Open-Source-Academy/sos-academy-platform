@@ -1,13 +1,13 @@
 'use client';
 
+import { EVENT_TYPE_OPTIONS } from '@sos-academy/shared';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { EVENT_TYPE_OPTIONS } from '@sos-academy/shared';
+import { useRequireAuth } from '../../../context/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { DURATIONS } from '../../../lib/constants';
-import { useRequireAuth } from '../../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
 
 export const dynamic = 'force-dynamic';

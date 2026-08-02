@@ -1,8 +1,8 @@
 'use client';
 
+import { CodeBackground } from '@sos-academy/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { CodeBackground } from '@sos-academy/ui';
 import Footer from '../../../components/Footer';
 import Navbar from '../../../components/Navbar';
 import {

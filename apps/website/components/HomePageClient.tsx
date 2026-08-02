@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { CodeBackground, HeroGrid, SpotlightCard } from '@sos-academy/ui';
+import { useEffect, useState } from 'react';
 import Footer from './Footer';
 import JoinModal from './JoinModal';
 import MentorsCarousel from './MentorsCarousel';
 import Navbar from './Navbar';
 
 const MAX_COMPANIES_SHOWN = 6;
-import UpcomingEvents from './UpcomingEvents';
+
+import { getActiveMentors, type Mentor } from '../lib/api-client';
 import { COMMUNITIES, COMPANIES, FEATURES, HOME_JSON_LD, PROJECTS, SITE_CONFIG } from '../lib/data';
-import { getActiveMentors, Mentor } from '../lib/api-client';
+import UpcomingEvents from './UpcomingEvents';
 
 export default function HomePageClient() {
   const [joinModalOpen, setJoinModalOpen] = useState(false);
