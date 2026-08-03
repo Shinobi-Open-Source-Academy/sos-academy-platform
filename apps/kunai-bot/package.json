@@ -13,7 +13,7 @@
   "dependencies": {
     "axios": "^1.16.0",
     "discord.js": "^14.26.5",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.2",
     "node-cron": "^4.6.0"
   },
   "devDependencies": {
