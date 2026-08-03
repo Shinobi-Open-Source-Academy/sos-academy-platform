@@ -360,6 +360,8 @@ export default function EventsPage() {
                 className={`card p-5 animate-fade-in group ${activeTab === 'past' ? 'cursor-pointer hover:border-white/20' : ''}`}
                 style={{ animationDelay: `${index * 40}ms` }}
                 onClick={() => activeTab === 'past' && openEventModal(event)}
+                onKeyDown={(e) => activeTab === 'past' && e.key === 'Enter' && openEventModal(event)}
+                tabIndex={activeTab === 'past' ? 0 : -1}
               >
                 <div className="flex items-start gap-5">
                   {/* Date Column */}
@@ -586,6 +588,7 @@ export default function EventsPage() {
           onClick={(e) => {
             if (e.target === e.currentTarget) closeEventModal();
           }}
+          onKeyDown={(e) => e.key === 'Escape' && closeEventModal()}
         >
           <div className="card max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
             {/* ── Sticky Header ── */}
