@@ -177,6 +177,20 @@ Admin panel will be available at:
 npx nx run server:seed
 ```
 
+#### Docker
+
+The API, website, admin, hacker portal and blog run from one production-oriented compose file. It has **no defaults**: every deployment-specific value must be set, and a missing one stops the command with a message naming it.
+
+```sh
+cp .env.docker.example .env      # fill in every value (see the comments in the file)
+docker compose up -d --build
+```
+
+MongoDB is not part of that file. Point `MONGODB_URI` at a managed database, or add the self-hosted one:
+`docker compose -f docker-compose.yml -f docker-compose.mongo.yml up -d --build`.
+
+For local development keep using `pnpm dev` with `.env.example`. See [docs/deployment.md](docs/deployment.md) for configuration, the published images, and deploying to Cloud Run, Fly.io or a VPS.
+
 ### Available Scripts
 
 ```sh
@@ -216,7 +230,7 @@ pnpm seed:status        # Check seed status
 
 ### Deployment Configuration
 
-When deploying to production or remote environments, configure the following environment variables:
+When deploying to production or remote environments, configure the following environment variables. Released Docker images and deployment recipes are covered in [docs/deployment.md](docs/deployment.md).
 
 **Backend:**
 ```env
@@ -379,10 +393,10 @@ npx nx run server:seed:status
 
 ```sh
 # Seed communities
-docker-compose exec backend node seed-docker.js seed
+docker compose exec server node dist/main.js seed
 
 # Check status
-docker-compose exec backend node seed-docker.js status
+docker compose exec server node dist/main.js status
 ```
 
 ### Seeder Endpoints (via API)
