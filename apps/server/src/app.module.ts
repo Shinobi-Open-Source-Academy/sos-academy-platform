@@ -14,6 +14,7 @@ import { CommunityModule } from './modules/community/community.module';
 import { HackIssueModule } from './modules/hack-issue/hack-issue.module';
 import { ProjectModule } from './modules/project/project.module';
 import { SeederModule } from './modules/seeder/seeder.module';
+import { SquadModule } from './modules/squad/squad.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 
@@ -33,6 +34,7 @@ import { UserModule } from './modules/user/user.module';
     BlogModule,
     SeederModule,
     HackIssueModule,
+    SquadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
