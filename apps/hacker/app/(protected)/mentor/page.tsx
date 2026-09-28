@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../../components/Sidebar';
 
 const upcomingTools = [
@@ -34,8 +35,42 @@ export default function MentorHomePage() {
             </p>
           </div>
 
+          <Link
+            href="/mentor/profile"
+            className="card p-5 mb-8 flex items-center gap-4 group animate-fade-in delay-75 hover:border-emerald-500/30"
+          >
+            <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-white font-medium">Edit your public profile</h2>
+              <p className="text-sm text-zinc-500 mt-0.5">
+                Title, description and links shown on the mentor directory.
+              </p>
+            </div>
+            <span
+              className="text-zinc-500 group-hover:text-emerald-400 transition-colors"
+              aria-hidden="true"
+            >
+              →
+            </span>
+          </Link>
+
           <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-4">
-            Your tools
+            Coming soon
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in delay-150">
             {upcomingTools.map((tool) => (

@@ -117,6 +117,7 @@ const mentorNavItems = [
   {
     name: 'Mentor Space',
     href: '/mentor',
+    exact: true,
     icon: (
       <svg
         className="w-5 h-5"
@@ -134,11 +135,31 @@ const mentorNavItems = [
       </svg>
     ),
   },
+  {
+    name: 'My Profile',
+    href: '/mentor/profile',
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <title>my profile</title>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 // `/mentors/book` keeps "Mentors" active, but `/mentors` must not activate "Mentor Space" (`/mentor`)
-const isActivePath = (pathname: string, href: string) =>
-  href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+const isActivePath = (pathname: string, href: string, exact = href === '/') =>
+  exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -196,8 +217,13 @@ export default function Sidebar() {
     </Link>
   );
 
-  const renderNavLink = (item: (typeof navItems)[number]) => {
-    const isActive = isActivePath(pathname, item.href);
+  const renderNavLink = (item: {
+    name: string;
+    href: string;
+    icon: React.ReactNode;
+    exact?: boolean;
+  }) => {
+    const isActive = isActivePath(pathname, item.href, item.exact);
     return (
       <Link
         key={item.name}
