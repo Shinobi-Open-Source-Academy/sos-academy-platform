@@ -1,21 +1,31 @@
 import {
+  Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Req,
   Res,
-  UseGuards,
-  HttpStatus,
   UnauthorizedException,
-  Body,
+  UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
-import { AuthService } from './auth.service';
+import { ICurrentUser } from '@sos-academy/shared';
+import { CookieOptions, Response } from 'express';
+import { envConfig } from '../../common/config/env.config';
+import { AuthService, refreshExpiryDate } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ICurrentUser } from '@sos-academy/shared';
-import { envConfig } from '../../common/config/env.config';
+
+const REFRESH_COOKIE = 'refresh_token';
+
+const refreshCookieOptions = ({ clear = false } = {}): CookieOptions => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  // Same lifetime as the session it belongs to
+  ...(!clear && { expires: refreshExpiryDate() }),
+});
 
 @Controller('auth')
 export class AuthController {
@@ -35,12 +45,7 @@ export class AuthController {
     const { accessToken, refreshToken } = await this.authService.login(user);
 
     // Set Refresh Token in HTTP-Only Cookie
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use 'strict' or 'lax' depending on cross-site needs
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie(REFRESH_COOKIE, refreshToken, refreshCookieOptions());
 
     const frontendUrl = envConfig.frontends.hackerPortalUrl;
 
@@ -60,7 +65,7 @@ export class AuthController {
 
   @Post('refresh')
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies['refresh_token'];
+    const refreshToken = req.cookies?.[REFRESH_COOKIE];
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
@@ -69,12 +74,7 @@ export class AuthController {
     const { accessToken, refreshToken: newRefreshToken } =
       await this.authService.refreshTokens(refreshToken);
 
-    res.cookie('refresh_token', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use 'strict' or 'lax' depending on cross-site needs
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie(REFRESH_COOKIE, newRefreshToken, refreshCookieOptions());
 
     return { accessToken, refreshToken: newRefreshToken };
   }
@@ -84,7 +84,7 @@ export class AuthController {
   async logout(@CurrentUser() user: ICurrentUser, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(user._id);
 
-    res.clearCookie('refresh_token');
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions({ clear: true }));
     return { success: true };
   }
 

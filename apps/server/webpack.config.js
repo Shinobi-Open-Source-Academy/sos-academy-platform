@@ -21,7 +21,7 @@ module.exports = (_, argv) => {
       path: outputPath,
       filename: outputFilename,
     },
-    externals: [nodeExternals({ allowlist: ['express-session'] })],
+    externals: [nodeExternals({ allowlist: ['express-session', 'cookie-parser'] })],
     module: {
       rules: [
         {
