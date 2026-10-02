@@ -4,10 +4,12 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitHubIssue, GitHubService, GitHubUnavailableError } from '../github/github.service';
 import { HackIssueService } from './hack-issue.service';
+import { HACK_ISSUE_STATUS_CHANGED, HackIssueEvent } from './hack-issue-status-machine';
 import { HackIssue } from './schemas/hack-issue.schema';
 
 const URL = 'https://github.com/Owner/Repo/issues/42';
@@ -35,7 +37,10 @@ describe('HackIssueService', () => {
     create: jest.Mock;
     find: jest.Mock;
     countDocuments: jest.Mock;
+    findById: jest.Mock;
+    findOneAndUpdate: jest.Mock;
   };
+  const eventEmitter = { emit: jest.fn() };
   let findQuery: Record<string, jest.Mock>;
 
   beforeEach(async () => {
@@ -53,7 +58,10 @@ describe('HackIssueService', () => {
       create: jest.fn().mockImplementation(async (doc) => doc),
       find: jest.fn().mockReturnValue(findQuery),
       countDocuments: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(0) }),
+      findById: jest.fn(),
+      findOneAndUpdate: jest.fn(),
     };
+    eventEmitter.emit.mockReset();
     githubService = { fetchIssue: jest.fn().mockResolvedValue(githubIssue()) };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -61,6 +69,7 @@ describe('HackIssueService', () => {
         HackIssueService,
         { provide: getModelToken(HackIssue.name), useValue: hackIssueModel },
         { provide: GitHubService, useValue: githubService },
+        { provide: EventEmitter2, useValue: eventEmitter },
       ],
     }).compile();
 
@@ -168,6 +177,76 @@ describe('HackIssueService', () => {
       expect(filter.$or[0].title.source).toBe('owner\\/repo \\(x');
       expect(findQuery.skip).toHaveBeenCalledWith(20);
       expect(result.pagination).toEqual({ total: 45, page: 2, limit: 20, pages: 3 });
+    });
+  });
+
+  describe('transition', () => {
+    const currentStatus = (status: string | null) =>
+      hackIssueModel.findById.mockReturnValue({
+        select: () => ({ lean: () => ({ exec: async () => (status ? { status } : null) }) }),
+      });
+
+    it('moves the issue, records the history and emits a domain event', async () => {
+      currentStatus('PR_OPEN');
+      const updated = { _id: 'i1', status: 'CHANGES_REQUESTED' };
+      hackIssueModel.findOneAndUpdate.mockReturnValue({ exec: async () => updated });
+
+      const result = await service.transition('i1', HackIssueEvent.REQUEST_CHANGES, {
+        actorId: 'mentor-1',
+        reason: 'Missing tests',
+      });
+
+      expect(result).toBe(updated);
+      const [filter, update] = hackIssueModel.findOneAndUpdate.mock.calls[0];
+      // Guarded on the status that was read, so a concurrent change can't be overwritten
+      expect(filter).toEqual({ _id: 'i1', status: 'PR_OPEN' });
+      expect(update.$set).toEqual({ status: 'CHANGES_REQUESTED' });
+      expect(update.$push.statusHistory).toMatchObject({
+        from: 'PR_OPEN',
+        to: 'CHANGES_REQUESTED',
+        event: HackIssueEvent.REQUEST_CHANGES,
+        actor: 'mentor-1',
+        reason: 'Missing tests',
+        at: expect.any(Date),
+      });
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        HACK_ISSUE_STATUS_CHANGED,
+        expect.objectContaining({
+          issueId: 'i1',
+          from: 'PR_OPEN',
+          to: 'CHANGES_REQUESTED',
+          event: HackIssueEvent.REQUEST_CHANGES,
+          actorId: 'mentor-1',
+        })
+      );
+    });
+
+    it('rejects an illegal transition without writing anything', async () => {
+      currentStatus('OPEN');
+
+      await expect(service.transition('i1', HackIssueEvent.MERGE)).rejects.toBeInstanceOf(
+        BadRequestException
+      );
+      expect(hackIssueModel.findOneAndUpdate).not.toHaveBeenCalled();
+      expect(eventEmitter.emit).not.toHaveBeenCalled();
+    });
+
+    it('reports a concurrent status change as a conflict', async () => {
+      currentStatus('ASSIGNED');
+      hackIssueModel.findOneAndUpdate.mockReturnValue({ exec: async () => null });
+
+      await expect(service.transition('i1', HackIssueEvent.START)).rejects.toBeInstanceOf(
+        ConflictException
+      );
+      expect(eventEmitter.emit).not.toHaveBeenCalled();
+    });
+
+    it('throws when the issue does not exist', async () => {
+      currentStatus(null);
+
+      await expect(service.transition('missing', HackIssueEvent.ASSIGN)).rejects.toBeInstanceOf(
+        NotFoundException
+      );
     });
   });
 });

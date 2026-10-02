@@ -6,12 +6,21 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { HackIssueStatus } from '@sos-academy/shared';
 import { FilterQuery, Model } from 'mongoose';
 import { GitHubService, GitHubUnavailableError } from '../github/github.service';
 import { GetHackIssuesQueryDto } from './dto/get-hack-issues.dto';
 import { RegisterHackIssueDto } from './dto/register-hack-issue.dto';
 import { parseGitHubIssueUrl } from './github-issue-url';
+import {
+  HACK_ISSUE_STATUS_CHANGED,
+  HackIssueEvent,
+  HackIssueStatusChangedEvent,
+  IllegalTransitionError,
+  nextStatus,
+} from './hack-issue-status-machine';
 import { HackIssue, HackIssueDocument } from './schemas/hack-issue.schema';
 
 const MONGO_DUPLICATE_KEY_ERROR = 11000;
@@ -22,7 +31,8 @@ export class HackIssueService {
 
   constructor(
     @InjectModel(HackIssue.name) private hackIssueModel: Model<HackIssueDocument>,
-    private readonly githubService: GitHubService
+    private readonly githubService: GitHubService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   /**
@@ -93,6 +103,66 @@ export class HackIssueService {
     }
   }
 
+  /**
+   * Move an issue through its lifecycle: validates the transition, records it in the status
+   * history and emits `HACK_ISSUE_STATUS_CHANGED`.
+   * @param actorId User who triggered it; omit for automatic changes (GitHub sync, staleness job)
+   * @throws BadRequestException for a transition the lifecycle doesn't allow
+   * @throws ConflictException if the issue changed status in the meantime
+   */
+  async transition(
+    issueId: string,
+    event: HackIssueEvent,
+    { actorId, reason }: { actorId?: string; reason?: string } = {}
+  ): Promise<HackIssue> {
+    const issue = await this.hackIssueModel.findById(issueId).select('status').lean().exec();
+    if (!issue) {
+      throw new NotFoundException(`Hack issue ${issueId} not found`);
+    }
+
+    let to: HackIssueStatus;
+    try {
+      to = nextStatus(issue.status, event);
+    } catch (error) {
+      if (error instanceof IllegalTransitionError) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
+
+    const at = new Date();
+    // Only applies if nobody changed the status since we read it
+    const updated = await this.hackIssueModel
+      .findOneAndUpdate(
+        { _id: issueId, status: issue.status },
+        {
+          $set: { status: to },
+          $push: { statusHistory: { from: issue.status, to, event, actor: actorId, reason, at } },
+        },
+        { new: true }
+      )
+      .exec();
+    if (!updated) {
+      throw new ConflictException(
+        `Hack issue ${issueId} changed status in the meantime, please retry`
+      );
+    }
+
+    const payload: HackIssueStatusChangedEvent = {
+      issueId,
+      from: issue.status,
+      to,
+      event,
+      actorId,
+      reason,
+      at,
+    };
+    this.eventEmitter.emit(HACK_ISSUE_STATUS_CHANGED, payload);
+    this.logger.log(`Hack issue ${issueId}: ${issue.status} → ${to} (${event})`);
+
+    return updated;
+  }
+
   async findAll(query: GetHackIssuesQueryDto) {
     const { status, search, page = 1, limit = 20 } = query;
 
@@ -108,7 +178,7 @@ export class HackIssueService {
     const [issues, total] = await Promise.all([
       this.hackIssueModel
         .find(filter)
-        .select('-__v -body')
+        .select('-__v -body -statusHistory')
         .populate('registeredBy', 'name email')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)

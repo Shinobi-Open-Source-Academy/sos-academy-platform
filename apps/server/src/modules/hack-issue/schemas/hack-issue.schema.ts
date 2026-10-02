@@ -1,8 +1,36 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HackIssueStatus } from '@sos-academy/shared';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { HackIssueEvent } from '../hack-issue-status-machine';
 
 export type HackIssueDocument = HackIssue & Document;
+
+/**
+ * One row of an issue's status history, written by every transition
+ */
+@Schema({ _id: false })
+export class HackIssueStatusChange {
+  @Prop({ type: String, enum: HackIssueStatus, required: true })
+  from: HackIssueStatus;
+
+  @Prop({ type: String, enum: HackIssueStatus, required: true })
+  to: HackIssueStatus;
+
+  @Prop({ type: String, enum: HackIssueEvent, required: true })
+  event: HackIssueEvent;
+
+  /** User who triggered it; empty for automatic changes (GitHub sync, staleness job) */
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: false })
+  actor?: MongooseSchema.Types.ObjectId;
+
+  @Prop()
+  reason?: string;
+
+  @Prop({ required: true })
+  at: Date;
+}
+
+export const HackIssueStatusChangeSchema = SchemaFactory.createForClass(HackIssueStatusChange);
 
 @Schema({
   timestamps: true,
@@ -64,6 +92,10 @@ export class HackIssue {
     required: false,
   })
   registeredBy?: MongooseSchema.Types.ObjectId;
+
+  /** Every status change, oldest first (see `HackIssueService.transition`) */
+  @Prop({ type: [HackIssueStatusChangeSchema], default: [] })
+  statusHistory: HackIssueStatusChange[];
 }
 
 export const HackIssueSchema = SchemaFactory.createForClass(HackIssue);
