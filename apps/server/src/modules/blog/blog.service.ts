@@ -120,11 +120,13 @@ export class BlogService {
     if (featured !== undefined) filter.featured = featured;
     if (tag) filter.tags = tag;
     if (search) {
+      // Match the text literally: "(", "*", "C++" or "node.js" are not regex syntax here
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const matchingUsers = await this.userModel
         .find({
           $or: [
-            { name: { $regex: search, $options: 'i' } },
-            { 'githubProfile.login': { $regex: search, $options: 'i' } },
+            { name: { $regex: safeSearch, $options: 'i' } },
+            { 'githubProfile.login': { $regex: safeSearch, $options: 'i' } },
           ],
         })
         .select('_id')
@@ -134,9 +136,9 @@ export class BlogService {
       const authorIds = matchingUsers.map((u) => u._id);
 
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } },
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { excerpt: { $regex: safeSearch, $options: 'i' } },
+        { tags: { $regex: safeSearch, $options: 'i' } },
         ...(authorIds.length ? [{ author: { $in: authorIds } }] : []),
       ];
     }
