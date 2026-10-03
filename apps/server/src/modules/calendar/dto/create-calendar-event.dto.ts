@@ -1,5 +1,5 @@
 import { CalendarEventType } from '@sos-academy/shared';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -50,6 +50,8 @@ export class CreateCalendarEventDto {
   @IsMongoId()
   project?: string;
 
+  // Forms send an empty string when there's no link (in-person events)
+  @Transform(({ value }) => (typeof value === 'string' && value.trim() === '' ? undefined : value))
   @IsOptional()
   @IsUrl()
   meetingLink?: string;
