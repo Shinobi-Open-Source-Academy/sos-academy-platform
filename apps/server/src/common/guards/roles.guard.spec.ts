@@ -85,7 +85,49 @@ describe('RolesGuard', () => {
   });
 });
 
+@Controller()
+@Roles(UserRole.KAGE)
+class KageController {
+  @Get()
+  @Auth()
+  loginOnly() {}
+
+  @Get()
+  @Roles()
+  emptyRoles() {}
+}
+
+describe('RolesGuard with a role-less handler decorator', () => {
+  const guard = new RolesGuard(new Reflector());
+
+  it.each([
+    'loginOnly',
+    'emptyRoles',
+  ])('keeps the controller roles when %s adds no roles of its own', (handler) => {
+    expect(() =>
+      guard.canActivate(context(KageController, handler, user({ role: UserRole.MEMBER })))
+    ).toThrow(ForbiddenException);
+    expect(() =>
+      guard.canActivate(
+        context(KageController, handler, user({ role: UserRole.KAGE, isActive: false }))
+      )
+    ).toThrow(ForbiddenException);
+    expect(guard.canActivate(context(KageController, handler, user({ role: UserRole.KAGE })))).toBe(
+      true
+    );
+  });
+});
+
 describe('Auth decorator', () => {
+  it('sets no roles metadata when called without roles', () => {
+    class BareController {
+      @Auth()
+      handler() {}
+    }
+
+    expect(Reflect.getMetadata(ROLES_KEY, BareController.prototype.handler)).toBeUndefined();
+  });
+
   it('sets the roles metadata and the JWT + roles guards', () => {
     class AuthController {
       @Auth(UserRole.MENTOR)

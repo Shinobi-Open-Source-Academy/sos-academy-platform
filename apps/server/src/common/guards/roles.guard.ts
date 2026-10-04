@@ -20,10 +20,15 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[] | undefined>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    // A handler's roles replace the controller's, but only when it actually lists some:
+    // a bare `@Auth()` / `@Roles()` on a handler must not lift the controller's restriction
+    const handlerRoles = this.reflector.get<UserRole[] | undefined>(
+      ROLES_KEY,
+      context.getHandler()
+    );
+    const requiredRoles = handlerRoles?.length
+      ? handlerRoles
+      : this.reflector.get<UserRole[] | undefined>(ROLES_KEY, context.getClass());
     if (!requiredRoles?.length) {
       return true;
     }
