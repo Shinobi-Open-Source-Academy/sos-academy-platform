@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { apiClient } from '../../lib/api-client';
 import { useRequireAuth } from '../../context/AuthContext';
+import { apiClient } from '../../lib/api-client';
 import MarkdownEditor from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 
@@ -196,6 +196,15 @@ function UserPicker({
     </div>
   );
 }
+
+/** Upload an image dropped/pasted in the post editor and return its public URL */
+const uploadBlogImage = async (file: File) => {
+  const form = new FormData();
+  form.append('image', file);
+  const res = await apiClient.upload<{ url: string }>('/blog/images', form);
+  if (!res.data?.url) throw new Error('No URL returned');
+  return res.data.url;
+};
 
 export default function BlogPage() {
   useRequireAuth();
@@ -466,6 +475,7 @@ export default function BlogPage() {
                     placeholder="Write your post in Markdown..."
                     rows={20}
                     required
+                    onImageUpload={uploadBlogImage}
                   />
                 </div>
 
