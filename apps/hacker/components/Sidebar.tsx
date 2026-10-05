@@ -36,8 +36,8 @@ const navItems = [
     ),
   },
   {
-    name: 'Activity',
-    href: '/activity',
+    name: 'Issues',
+    href: '/issues',
     icon: (
       <svg
         className="w-5 h-5"

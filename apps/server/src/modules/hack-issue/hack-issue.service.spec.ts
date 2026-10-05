@@ -186,6 +186,20 @@ describe('HackIssueService', () => {
         select: () => ({ lean: () => ({ exec: async () => (status ? { status } : null) }) }),
       });
 
+    it('changes other fields in the same atomic update', async () => {
+      currentStatus('ASSIGNED');
+      hackIssueModel.findOneAndUpdate.mockReturnValue({ exec: async () => ({ _id: 'i1' }) });
+
+      await service.transition('i1', HackIssueEvent.UNASSIGN, {
+        set: { note: 'x' },
+        unset: ['assignee', 'assignedAt'],
+      });
+
+      const [, update] = hackIssueModel.findOneAndUpdate.mock.calls[0];
+      expect(update.$set).toEqual({ note: 'x', status: 'UNASSIGNED' });
+      expect(update.$unset).toEqual({ assignee: '', assignedAt: '' });
+    });
+
     it('moves the issue, records the history and emits a domain event', async () => {
       currentStatus('PR_OPEN');
       const updated = { _id: 'i1', status: 'CHANGES_REQUESTED' };

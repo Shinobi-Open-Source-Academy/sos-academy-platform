@@ -39,6 +39,10 @@ export const envConfig = {
   frontends: {
     hackerPortalUrl: env('HACKER_PORTAL_URL', 'http://localhost:3000'),
   },
+  hack: {
+    /** Issues a hacker can hold at once (assigned, in progress or under review) */
+    maxActiveClaims: Number.parseInt(env('HACK_MAX_ACTIVE_CLAIMS', '3'), 10),
+  },
   github: {
     clientId: env('GITHUB_CLIENT_ID', 'default_github_client_id_change_in_production'),
     clientSecret: env('GITHUB_CLIENT_SECRET', 'default_github_client_secret_change_in_production'),

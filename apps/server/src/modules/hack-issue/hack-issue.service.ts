@@ -107,13 +107,24 @@ export class HackIssueService {
    * Move an issue through its lifecycle: validates the transition, records it in the status
    * history and emits `HACK_ISSUE_STATUS_CHANGED`.
    * @param actorId User who triggered it; omit for automatic changes (GitHub sync, staleness job)
+   * @param set / unset Other fields changed in the same atomic update (e.g. the assignee)
    * @throws BadRequestException for a transition the lifecycle doesn't allow
    * @throws ConflictException if the issue changed status in the meantime
    */
   async transition(
     issueId: string,
     event: HackIssueEvent,
-    { actorId, reason }: { actorId?: string; reason?: string } = {}
+    {
+      actorId,
+      reason,
+      set,
+      unset,
+    }: {
+      actorId?: string;
+      reason?: string;
+      set?: Record<string, unknown>;
+      unset?: string[];
+    } = {}
   ): Promise<HackIssue> {
     const issue = await this.hackIssueModel.findById(issueId).select('status').lean().exec();
     if (!issue) {
@@ -136,7 +147,10 @@ export class HackIssueService {
       .findOneAndUpdate(
         { _id: issueId, status: issue.status },
         {
-          $set: { status: to },
+          $set: { ...set, status: to },
+          ...(unset?.length
+            ? { $unset: Object.fromEntries(unset.map((field) => [field, ''])) }
+            : {}),
           $push: { statusHistory: { from: issue.status, to, event, actor: actorId, reason, at } },
         },
         { new: true }

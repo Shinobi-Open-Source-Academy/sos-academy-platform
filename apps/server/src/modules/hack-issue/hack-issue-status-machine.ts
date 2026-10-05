@@ -30,7 +30,8 @@ export enum HackIssueEvent {
 const S = HackIssueStatus;
 
 /** Statuses an issue is being worked on in (assigned, in progress or under review) */
-const ACTIVE = [S.ASSIGNED, S.IN_PROGRESS, S.PR_OPEN, S.CHANGES_REQUESTED];
+export const ACTIVE_STATUSES = [S.ASSIGNED, S.IN_PROGRESS, S.PR_OPEN, S.CHANGES_REQUESTED];
+const ACTIVE = ACTIVE_STATUSES;
 
 /**
  * The whole lifecycle in one place: event → statuses it is allowed from → resulting status.

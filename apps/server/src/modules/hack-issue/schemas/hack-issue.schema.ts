@@ -93,6 +93,17 @@ export class HackIssue {
   })
   registeredBy?: MongooseSchema.Types.ObjectId;
 
+  /** Hacker working on the issue, set when it is claimed and cleared when it is released */
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  })
+  assignee?: MongooseSchema.Types.ObjectId;
+
+  @Prop()
+  assignedAt?: Date;
+
   /** Every status change, oldest first (see `HackIssueService.transition`) */
   @Prop({ type: [HackIssueStatusChangeSchema], default: [] })
   statusHistory: HackIssueStatusChange[];
@@ -104,3 +115,4 @@ export const HackIssueSchema = SchemaFactory.createForClass(HackIssue);
 HackIssueSchema.index({ repository: 1, number: 1 }, { unique: true });
 HackIssueSchema.index({ status: 1, createdAt: -1 });
 HackIssueSchema.index({ language: 1 });
+HackIssueSchema.index({ assignee: 1, status: 1 });
