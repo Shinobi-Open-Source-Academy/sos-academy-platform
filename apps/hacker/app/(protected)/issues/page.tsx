@@ -16,6 +16,8 @@ interface HackIssue {
   url: string;
   status: string;
   assignedAt?: string;
+  /** Kept up to date by the GitHub sync job */
+  pullRequest?: { number: number; url: string; state: 'open' | 'closed'; merged: boolean };
 }
 
 interface AvailableResponse {
@@ -70,6 +72,16 @@ function IssueRow({ issue, action }: { issue: HackIssue; action: React.ReactNode
             {issue.owner}/{issue.repo}#{issue.number}
           </span>
           {issue.language && <span>· {issue.language}</span>}
+          {issue.pullRequest && (
+            <a
+              href={issue.pullRequest.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-400 hover:underline"
+            >
+              · PR #{issue.pullRequest.number}
+            </a>
+          )}
           {issue.labels.slice(0, 3).map((label) => (
             <span key={label} className="badge badge-neutral text-[10px]">
               {label}

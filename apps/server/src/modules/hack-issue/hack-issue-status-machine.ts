@@ -84,6 +84,42 @@ export function nextStatus(from: HackIssueStatus, event: HackIssueEvent): HackIs
   return transition.to;
 }
 
+/**
+ * Shortest sequence of events leading from one status to another, using only `events`
+ * (e.g. the ones GitHub activity can trigger). `[]` when already there, `null` when unreachable.
+ * @example pathTo(ASSIGNED, MERGED, SYNC_EVENTS) → [OPEN_PR, MERGE]
+ */
+export function pathTo(
+  from: HackIssueStatus,
+  to: HackIssueStatus,
+  events: HackIssueEvent[] = Object.values(HackIssueEvent)
+): HackIssueEvent[] | null {
+  const queue: { status: HackIssueStatus; path: HackIssueEvent[] }[] = [{ status: from, path: [] }];
+  const seen = new Set([from]);
+  while (queue.length) {
+    const { status, path } = queue.shift() as { status: HackIssueStatus; path: HackIssueEvent[] };
+    if (status === to) {
+      return path;
+    }
+    for (const event of events) {
+      const { from: allowed, to: next } = TRANSITIONS[event];
+      if (allowed.includes(status) && !seen.has(next)) {
+        seen.add(next);
+        queue.push({ status: next, path: [...path, event] });
+      }
+    }
+  }
+  return null;
+}
+
+/** Events the GitHub sync job can trigger on its own, from pull request activity */
+export const SYNC_EVENTS = [
+  HackIssueEvent.OPEN_PR,
+  HackIssueEvent.REQUEST_CHANGES,
+  HackIssueEvent.MERGE,
+  HackIssueEvent.CLOSE_UNMERGED,
+];
+
 /** Events allowed from a status, e.g. to show the possible actions in a UI */
 export const allowedEvents = (from: HackIssueStatus): HackIssueEvent[] =>
   (Object.keys(TRANSITIONS) as HackIssueEvent[]).filter((event) =>

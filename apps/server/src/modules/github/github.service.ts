@@ -21,6 +21,19 @@ export interface GitHubIssue {
   isPullRequest: boolean;
 }
 
+/** A pull request that references a registered issue */
+export interface GitHubPullRequest {
+  number: number;
+  authorLogin: string;
+  state: 'open' | 'closed';
+  merged: boolean;
+  mergedAt: Date | null;
+  updatedAt: Date;
+  htmlUrl: string;
+  /** Latest decisive review: changes requested by at least one reviewer, or approved */
+  reviewDecision: 'CHANGES_REQUESTED' | 'APPROVED' | null;
+}
+
 /**
  * Thrown when GitHub can't be reached or refuses the request for a reason other than
  * the resource not existing (rate limit, network error, 5xx...).
@@ -54,6 +67,55 @@ export class GitHubService {
       this.logger.warn(
         'GitHub API token not configured. API requests will be rate-limited (60/hour). Set GITHUB_API_TOKEN or GITHUB_ORG_ADMIN_TOKEN for higher limits (5000/hour).'
       );
+    }
+  }
+
+  /** Remaining GitHub API calls in the current window, as last reported by GitHub */
+  private rateLimitRemaining: number | null = null;
+  private rateLimitTotal: number | null = null;
+  private rateLimitResetAt: Date | null = null;
+
+  /**
+   * GitHub API quota as last reported by GitHub. `remaining` is `null` when unknown, or once the
+   * window has reset (the next call will report the new value).
+   */
+  get rateLimit(): { remaining: number | null; limit: number | null; resetAt: Date | null } {
+    const expired = this.rateLimitResetAt !== null && this.rateLimitResetAt.getTime() <= Date.now();
+    return {
+      remaining: expired ? null : this.rateLimitRemaining,
+      limit: this.rateLimitTotal,
+      resetAt: this.rateLimitResetAt,
+    };
+  }
+
+  private trackRateLimit(headers: Record<string, unknown> | undefined): void {
+    const remaining = Number(headers?.['x-ratelimit-remaining']);
+    const limit = Number(headers?.['x-ratelimit-limit']);
+    const reset = Number(headers?.['x-ratelimit-reset']);
+    if (Number.isFinite(remaining)) {
+      this.rateLimitRemaining = remaining;
+    }
+    if (Number.isFinite(limit) && limit > 0) {
+      this.rateLimitTotal = limit;
+    }
+    if (Number.isFinite(reset) && reset > 0) {
+      this.rateLimitResetAt = new Date(reset * 1000);
+    }
+  }
+
+  private async apiGet<T>(path: string): Promise<T> {
+    try {
+      const response = await axios.get(`${GITHUB_API_BASE_URL}${path}`, {
+        headers: this.getApiHeaders(),
+        timeout: GITHUB_API_TIMEOUT,
+      });
+      this.trackRateLimit(response.headers as Record<string, unknown>);
+      return response.data as T;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        this.trackRateLimit(error.response?.headers as Record<string, unknown> | undefined);
+      }
+      throw error;
     }
   }
 
@@ -393,6 +455,108 @@ export class GitHubService {
         );
       }
       throw new GitHubUnavailableError(`Could not fetch GitHub issue ${repoPath}#${number}`);
+    }
+  }
+
+  /**
+   * Pull requests of the same repository that reference an issue and were opened by `authorLogin`,
+   * read from the issue's timeline ("cross-referenced" events). Costs one call for the timeline,
+   * plus one or two per matching pull request.
+   * @returns an empty array when the issue no longer exists
+   * @throws GitHubUnavailableError on rate limit, network or 5xx errors
+   */
+  async fetchPullRequestsForIssue(
+    owner: string,
+    repo: string,
+    number: number,
+    authorLogin: string
+  ): Promise<GitHubPullRequest[]> {
+    const repoPath = `${owner}/${repo}`;
+    const login = authorLogin.toLowerCase();
+
+    try {
+      const timeline = await this.apiGet<
+        {
+          event?: string;
+          source?: {
+            issue?: {
+              number: number;
+              pull_request?: unknown;
+              user?: { login?: string };
+              repository?: { full_name?: string };
+            };
+          };
+        }[]
+      >(`/repos/${repoPath}/issues/${number}/timeline?per_page=100`);
+
+      const prNumbers = [
+        ...new Set(
+          timeline
+            .filter(
+              (item) =>
+                item.event === 'cross-referenced' &&
+                item.source?.issue?.pull_request &&
+                item.source.issue.repository?.full_name?.toLowerCase() === repoPath.toLowerCase() &&
+                item.source.issue.user?.login?.toLowerCase() === login
+            )
+            .map((item) => item.source?.issue?.number as number)
+        ),
+      ];
+
+      const pullRequests: GitHubPullRequest[] = [];
+      for (const prNumber of prNumbers) {
+        const pr = await this.apiGet<{
+          number: number;
+          state: 'open' | 'closed';
+          merged: boolean;
+          merged_at: string | null;
+          updated_at: string;
+          html_url: string;
+          user: { login: string };
+        }>(`/repos/${repoPath}/pulls/${prNumber}`);
+
+        let reviewDecision: GitHubPullRequest['reviewDecision'] = null;
+        if (pr.state === 'open') {
+          const reviews = await this.apiGet<{ state: string; user?: { login?: string } }[]>(
+            `/repos/${repoPath}/pulls/${prNumber}/reviews?per_page=100`
+          );
+          // Each reviewer's latest decisive review counts, like GitHub's own review decision
+          const latest = new Map<string, string>();
+          for (const review of reviews) {
+            if (['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
+              latest.set(review.user?.login ?? '', review.state);
+            }
+          }
+          const states = [...latest.values()];
+          reviewDecision = states.includes('CHANGES_REQUESTED')
+            ? 'CHANGES_REQUESTED'
+            : states.includes('APPROVED')
+              ? 'APPROVED'
+              : null;
+        }
+
+        pullRequests.push({
+          number: pr.number,
+          authorLogin: pr.user.login,
+          state: pr.state,
+          merged: pr.merged,
+          mergedAt: pr.merged_at ? new Date(pr.merged_at) : null,
+          updatedAt: new Date(pr.updated_at),
+          htmlUrl: pr.html_url,
+          reviewDecision,
+        });
+      }
+      return pullRequests;
+    } catch (error) {
+      const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+      if (status === 404 || status === 410) {
+        this.logger.warn(`GitHub issue not found or not public: ${repoPath}#${number}`);
+        return [];
+      }
+      this.logger.error(
+        `Failed to fetch pull requests for ${repoPath}#${number}: ${status ?? ''} ${error instanceof Error ? error.message : String(error)}`
+      );
+      throw new GitHubUnavailableError(`Could not fetch pull requests for ${repoPath}#${number}`);
     }
   }
 }

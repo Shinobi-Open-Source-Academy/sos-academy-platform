@@ -7,6 +7,7 @@ import { HackIssueController } from './hack-issue.controller';
 import { HackIssueService } from './hack-issue.service';
 import { HackIssueClaimController } from './hack-issue-claim.controller';
 import { HackIssueClaimService } from './hack-issue-claim.service';
+import { HackIssueSyncService } from './hack-issue-sync.service';
 import { HackIssue, HackIssueSchema } from './schemas/hack-issue.schema';
 
 @Module({
@@ -17,7 +18,7 @@ import { HackIssue, HackIssueSchema } from './schemas/hack-issue.schema';
     UserModule,
   ],
   controllers: [HackIssueController, HackIssueClaimController],
-  providers: [HackIssueService, HackIssueClaimService],
-  exports: [MongooseModule, HackIssueService, HackIssueClaimService],
+  providers: [HackIssueService, HackIssueClaimService, HackIssueSyncService],
+  exports: [MongooseModule, HackIssueService, HackIssueClaimService, HackIssueSyncService],
 })
 export class HackIssueModule {}

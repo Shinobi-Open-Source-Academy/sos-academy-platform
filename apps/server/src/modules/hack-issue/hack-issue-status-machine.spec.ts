@@ -4,6 +4,8 @@ import {
   HackIssueEvent as E,
   IllegalTransitionError,
   nextStatus,
+  pathTo,
+  SYNC_EVENTS,
   TRANSITIONS,
 } from './hack-issue-status-machine';
 
@@ -73,5 +75,36 @@ describe('hack issue status machine', () => {
     expect(() => nextStatus(S.OPEN, E.MERGE)).toThrow(
       'Cannot MERGE an issue that is OPEN (allowed from: PR_OPEN)'
     );
+  });
+
+  describe('pathTo', () => {
+    it.each([
+      [S.ASSIGNED, S.PR_OPEN, [E.OPEN_PR]],
+      [S.ASSIGNED, S.MERGED, [E.OPEN_PR, E.MERGE]],
+      [S.IN_PROGRESS, S.CHANGES_REQUESTED, [E.OPEN_PR, E.REQUEST_CHANGES]],
+      [S.CHANGES_REQUESTED, S.PR_OPEN, [E.OPEN_PR]],
+      [S.CHANGES_REQUESTED, S.MERGED, [E.OPEN_PR, E.MERGE]],
+      [S.PR_OPEN, S.CLOSED_UNMERGED, [E.CLOSE_UNMERGED]],
+    ])('goes from %s to %s with the sync events %j', (from, to, path) => {
+      expect(pathTo(from, to, SYNC_EVENTS)).toEqual(path);
+    });
+
+    it('returns an empty path when already there', () => {
+      expect(pathTo(S.PR_OPEN, S.PR_OPEN, SYNC_EVENTS)).toEqual([]);
+    });
+
+    it('returns null when the sync events cannot get there', () => {
+      // A merged issue is final, and a stale one needs a person to release it
+      expect(pathTo(S.MERGED, S.PR_OPEN, SYNC_EVENTS)).toBeNull();
+      expect(pathTo(S.STALE, S.MERGED, SYNC_EVENTS)).toBeNull();
+    });
+
+    it('only produces transitions the machine accepts', () => {
+      let status = S.ASSIGNED;
+      for (const event of pathTo(S.ASSIGNED, S.MERGED) ?? []) {
+        status = nextStatus(status, event);
+      }
+      expect(status).toBe(S.MERGED);
+    });
   });
 });

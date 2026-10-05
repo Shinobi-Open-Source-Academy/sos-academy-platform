@@ -17,13 +17,17 @@ import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
 import { GetHackIssuesQueryDto } from './dto/get-hack-issues.dto';
 import { RegisterHackIssueDto } from './dto/register-hack-issue.dto';
 import { HackIssueService } from './hack-issue.service';
+import { HackIssueSyncService } from './hack-issue-sync.service';
 
 @ApiTags('Hack Issues')
 @Controller('hack-issues')
 // TODO: open to senseis once a RolesGuard exists (#219)
 @UseGuards(AdminSessionGuard)
 export class HackIssueController {
-  constructor(private readonly hackIssueService: HackIssueService) {}
+  constructor(
+    private readonly hackIssueService: HackIssueService,
+    private readonly syncService: HackIssueSyncService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -44,5 +48,15 @@ export class HackIssueController {
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async findAll(@Query() query: GetHackIssuesQueryDto) {
     return this.hackIssueService.findAll(query);
+  }
+
+  @Post('sync')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sync assigned issues with their GitHub pull requests now — admin only',
+  })
+  @ApiResponse({ status: 200, description: 'How many issues were checked and moved' })
+  async sync() {
+    return this.syncService.syncAll();
   }
 }

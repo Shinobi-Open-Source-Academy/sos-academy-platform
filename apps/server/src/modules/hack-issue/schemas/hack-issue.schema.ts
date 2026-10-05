@@ -32,6 +32,29 @@ export class HackIssueStatusChange {
 
 export const HackIssueStatusChangeSchema = SchemaFactory.createForClass(HackIssueStatusChange);
 
+/**
+ * The pull request linked to the issue, as last seen by the GitHub sync job
+ */
+@Schema({ _id: false })
+export class HackIssuePullRequest {
+  @Prop({ required: true })
+  number: number;
+
+  @Prop({ required: true })
+  url: string;
+
+  @Prop({ required: true })
+  state: 'open' | 'closed';
+
+  @Prop({ default: false })
+  merged: boolean;
+
+  @Prop()
+  reviewDecision?: 'CHANGES_REQUESTED' | 'APPROVED';
+}
+
+export const HackIssuePullRequestSchema = SchemaFactory.createForClass(HackIssuePullRequest);
+
 @Schema({
   timestamps: true,
   toJSON: {
@@ -103,6 +126,13 @@ export class HackIssue {
 
   @Prop()
   assignedAt?: Date;
+
+  @Prop({ type: HackIssuePullRequestSchema, required: false })
+  pullRequest?: HackIssuePullRequest;
+
+  /** Last time the GitHub sync job checked this issue */
+  @Prop()
+  lastSyncedAt?: Date;
 
   /** Every status change, oldest first (see `HackIssueService.transition`) */
   @Prop({ type: [HackIssueStatusChangeSchema], default: [] })

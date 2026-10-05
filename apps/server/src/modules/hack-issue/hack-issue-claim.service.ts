@@ -21,7 +21,7 @@ const CLAIMABLE = [HackIssueStatus.OPEN, HackIssueStatus.UNASSIGNED];
 
 /** What hackers see of an issue: no registration details, body or status history */
 const PUBLIC_FIELDS =
-  'repository owner repo number title labels language url status assignee assignedAt createdAt';
+  'repository owner repo number title labels language url status assignee assignedAt pullRequest createdAt';
 
 /**
  * Claiming, releasing and assigning issues on the hack platform. Every change goes through the
