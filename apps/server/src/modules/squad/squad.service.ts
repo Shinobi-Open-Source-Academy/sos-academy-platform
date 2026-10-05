@@ -13,6 +13,25 @@ import { CreateSquadDto } from './dto/create-squad.dto';
 import { GetSquadsQueryDto } from './dto/get-squads.dto';
 import { DEFAULT_SQUAD_CAPACITY, Squad, SquadDocument } from './schemas/squad.schema';
 
+interface RosterMemberDoc {
+  _id: unknown;
+  name: string;
+  githubProfile?: { login?: string; avatarUrl?: string };
+}
+
+export interface SquadRoster {
+  id: string;
+  community: { name?: string; slug?: string };
+  capacity: number;
+  members: {
+    id: string;
+    name: string;
+    githubLogin: string | null;
+    avatarUrl: string | null;
+    joinedAt?: Date;
+  }[];
+}
+
 const isDuplicateKeyError = (error: unknown) =>
   !!error && typeof error === 'object' && 'code' in error && error.code === 11000;
 
@@ -60,7 +79,14 @@ export class SquadService {
     }
 
     try {
-      const squad = new this.squadModel({ mentor, community, members, capacity });
+      const joinedAt = new Date();
+      const squad = new this.squadModel({
+        mentor,
+        community,
+        members,
+        capacity,
+        memberJoinedAt: Object.fromEntries(members.map((memberId) => [memberId, joinedAt])),
+      });
       return await squad.save();
     } catch (error) {
       if (isDuplicateKeyError(error)) {
@@ -118,6 +144,41 @@ export class SquadService {
   }
 
   /**
+   * The roster of the squads a mentor leads: only their own squads, and only what a mentor
+   * needs to see about their mentees (no email).
+   */
+  async findMine(mentorId: string): Promise<SquadRoster[]> {
+    const squads = await this.squadModel
+      .find({ mentor: mentorId, isActive: true })
+      .populate<{ community: { _id: unknown; name: string; slug: string } }>(
+        'community',
+        'name slug'
+      )
+      .populate<{ members: RosterMemberDoc[] }>('members', 'name githubProfile')
+      .sort({ createdAt: 1 })
+      .lean()
+      .exec();
+
+    return squads.map((squad) => {
+      const joinedAt = (squad.memberJoinedAt ?? {}) as unknown as Record<string, Date>;
+      return {
+        id: String(squad._id),
+        community: { name: squad.community?.name, slug: squad.community?.slug },
+        capacity: squad.capacity,
+        members: squad.members
+          .map((member) => ({
+            id: String(member._id),
+            name: member.name,
+            githubLogin: member.githubProfile?.login ?? null,
+            avatarUrl: member.githubProfile?.avatarUrl ?? null,
+            joinedAt: joinedAt[String(member._id)] ?? (squad as { createdAt?: Date }).createdAt,
+          }))
+          .sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()),
+      };
+    });
+  }
+
+  /**
    * Adds an approved mentee to an active squad, without going over its capacity.
    */
   async addMember(squadId: string, userId: string): Promise<Squad> {
@@ -148,7 +209,7 @@ export class SquadService {
             members: { $ne: userId },
             $expr: { $lt: [{ $size: '$members' }, '$capacity'] },
           },
-          { $addToSet: { members: userId } },
+          { $addToSet: { members: userId }, $set: { [`memberJoinedAt.${userId}`]: new Date() } },
           { new: true }
         )
         .exec();
@@ -170,7 +231,10 @@ export class SquadService {
 
   async removeMember(squadId: string, userId: string): Promise<Squad> {
     const updated = await this.squadModel
-      .findOneAndUpdate({ _id: squadId, members: userId }, { $pull: { members: userId } })
+      .findOneAndUpdate(
+        { _id: squadId, members: userId },
+        { $pull: { members: userId }, $unset: { [`memberJoinedAt.${userId}`]: '' } }
+      )
       .exec();
 
     if (!updated) {

@@ -84,6 +84,10 @@ describe('SquadService', () => {
         community: communityId,
         members,
         capacity: 3,
+        memberJoinedAt: {
+          [members[0]]: expect.any(Date),
+          [members[1]]: expect.any(Date),
+        },
       });
       expect(save).toHaveBeenCalled();
       expect(squad).toMatchObject({ mentor: mentorId, community: communityId, capacity: 3 });
@@ -97,6 +101,7 @@ describe('SquadService', () => {
         community: communityId,
         members: [],
         capacity: DEFAULT_SQUAD_CAPACITY,
+        memberJoinedAt: {},
       });
     });
 
@@ -210,7 +215,10 @@ describe('SquadService', () => {
           members: { $ne: menteeId },
           $expr: { $lt: [{ $size: '$members' }, '$capacity'] },
         },
-        { $addToSet: { members: menteeId } },
+        {
+          $addToSet: { members: menteeId },
+          $set: { [`memberJoinedAt.${menteeId}`]: expect.any(Date) },
+        },
         { new: true }
       );
       // the one-squad check ignores the squad being edited
@@ -292,7 +300,7 @@ describe('SquadService', () => {
       await expect(service.removeMember(squadId, menteeId)).resolves.toBe(populated);
       expect(squadModel.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: squadId, members: menteeId },
-        { $pull: { members: menteeId } }
+        { $pull: { members: menteeId }, $unset: { [`memberJoinedAt.${menteeId}`]: '' } }
       );
     });
 
@@ -310,6 +318,69 @@ describe('SquadService', () => {
       squadModel.exists.mockResolvedValue(null);
 
       await expect(service.removeMember(squadId, menteeId)).rejects.toThrow('not found');
+    });
+  });
+
+  describe('findMine', () => {
+    it("returns only the mentor's active squads, with each member's join date and no email", async () => {
+      const naruto = new Types.ObjectId();
+      const sakura = new Types.ObjectId();
+      const created = new Date('2026-09-01');
+      query.lean = jest.fn().mockReturnThis();
+      query.exec.mockResolvedValue([
+        {
+          _id: 'squad-1',
+          community: { name: 'JavaScript', slug: 'javascript' },
+          capacity: 5,
+          createdAt: created,
+          memberJoinedAt: { [String(naruto)]: new Date('2026-09-20') },
+          members: [
+            {
+              _id: naruto,
+              name: 'Naruto',
+              email: 'naruto@test.local',
+              githubProfile: { login: 'naruto-dev', avatarUrl: 'https://avatar' },
+            },
+            { _id: sakura, name: 'Sakura' },
+          ],
+        },
+      ]);
+
+      const roster = await service.findMine(mentorId);
+
+      expect(squadModel.find).toHaveBeenCalledWith({ mentor: mentorId, isActive: true });
+      expect(query.populate).toHaveBeenCalledWith('members', 'name githubProfile');
+      expect(roster).toEqual([
+        {
+          id: 'squad-1',
+          community: { name: 'JavaScript', slug: 'javascript' },
+          capacity: 5,
+          members: [
+            // no recorded join date: falls back to the squad's creation
+            {
+              id: String(sakura),
+              name: 'Sakura',
+              githubLogin: null,
+              avatarUrl: null,
+              joinedAt: created,
+            },
+            {
+              id: String(naruto),
+              name: 'Naruto',
+              githubLogin: 'naruto-dev',
+              avatarUrl: 'https://avatar',
+              joinedAt: new Date('2026-09-20'),
+            },
+          ],
+        },
+      ]);
+    });
+
+    it('returns an empty list for a mentor without a squad', async () => {
+      query.lean = jest.fn().mockReturnThis();
+      query.exec.mockResolvedValue([]);
+
+      await expect(service.findMine(mentorId)).resolves.toEqual([]);
     });
   });
 

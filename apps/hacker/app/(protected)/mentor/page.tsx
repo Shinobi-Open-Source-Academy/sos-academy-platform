@@ -1,10 +1,20 @@
 'use client';
 
+import Link from 'next/link';
 import Sidebar from '../../../components/Sidebar';
 
-const upcomingTools = [
+interface MentorTool {
+  title: string;
+  description: string;
+  icon: string;
+  /** Tools without a link are not built yet */
+  href?: string;
+}
+
+const tools: MentorTool[] = [
   {
     title: 'My Squad',
+    href: '/mentor/squad',
     description: 'See the mentees in your squad, their GitHub handle and when they joined.',
     icon: 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z',
   },
@@ -38,27 +48,43 @@ export default function MentorHomePage() {
             Your tools
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in delay-150">
-            {upcomingTools.map((tool) => (
-              <div key={tool.title} className="card p-5 flex flex-col">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="w-10 h-10 flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d={tool.icon} />
-                    </svg>
+            {tools.map((tool) => {
+              const content = (
+                <>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="w-10 h-10 flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d={tool.icon} />
+                      </svg>
+                    </div>
+                    {tool.href ? (
+                      <span className="badge badge-success text-[10px]">Open</span>
+                    ) : (
+                      <span className="badge badge-neutral text-[10px]">Coming soon</span>
+                    )}
                   </div>
-                  <span className="badge badge-neutral text-[10px]">Coming soon</span>
+                  <h3 className="text-white font-medium mt-4">{tool.title}</h3>
+                  <p className="text-sm text-zinc-500 mt-1">{tool.description}</p>
+                </>
+              );
+
+              return tool.href ? (
+                <Link key={tool.title} href={tool.href} className="card p-5 flex flex-col">
+                  {content}
+                </Link>
+              ) : (
+                <div key={tool.title} className="card p-5 flex flex-col">
+                  {content}
                 </div>
-                <h3 className="text-white font-medium mt-4">{tool.title}</h3>
-                <p className="text-sm text-zinc-500 mt-1">{tool.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </main>

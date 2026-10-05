@@ -36,6 +36,14 @@ export class Squad {
   })
   members: MongooseSchema.Types.ObjectId[];
 
+  /** When each member joined the squad, keyed by user ID */
+  @Prop({
+    type: Map,
+    of: Date,
+    default: {},
+  })
+  memberJoinedAt: Map<string, Date>;
+
   @Prop({
     type: Number,
     min: 1,
