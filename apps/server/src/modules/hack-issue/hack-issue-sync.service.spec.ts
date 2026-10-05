@@ -253,7 +253,11 @@ describe('HackIssueSyncService', () => {
 
     it('does not run twice at the same time', async () => {
       let release: () => void = () => undefined;
-      findExec.mockReturnValue(new Promise((resolve) => (release = () => resolve([]))));
+      findExec.mockReturnValue(
+        new Promise((resolve) => {
+          release = () => resolve([]);
+        })
+      );
 
       const first = service.syncAll();
       await expect(service.syncAll()).resolves.toMatchObject({ checked: 0 });
