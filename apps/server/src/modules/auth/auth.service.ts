@@ -3,12 +3,28 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { IGitHubProfile } from '@sos-academy/shared';
-import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
 import { envConfig } from '../../common/config/env.config';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { UserService } from '../user/user.service';
+import { hashRefreshToken } from './refresh-token';
 import { Session, SessionDocument } from './schemas/session.schema';
+
+/**
+ * When a session created now expires, based on JWT_REFRESH_EXPIRATION (e.g. "7d", "30m")
+ */
+export function refreshExpiryDate(expiresIn = envConfig.jwt.refreshExpiration): Date {
+  const expiryDate = new Date();
+  const amount = Number.parseInt(expiresIn, 10);
+  if (expiresIn.endsWith('d')) {
+    expiryDate.setDate(expiryDate.getDate() + amount);
+  } else if (expiresIn.endsWith('m')) {
+    expiryDate.setMinutes(expiryDate.getMinutes() + amount);
+  } else {
+    expiryDate.setDate(expiryDate.getDate() + 7); // Default 7d
+  }
+  return expiryDate;
+}
 
 @Injectable()
 export class AuthService {
@@ -21,11 +37,20 @@ export class AuthService {
   ) {}
 
   async handleGitHubOAuth(profile: IGitHubProfile) {
-    // TODO: Add OAuth-specific validations here (e.g., check if user is active, email verified, etc.)
+    // Accounts are matched and created by email, which GitHub only shares with the user:email scope
+    if (!profile.email) {
+      throw new UnauthorizedException(
+        'Your GitHub account has no email address we can use. Add a verified email on GitHub and try again.'
+      );
+    }
+
     const user = await this.userService.findOrCreateFromGitHub(profile);
 
     if (!user) {
       throw new UnauthorizedException('Failed to validate GitHub user');
+    }
+    if (user.isActive === false) {
+      throw new UnauthorizedException('This account has been deactivated');
     }
 
     return user;
@@ -52,28 +77,34 @@ export class AuthService {
     };
   }
 
+  /**
+   * Exchange a refresh token for a new access token. The refresh token is rotated: the session it
+   * belongs to now stores the new one, so each refresh token can only be used once.
+   */
   async refreshTokens(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
         secret: envConfig.jwt.refreshSecret,
       });
 
+      // A user has one session per login (browser/device): find the one this token belongs to
       const session = await this.sessionModel
         .findOne({
           user: payload.sub,
+          refreshToken: hashRefreshToken(refreshToken),
+          expiresAt: { $gt: new Date() },
         })
         .exec();
-
       if (!session) {
         throw new UnauthorizedException('Session not found or expired');
       }
 
-      const isTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
-      if (!isTokenValid) {
-        throw new UnauthorizedException('Invalid refresh token');
+      const user = await this.userService.findOne(payload.sub);
+      if (user.isActive === false) {
+        await this.logout(payload.sub);
+        throw new UnauthorizedException('This account has been deactivated');
       }
 
-      const user = await this.userService.findOne(payload.sub);
       const newPayload = { sub: user.id, email: user.email, role: user.role };
       const newAccessToken = this.jwtService.sign(newPayload);
       const newRefreshToken = this.jwtService.sign(newPayload, {
@@ -81,13 +112,17 @@ export class AuthService {
         expiresIn: envConfig.jwt.refreshExpiration as JwtSignOptions['expiresIn'],
       });
 
+      session.refreshToken = hashRefreshToken(newRefreshToken);
+      session.expiresAt = refreshExpiryDate();
+      await session.save();
+
       return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
         user,
       };
     } catch (error) {
-      this.logger.error(`Token refresh failed: ${error.message}`);
+      this.logger.warn(`Token refresh failed: ${error instanceof Error ? error.message : error}`);
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
@@ -102,22 +137,10 @@ export class AuthService {
     userAgent?: string,
     ipAddress?: string
   ) {
-    const hashedToken = await bcrypt.hash(refreshToken, 10);
-
-    const expiresIn = envConfig.jwt.refreshExpiration;
-    const expiryDate = new Date();
-    if (expiresIn.endsWith('d')) {
-      expiryDate.setDate(expiryDate.getDate() + parseInt(expiresIn));
-    } else if (expiresIn.endsWith('m')) {
-      expiryDate.setMinutes(expiryDate.getMinutes() + parseInt(expiresIn));
-    } else {
-      expiryDate.setDate(expiryDate.getDate() + 7); // Default 7d
-    }
-
     const session = new this.sessionModel({
       user: userId,
-      refreshToken: hashedToken,
-      expiresAt: expiryDate,
+      refreshToken: hashRefreshToken(refreshToken),
+      expiresAt: refreshExpiryDate(),
       userAgent,
       ipAddress,
     });

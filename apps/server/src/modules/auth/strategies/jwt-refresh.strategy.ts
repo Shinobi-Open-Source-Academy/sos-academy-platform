@@ -1,13 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Request } from 'express';
-import { envConfig } from 'apps/server/src/common/config/env.config';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Session, SessionDocument } from '../schemas/session.schema';
+import { PassportStrategy } from '@nestjs/passport';
 import { ICurrentUser } from '@sos-academy/shared';
-import * as bcrypt from 'bcryptjs';
+import { envConfig } from 'apps/server/src/common/config/env.config';
+import { Request } from 'express';
+import { Model } from 'mongoose';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { hashRefreshToken } from '../refresh-token';
+import { Session, SessionDocument } from '../schemas/session.schema';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
@@ -40,17 +40,12 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     const session = await this.sessionModel
       .findOne({
         user: payload.sub,
+        refreshToken: hashRefreshToken(refreshToken),
       })
       .exec();
 
     if (!session) {
       throw new UnauthorizedException('Session not found or expired');
-    }
-
-    const isTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
-
-    if (!isTokenValid) {
-      throw new UnauthorizedException('Invalid refresh token');
     }
 
     if (session.expiresAt < new Date()) {
