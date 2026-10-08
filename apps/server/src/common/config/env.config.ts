@@ -26,7 +26,7 @@ export const envConfig = {
     refreshExpiration: env('JWT_REFRESH_EXPIRATION', '7d'),
   },
   cors: {
-    origin: env('CORS_ORIGIN', 'http://localhost:3000,http://localhost:3001'),
+    origin: env('CORS_ORIGIN', 'http://localhost:3000,http://localhost:3001,http://localhost:3002'),
   },
   logging: {
     level: env('LOG_LEVEL', 'debug'),
@@ -38,6 +38,17 @@ export const envConfig = {
   },
   frontends: {
     hackerPortalUrl: env('HACKER_PORTAL_URL', 'http://localhost:3000'),
+  },
+  hack: {
+    /** Issues a hacker can hold at once (assigned, in progress or under review) */
+    maxActiveClaims: Number.parseInt(env('HACK_MAX_ACTIVE_CLAIMS', '3'), 10),
+    sync: {
+      /** Poll GitHub for the pull requests of assigned issues */
+      enabled: env('HACK_SYNC_ENABLED', 'true') !== 'false',
+      intervalMinutes: Number.parseInt(env('HACK_SYNC_INTERVAL_MINUTES', '10'), 10),
+      /** Stop a run early when fewer GitHub API calls than this are left */
+      minRateLimit: Number.parseInt(env('HACK_SYNC_MIN_RATE_LIMIT', '50'), 10),
+    },
   },
   github: {
     clientId: env('GITHUB_CLIENT_ID', 'default_github_client_id_change_in_production'),
