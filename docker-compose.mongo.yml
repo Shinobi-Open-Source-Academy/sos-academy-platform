@@ -1,0 +1,40 @@
+# Optional self-hosted MongoDB, for when you do not use a managed database (Atlas, etc.).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.mongo.yml up -d --build
+#
+# Set MONGODB_URI in your env file to match, e.g.
+#   mongodb://<MONGO_ROOT_USERNAME>:<MONGO_ROOT_PASSWORD>@mongo:27017/sos-academy?authSource=admin
+#
+# The database is not published on any host port. Root credentials are required, and only take
+# effect when the data volume is first created. Back up the mongo-data volume yourself.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is not set - root user of the self-hosted MongoDB}"
+      - "MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD is not set - root password of the self-hosted MongoDB}"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  server:
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

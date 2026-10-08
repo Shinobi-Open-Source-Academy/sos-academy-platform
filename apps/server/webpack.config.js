@@ -14,6 +14,10 @@ module.exports = (_, argv) => {
   // For watch mode, NestJS expects the file at dist/main.js (not dist/src/main.js)
   const outputFilename = isWatch ? 'main.js' : 'main.js';
 
+  // Set by the Dockerfile only: inline every dependency into main.js so the runtime image needs no
+  // node_modules. By default the packages declared in this app's package.json stay external.
+  const bundleAllDeps = process.env.BUNDLE_ALL_DEPS === 'true';
+
   return {
     target: 'node',
     entry: './src/main.ts',
@@ -21,7 +25,9 @@ module.exports = (_, argv) => {
       path: outputPath,
       filename: outputFilename,
     },
-    externals: [nodeExternals({ allowlist: ['express-session', 'cookie-parser'] })],
+    externals: bundleAllDeps
+      ? []
+      : [nodeExternals({ allowlist: ['express-session', 'cookie-parser'] })],
     module: {
       rules: [
         {
@@ -94,6 +100,11 @@ module.exports = (_, argv) => {
       {
         module: /mongodb\/lib\/deps\.js/,
         message: /Module not found/,
+      },
+      {
+        // resend loads @react-email/render optionally, inside a try/catch (only when bundled)
+        module: /resend\/dist/,
+        message: /@react-email\/render/,
       },
     ],
   };
