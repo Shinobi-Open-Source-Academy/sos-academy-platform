@@ -7,6 +7,26 @@ const GITHUB_API_TIMEOUT = 30000;
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 const GITHUB_API_VERSION = '2022-11-28';
 
+export interface GitHubIssue {
+  githubId: number;
+  owner: string;
+  repo: string;
+  number: number;
+  title: string;
+  body: string | null;
+  labels: string[];
+  language: string | null;
+  state: 'open' | 'closed';
+  htmlUrl: string;
+  isPullRequest: boolean;
+}
+
+/**
+ * Thrown when GitHub can't be reached or refuses the request for a reason other than
+ * the resource not existing (rate limit, network error, 5xx...).
+ */
+export class GitHubUnavailableError extends Error {}
+
 @Injectable()
 export class GitHubService {
   private readonly logger = new Logger(GitHubService.name);
@@ -306,6 +326,73 @@ export class GitHubService {
         );
       }
       return null;
+    }
+  }
+
+  /**
+   * Fetch a GitHub issue along with its repository's primary language
+   * @param owner Repository owner
+   * @param repo Repository name
+   * @param number Issue number
+   * @returns Issue data, or null if the issue doesn't exist or isn't public
+   * @throws GitHubUnavailableError if GitHub can't be reached or rate-limits the request
+   */
+  async fetchIssue(owner: string, repo: string, number: number): Promise<GitHubIssue | null> {
+    const repoPath = `${owner}/${repo}`;
+
+    try {
+      const [issueResponse, repoResponse] = await Promise.all([
+        axios.get(`${GITHUB_API_BASE_URL}/repos/${repoPath}/issues/${number}`, {
+          headers: this.getApiHeaders(),
+          timeout: GITHUB_API_TIMEOUT,
+        }),
+        axios.get(`${GITHUB_API_BASE_URL}/repos/${repoPath}`, {
+          headers: this.getApiHeaders(),
+          timeout: GITHUB_API_TIMEOUT,
+        }),
+      ]);
+
+      const issue = issueResponse.data;
+      const repository = repoResponse.data;
+      const [canonicalOwner, canonicalRepo] = (repository.full_name as string).split('/');
+
+      return {
+        githubId: issue.id,
+        owner: canonicalOwner,
+        repo: canonicalRepo,
+        number: issue.number,
+        title: issue.title,
+        body: issue.body ?? null,
+        labels: (issue.labels ?? [])
+          .map((label: string | { name?: string }) =>
+            typeof label === 'string' ? label : label.name
+          )
+          .filter((name: string | undefined): name is string => Boolean(name)),
+        language: repository.language ?? null,
+        state: issue.state,
+        htmlUrl: issue.html_url,
+        isPullRequest: Boolean(issue.pull_request),
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const message = error.response?.data?.message || error.message;
+
+        // GitHub answers 404 for private repositories as well as missing ones; 410 = issue deleted
+        if (status === 404 || status === 410) {
+          this.logger.warn(`GitHub issue not found or not public: ${repoPath}#${number}`);
+          return null;
+        }
+
+        this.logger.error(
+          `Failed to fetch GitHub issue ${repoPath}#${number}: ${status} - ${message}`
+        );
+      } else {
+        this.logger.error(
+          `Failed to fetch GitHub issue ${repoPath}#${number}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+      throw new GitHubUnavailableError(`Could not fetch GitHub issue ${repoPath}#${number}`);
     }
   }
 }
