@@ -1,0 +1,95 @@
+name: Deploy server
+
+# Builds the API image and deploys it straight to Cloud Run on every push to main that touches
+# the server or something it depends on. No release/versioning gate: this deploys continuously,
+# independent of whether semantic-release (release.yml) decides a given push warrants a version
+# bump — a server-only change like a Dockerfile fix has no reason to wait on that.
+#
+# Auth is keyless: GitHub's OIDC token is exchanged for short-lived GCP credentials via Workload
+# Identity Federation, scoped to this exact repo + the main branch only (see the attribute
+# condition on the WIF provider) — no service account JSON key stored as a GitHub secret.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/server/**
+      - libs/shared/**
+      - Dockerfile
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .github/workflows/deploy-server.yml
+  workflow_dispatch: {} # manual re-deploy of the current main, e.g. after a Secret Manager rotation
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false # never cancel a deploy mid-flight
+
+permissions:
+  contents: read
+  id-token: write # required to mint the OIDC token WIF exchanges
+
+env:
+  PROJECT_ID: sos-academy-483918
+  REGION: us-central1
+  SERVICE: server
+  WORKLOAD_IDENTITY_PROVIDER: projects/194253303838/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
+  DEPLOY_SA: github-deployer@sos-academy-483918.iam.gserviceaccount.com
+
+jobs:
+  deploy:
+    name: Build, push, deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push (amd64 — Cloud Run requirement)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: server
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/sos-academy/server:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/sos-academy/server:latest
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,mode=max,scope=server,ignore-error=true
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image="${REGION}-docker.pkg.dev/${PROJECT_ID}/sos-academy/server:${{ github.sha }}" \
+            --region="$REGION"
+          echo "url=$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')" >> "$GITHUB_OUTPUT"
+        # Deliberately no --set-env-vars/--set-secrets here: `gcloud run deploy --image=...` with no
+        # other config flags carries over the previous revision's env vars and secret references
+        # unchanged, it only swaps the image. Config changes go through the CLI by hand (see
+        # docs/gcp-cloud-run-deploy.md) and this workflow preserves whatever that left in place.
+
+      - name: Smoke test
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "${{ steps.deploy.outputs.url }}/api")
+          if [ "$code" != "200" ]; then
+            echo "::error::Health check returned $code, expected 200"
+            exit 1
+          fi
+          echo "✅ ${{ steps.deploy.outputs.url }}/api responded 200"

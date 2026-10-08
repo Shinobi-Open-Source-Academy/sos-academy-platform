@@ -1,0 +1,38 @@
+name: PR Title
+
+# Release versions are derived from Conventional Commit messages. Merging a PR puts its title (on
+# squash merge) or its commits (on merge commit) on main, so a malformed title means a change that
+# silently never gets released. Enforced with the same rules as the local commit-msg hook.
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  conventional-title:
+    name: Conventional Commit title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Lint PR title
+        env:
+          # Passed through the environment, never interpolated into the script (titles are untrusted).
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint
