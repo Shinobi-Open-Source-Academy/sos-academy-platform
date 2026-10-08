@@ -1,25 +1,80 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
 import { BlogService } from './blog.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ReactDto } from './dto/react.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import {
+  ALLOWED_IMAGE_TYPES,
+  ImageUploadService,
+  MAX_IMAGE_SIZE,
+  UploadedImage,
+} from './image-upload.service';
 
 @ApiTags('Blog')
 @Controller('blog')
 export class BlogController {
-  constructor(private readonly blogService: BlogService) {}
+  constructor(
+    private readonly blogService: BlogService,
+    private readonly imageUploadService: ImageUploadService
+  ) {}
+
+  @Post('images')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AdminSessionGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: { fileSize: MAX_IMAGE_SIZE, files: 1 },
+      fileFilter: (_req, file, callback) =>
+        ALLOWED_IMAGE_TYPES.includes(file.mimetype)
+          ? callback(null, true)
+          : callback(
+              new BadRequestException('Only PNG, JPEG, GIF and WebP images are allowed'),
+              false
+            ),
+    })
+  )
+  @ApiOperation({ summary: 'Upload an image for a blog post — admin only' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: { type: 'object', properties: { image: { type: 'string', format: 'binary' } } },
+  })
+  @ApiResponse({ status: 201, description: 'Public URL of the uploaded image' })
+  @ApiResponse({ status: 400, description: 'Missing file, wrong type or larger than 5 MB' })
+  @ApiResponse({ status: 503, description: 'Uploads not configured or Cloudinary unavailable' })
+  async uploadImage(@UploadedFile() file?: UploadedImage) {
+    if (!file) {
+      throw new BadRequestException('No image received (expected a multipart "image" field)');
+    }
+    return this.imageUploadService.upload(file);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new blog post' })
