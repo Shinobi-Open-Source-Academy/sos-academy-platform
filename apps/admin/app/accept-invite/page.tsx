@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import PasswordInput from '../../components/PasswordInput';
-import { apiClient, ApiError } from '../../lib/api-client';
+import { ApiError, apiClient } from '../../lib/api-client';
 
 export const dynamic = 'force-dynamic';
 

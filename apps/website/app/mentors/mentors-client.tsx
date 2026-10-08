@@ -1,12 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { CodeBackground, SpotlightCard } from '@sos-academy/ui';
+import { useEffect, useRef, useState } from 'react';
 import Footer from '../../components/Footer';
-import MentorApplicationForm from '../../components/MentorApplicationForm';
-import MentorsCarousel from '../../components/MentorsCarousel';
-import Navbar from '../../components/Navbar';
-import { getActiveMentors, type Mentor } from '../../lib/api-client';
 import {
   AdjustmentsIcon,
   ChatBubbleIcon,
@@ -14,6 +10,10 @@ import {
   ClipboardListIcon,
   TrendingUpIcon,
 } from '../../components/icons';
+import MentorApplicationForm from '../../components/MentorApplicationForm';
+import MentorsCarousel from '../../components/MentorsCarousel';
+import Navbar from '../../components/Navbar';
+import { getActiveMentors, type Mentor } from '../../lib/api-client';
 import { COMMUNITIES, SITE_CONFIG } from '../../lib/data';
 import { REQUIREMENTS } from './_data';
 

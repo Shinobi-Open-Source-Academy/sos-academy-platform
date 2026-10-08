@@ -1,12 +1,12 @@
 'use client';
 
+import { formatDateTime } from '@sos-academy/shared';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { formatDateTime } from '@sos-academy/shared';
+import { useRequireAuth } from '../../context/AuthContext';
 import { apiClient } from '../../lib/api-client';
 import { DURATIONS } from '../../lib/constants';
-import { useRequireAuth } from '../../context/AuthContext';
 import MarkdownEditor, { markdownToHtml } from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 

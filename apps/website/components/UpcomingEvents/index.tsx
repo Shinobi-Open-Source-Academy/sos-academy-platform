@@ -1,10 +1,10 @@
 'use client';
 
+import { EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '@sos-academy/shared';
+import { Skeleton, SpotlightCard } from '@sos-academy/ui';
 import { useEffect, useState } from 'react';
 import { getUpcomingEvents, type UpcomingEvent } from '../../lib/api-client';
-import { EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '@sos-academy/shared';
 import { CalendarIcon, ClockIcon, UsersIcon } from '../icons';
-import { Skeleton, SpotlightCard } from '@sos-academy/ui';
 import { Countdown } from './Countdown';
 import { MAX_EVENTS_SHOWN } from './constants';
 import { EventJoinButton, SmallEventJoinButton } from './EventJoinButton';

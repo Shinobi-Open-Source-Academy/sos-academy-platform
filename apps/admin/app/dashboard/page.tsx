@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { apiClient } from '../../lib/api-client';
 import { useRequireAuth } from '../../context/AuthContext';
+import { apiClient } from '../../lib/api-client';
 import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';

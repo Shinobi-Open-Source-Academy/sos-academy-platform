@@ -1,7 +1,7 @@
 'use client';
 
-import { GitHubIcon, GlobeIcon, LinkedInIcon, TwitterIcon } from './icons';
 import { SpotlightCard } from '@sos-academy/ui';
+import { GitHubIcon, GlobeIcon, LinkedInIcon, TwitterIcon } from './icons';
 
 const MAX_EXPERTISE_SHOWN = 3;
 
