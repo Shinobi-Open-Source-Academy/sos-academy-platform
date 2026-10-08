@@ -51,6 +51,15 @@ interface Broadcast {
   failedCount?: number;
 }
 
+/**
+ * Value for a datetime-local input: the date in the admin's local time ("YYYY-MM-DDTHH:mm").
+ * toISOString() would give UTC, which the input then reads as local time and shifts the event.
+ */
+const toDateTimeLocal = (date: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 export default function BroadcastsPage() {
   useRequireAuth();
   const router = useRouter();
@@ -288,9 +297,7 @@ export default function BroadcastsPage() {
     }
 
     if (broadcast.eventStartTime) {
-      // Convert ISO string to datetime-local format
-      const startDate = new Date(broadcast.eventStartTime);
-      setEventStartTime(startDate.toISOString().slice(0, 16));
+      setEventStartTime(toDateTimeLocal(new Date(broadcast.eventStartTime)));
     }
 
     if (broadcast.eventDuration) {
