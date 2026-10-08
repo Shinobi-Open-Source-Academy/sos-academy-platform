@@ -55,9 +55,9 @@ const mockActivity = [
 
 export default function ActivityPage() {
   return (
-    <div className="min-h-screen bg-black flex">
+    <div className="min-h-screen bg-black md:flex">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 sm:p-8 overflow-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 animate-fade-in">
             <h1 className="text-2xl font-semibold text-white">Activity</h1>
