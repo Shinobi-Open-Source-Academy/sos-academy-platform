@@ -15,19 +15,39 @@ import { envConfig } from '../../common/config/env.config';
 import { Community, CommunityDocument } from '../community/schemas/community.schema';
 import { EmailService } from '../email/email.service';
 import { GitHubService } from '../github/github.service';
-import { AdminLoginDto } from './dto/admin-login.dto';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
-import { InviteAdminDto } from './dto/invite-admin.dto';
+import { AdminLoginDto } from './dto/admin-login.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersQueryDto } from './dto/get-user.dto';
+import { InviteAdminDto } from './dto/invite-admin.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
 import { RejectMentorDto } from './dto/reject-mentor.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
+import { UpdateMentorDto } from './dto/update-mentor.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
+
+const SOCIAL_LINKS = ['github', 'linkedin', 'twitter', 'website'] as const;
+
+export interface MentorProfile {
+  title: string | null;
+  description: string | null;
+  socialLinks: Record<(typeof SOCIAL_LINKS)[number], string | null>;
+}
+
+const toMentorProfile = (user: User): MentorProfile => ({
+  title: user.title ?? null,
+  description: user.description ?? null,
+  socialLinks: {
+    github: user.socialLinks?.github ?? null,
+    linkedin: user.socialLinks?.linkedin ?? null,
+    twitter: user.socialLinks?.twitter ?? null,
+    website: user.socialLinks?.website ?? null,
+  },
+});
 
 @Injectable()
 export class UserService {
@@ -94,15 +114,64 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
+    const update = { ...updateUserDto };
+    // Never store a plain-text password
+    if (update.password) {
+      update.password = await this.hashPassword(update.password);
+    }
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(id, update, { new: true }).exec();
 
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
     return updatedUser;
+  }
+
+  /**
+   * Public mentor profile fields (shown on the mentor directory) of a user
+   */
+  async getMentorProfile(userId: string): Promise<MentorProfile> {
+    return toMentorProfile(await this.findOne(userId));
+  }
+
+  /**
+   * Update the public mentor profile fields of a user. `null` clears a field.
+   */
+  async updateMentorProfile(userId: string, dto: UpdateMentorDto): Promise<MentorProfile> {
+    const $set: Record<string, string> = {};
+    const $unset: Record<string, ''> = {};
+    const assign = (path: string, value: string | null | undefined) => {
+      if (value === undefined) return;
+      if (value === null) $unset[path] = '';
+      else $set[path] = value;
+    };
+
+    assign('title', dto.title);
+    assign('description', dto.description);
+    for (const link of SOCIAL_LINKS) {
+      assign(`socialLinks.${link}`, dto[link]);
+    }
+
+    if (!Object.keys($set).length && !Object.keys($unset).length) {
+      return this.getMentorProfile(userId);
+    }
+
+    const user = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        {
+          ...(Object.keys($set).length && { $set }),
+          ...(Object.keys($unset).length && { $unset }),
+        },
+        { new: true, runValidators: true }
+      )
+      .exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return toMentorProfile(user);
   }
 
   async remove(id: string): Promise<User> {
