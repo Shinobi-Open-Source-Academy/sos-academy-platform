@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user.schema';
 import { BlogController } from './blog.controller';
 import { BlogService } from './blog.service';
+import { ImageUploadService } from './image-upload.service';
 import { Post, PostSchema } from './schemas/post.schema';
 
 @Module({
@@ -13,7 +14,7 @@ import { Post, PostSchema } from './schemas/post.schema';
     ]),
   ],
   controllers: [BlogController],
-  providers: [BlogService],
+  providers: [BlogService, ImageUploadService],
   exports: [BlogService],
 })
 export class BlogModule {}
