@@ -26,7 +26,7 @@ export const envConfig = {
     refreshExpiration: env('JWT_REFRESH_EXPIRATION', '7d'),
   },
   cors: {
-    origin: env('CORS_ORIGIN', 'http://localhost:3000,http://localhost:3001'),
+    origin: env('CORS_ORIGIN', 'http://localhost:3000,http://localhost:3001,http://localhost:3002'),
   },
   logging: {
     level: env('LOG_LEVEL', 'debug'),

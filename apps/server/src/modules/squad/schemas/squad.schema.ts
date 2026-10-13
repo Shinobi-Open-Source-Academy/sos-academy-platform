@@ -55,3 +55,14 @@ export const SquadSchema = SchemaFactory.createForClass(Squad);
 SquadSchema.index({ mentor: 1, community: 1 });
 SquadSchema.index({ members: 1, isActive: 1 });
 SquadSchema.index({ community: 1, isActive: 1 });
+
+// A mentee is in at most one active squad. Empty squads are left out of the index: a unique
+// multikey index would otherwise see every empty `members` array as the same (missing) key.
+SquadSchema.index(
+  { members: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { isActive: true, 'members.0': { $exists: true } },
+    name: 'one_active_squad_per_member',
+  }
+);
