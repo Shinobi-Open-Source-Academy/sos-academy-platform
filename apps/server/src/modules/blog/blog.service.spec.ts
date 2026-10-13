@@ -47,4 +47,26 @@ describe('BlogService.findAll search', () => {
     expect(pattern.test('Intro to node.js')).toBe(true);
     expect(pattern.test('Intro to nodexjs')).toBe(false);
   });
+
+  it.each([
+    '(',
+    '[',
+    '*',
+    '?',
+    'C++',
+    '(and C)',
+  ])('treats %s as plain text in every searched field', async (search) => {
+    await service.findAll({ search });
+    const postFilter = postModel.find.mock.calls[0][0];
+    const userFilter = userModel.find.mock.calls[0][0];
+    const patterns = [...postFilter.$or, ...userFilter.$or]
+      .map((clause: Record<string, { $regex?: string }>) => Object.values(clause)[0].$regex)
+      .filter(Boolean)
+      .map((source: string) => new RegExp(source, 'i'));
+
+    expect(patterns).toHaveLength(5);
+    for (const pattern of patterns) {
+      expect(pattern.test(`intro ${search} outro`)).toBe(true);
+    }
+  });
 });
