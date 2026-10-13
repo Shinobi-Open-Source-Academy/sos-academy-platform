@@ -1,6 +1,6 @@
 {
   "name": "@sos-academy-platform/source",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "license": "MIT",
   "packageManager": "pnpm@10.18.1",
   "scripts": {
