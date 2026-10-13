@@ -1,6 +1,7 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { AppModule } from './app.module';
 import { envConfig } from './common/config/env.config';
@@ -30,6 +31,9 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
+
+  // Needed to read the HttpOnly refresh-token cookie on /auth/refresh
+  app.use(cookieParser());
 
   const isProd = envConfig.nodeEnv === 'production';
   app.use(
