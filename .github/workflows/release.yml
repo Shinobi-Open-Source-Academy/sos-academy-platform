@@ -1,90 +1,73 @@
 name: Release
 
+# Every push to main is analysed by semantic-release. If it contains a releasable Conventional
+# Commit (feat, fix, perf, or a breaking change) it bumps the version, tags vX.Y.Z, updates
+# CHANGELOG.md, publishes a GitHub Release, and then builds + pushes the Docker images.
+
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release:
-    name: Create Release
+    name: Version & GitHub release
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write # push the tag and the CHANGELOG/package.json commit
+      issues: write # comment on issues resolved by the release
+      pull-requests: write # comment on PRs included in the release
+    outputs:
+      version: ${{ steps.semantic-release.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # semantic-release needs the full history and all tags
+          persist-credentials: false # semantic-release authenticates with GITHUB_TOKEN itself
+
+      - name: Require a baseline tag
+        # With no v* tag, semantic-release treats the whole history as unreleased and would publish
+        # v1.0.0 with every commit ever made as its changelog. Fail loudly instead.
+        run: |
+          if [ -z "$(git tag --list 'v*')" ]; then
+            echo "::error::No v* tag found. Create a baseline tag first (docs/deployment.md, 'Releases')."
+            exit 1
+          fi
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
-
-      - name: Run tests
-        run: pnpm test --passWithNoTests
-
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-      - name: Generate changelog
-        id: changelog
-        uses: mikepenz/release-changelog-builder-action@v4
-        with:
-          configuration: ".github/release.yml"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release v${{ steps.get_version.outputs.VERSION }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+      - name: Run semantic-release
+        id: semantic-release
+        run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUSKY: '0'
 
-      - name: Update CHANGELOG.md
-        run: |
-          VERSION=${{ steps.get_version.outputs.VERSION }}
-          DATE=$(date +%Y-%m-%d)
-
-          # Create temporary changelog entry
-          cat << EOF > /tmp/changelog_entry.md
-          ## [$VERSION] - $DATE
-
-          ${{ steps.changelog.outputs.changelog }}
-
-          EOF
-
-          # Insert new entry after the [Unreleased] section
-          sed -i "/## \[Unreleased\]/r /tmp/changelog_entry.md" CHANGELOG.md
-
-          # Update the comparison links at the bottom
-          echo "" >> CHANGELOG.md
-          echo "[${VERSION}]: https://github.com/Shinobi-Open-Source-Academy/sos-academy-platform/releases/tag/v${VERSION}" >> CHANGELOG.md
-
-      - name: Commit CHANGELOG.md
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs: update CHANGELOG for v${{ steps.get_version.outputs.VERSION }}"
-          file_pattern: CHANGELOG.md
-          branch: main
+  images:
+    name: Docker images
+    needs: release
+    # `version` is only set when semantic-release actually published a new release.
+    if: needs.release.outputs.version != ''
+    permissions:
+      contents: read
+      packages: write # push to ghcr.io
+    uses: ./.github/workflows/docker.yml
+    with:
+      version: ${{ needs.release.outputs.version }}

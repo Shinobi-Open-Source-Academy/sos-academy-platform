@@ -1,48 +1,52 @@
-import { getModelToken } from '@nestjs/mongoose';
-import { Test } from '@nestjs/testing';
-import { User } from '../user/schemas/user.schema';
 import { BlogService } from './blog.service';
-import { Post } from './schemas/post.schema';
 
-const chain = (result: unknown) => {
-  const query: Record<string, jest.Mock> = {};
-  for (const method of ['sort', 'skip', 'limit', 'select', 'populate', 'lean']) {
-    query[method] = jest.fn(() => query);
+function chain(result: unknown) {
+  const link: Record<string, jest.Mock> = {};
+  for (const name of ['select', 'sort', 'skip', 'limit', 'populate', 'lean']) {
+    link[name] = jest.fn().mockReturnValue(link);
   }
-  query.exec = jest.fn(async () => result);
-  return query;
-};
+  link.exec = jest.fn().mockResolvedValue(result);
+  return link;
+}
 
 describe('BlogService.findAll search', () => {
+  let postModel: { find: jest.Mock; countDocuments: jest.Mock };
+  let userModel: { find: jest.Mock };
   let service: BlogService;
-  const postModel = { find: jest.fn(), countDocuments: jest.fn() };
-  const userModel = { find: jest.fn() };
 
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    postModel.find.mockReturnValue(chain([]));
-    postModel.countDocuments.mockReturnValue(chain(0));
-    userModel.find.mockReturnValue(chain([]));
-    const module = await Test.createTestingModule({
-      providers: [
-        BlogService,
-        { provide: getModelToken(Post.name), useValue: postModel },
-        { provide: getModelToken(User.name), useValue: userModel },
-      ],
-    }).compile();
-    service = module.get(BlogService);
+  beforeEach(() => {
+    postModel = {
+      find: jest.fn().mockReturnValue(chain([])),
+      countDocuments: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(0) }),
+    };
+    userModel = { find: jest.fn().mockReturnValue(chain([])) };
+    service = new BlogService(postModel as never, userModel as never);
   });
 
-  /** Regexes the service sends to MongoDB for a search */
-  const searchRegexes = async (search: string) => {
-    await service.findAll({ search, published: true });
-    const postFilter = postModel.find.mock.calls[0][0];
-    const userFilter = userModel.find.mock.calls[0][0];
-    return [...postFilter.$or, ...userFilter.$or]
-      .map((clause: Record<string, { $regex?: string }>) => Object.values(clause)[0].$regex)
-      .filter(Boolean)
-      .map((source: string) => new RegExp(source, 'i'));
-  };
+  function titlePattern(): string {
+    const filter = postModel.find.mock.calls[0][0] as { $or: Array<{ title: { $regex: string } }> };
+    return filter.$or[0].title.$regex;
+  }
+
+  it('matches the search text literally rather than as a regular expression', async () => {
+    await service.findAll({ search: 'C++' });
+    const pattern = new RegExp(titlePattern(), 'i');
+    expect(pattern.test('Learning C++ today')).toBe(true);
+    expect(pattern.test('Learning C plus plus today')).toBe(false);
+  });
+
+  it('does not reject a search that contains regex syntax such as a bracket or a parenthesis', async () => {
+    await expect(service.findAll({ search: '(' })).resolves.toBeDefined();
+    const pattern = new RegExp(titlePattern(), 'i');
+    expect(pattern.test('a note (draft)')).toBe(true);
+  });
+
+  it('matches node.js only where the dot is literal', async () => {
+    await service.findAll({ search: 'node.js' });
+    const pattern = new RegExp(titlePattern(), 'i');
+    expect(pattern.test('Intro to node.js')).toBe(true);
+    expect(pattern.test('Intro to nodexjs')).toBe(false);
+  });
 
   it.each([
     '(',
@@ -51,19 +55,18 @@ describe('BlogService.findAll search', () => {
     '?',
     'C++',
     '(and C)',
-  ])('treats %s as plain text instead of an invalid regex', async (search) => {
-    const regexes = await searchRegexes(search);
+  ])('treats %s as plain text in every searched field', async (search) => {
+    await service.findAll({ search });
+    const postFilter = postModel.find.mock.calls[0][0];
+    const userFilter = userModel.find.mock.calls[0][0];
+    const patterns = [...postFilter.$or, ...userFilter.$or]
+      .map((clause: Record<string, { $regex?: string }>) => Object.values(clause)[0].$regex)
+      .filter(Boolean)
+      .map((source: string) => new RegExp(source, 'i'));
 
-    expect(regexes).toHaveLength(5);
-    for (const regex of regexes) {
-      expect(regex.test(`intro ${search} outro`)).toBe(true);
+    expect(patterns).toHaveLength(5);
+    for (const pattern of patterns) {
+      expect(pattern.test(`intro ${search} outro`)).toBe(true);
     }
-  });
-
-  it('matches dots literally', async () => {
-    const [titleRegex] = await searchRegexes('node.js');
-
-    expect(titleRegex.test('Getting started with Node.js')).toBe(true);
-    expect(titleRegex.test('Why nodexjs is not a thing')).toBe(false);
   });
 });

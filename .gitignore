@@ -58,3 +58,4 @@ next-env.d.ts
 
 ## turbo builds
 *.turbo
+.env.docker
