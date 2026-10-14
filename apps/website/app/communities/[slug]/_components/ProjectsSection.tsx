@@ -1,5 +1,5 @@
-import { ChevronDownIcon, ChevronUpIcon, XIcon } from '../../../../components/icons';
 import { Skeleton } from '@sos-academy/ui';
+import { ChevronDownIcon, ChevronUpIcon, XIcon } from '../../../../components/icons';
 import type { ProjectStats, ProjectsResponse } from '../../../../lib/api-client';
 import { ComingSoonOverlay } from './ComingSoonOverlay';
 import { SORT_OPTIONS } from './constants';

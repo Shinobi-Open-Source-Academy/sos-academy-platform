@@ -101,6 +101,14 @@ class ApiClient {
   async delete<T>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>) {
     return this.request<T>(endpoint, { ...config, method: 'DELETE' });
   }
+
+  async patch<T>(
+    endpoint: string,
+    body?: unknown,
+    config?: Omit<RequestConfig, 'method' | 'body'>
+  ) {
+    return this.request<T>(endpoint, { ...config, method: 'PATCH', body });
+  }
 }
 
 export class ApiError extends Error {

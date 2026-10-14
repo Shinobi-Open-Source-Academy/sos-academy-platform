@@ -22,6 +22,9 @@ interface CalendarEvent {
   location?: string;
   organizer?: { name: string };
   community?: { name: string };
+  callId?: string;
+  summary?: string;
+  summaryStatus?: 'none' | 'pending' | 'available' | 'error';
 }
 
 type TabType = 'upcoming' | 'past' | 'all';
@@ -34,6 +37,10 @@ export default function EventsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [callIdInput, setCallIdInput] = useState('');
+  const [isFetchingSummary, setIsFetchingSummary] = useState(false);
+  const [isUpdatingCallId, setIsUpdatingCallId] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -84,6 +91,61 @@ export default function EventsPage() {
     }
   };
 
+  const handleUpdateCallId = async () => {
+    if (!selectedEvent || !callIdInput.trim()) {
+      toast.error('Please enter a call ID');
+      return;
+    }
+
+    setIsUpdatingCallId(true);
+    try {
+      await apiClient.patch(`/calendar/events/${selectedEvent._id}/call-id`, {
+        callId: callIdInput.trim(),
+      });
+      await fetchEvents();
+      const updatedEvent = events.find((e) => e._id === selectedEvent._id);
+      if (updatedEvent) {
+        setSelectedEvent(updatedEvent);
+      }
+      toast.success('Call ID updated successfully');
+    } catch (error) {
+      console.error('Failed to update call ID:', error);
+      toast.error('Failed to update call ID');
+    } finally {
+      setIsUpdatingCallId(false);
+    }
+  };
+
+  const handleFetchSummary = async () => {
+    if (!selectedEvent) return;
+
+    setIsFetchingSummary(true);
+    try {
+      await apiClient.post(`/calendar/events/${selectedEvent._id}/fetch-summary`);
+      await fetchEvents();
+      const updatedEvent = events.find((e) => e._id === selectedEvent._id);
+      if (updatedEvent) {
+        setSelectedEvent(updatedEvent);
+      }
+      toast.success('Summary fetched successfully');
+    } catch (error) {
+      console.error('Failed to fetch summary:', error);
+      toast.error('Failed to fetch summary. Please check the call ID.');
+    } finally {
+      setIsFetchingSummary(false);
+    }
+  };
+
+  const openEventModal = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setCallIdInput(event.callId || '');
+  };
+
+  const closeEventModal = () => {
+    setSelectedEvent(null);
+    setCallIdInput('');
+  };
+
   const now = new Date();
 
   const filteredEvents = events
@@ -111,6 +173,58 @@ export default function EventsPage() {
   const isEventToday = (dateStr: string) => {
     const eventDate = new Date(dateStr);
     return eventDate.toDateString() === now.toDateString();
+  };
+
+  const getSummaryStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'available':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-400 rounded-full">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Summary
+          </span>
+        );
+      case 'pending':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium bg-yellow-500/10 text-yellow-400 rounded-full">
+            <svg
+              className="w-3 h-3 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Pending
+          </span>
+        );
+      case 'error':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium bg-red-500/10 text-red-400 rounded-full">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Error
+          </span>
+        );
+      default:
+        return null;
+    }
   };
 
   if (!mounted || loading) {
@@ -243,8 +357,13 @@ export default function EventsPage() {
             {filteredEvents.map((event, index) => (
               <div
                 key={event._id}
-                className="card p-5 animate-fade-in group"
+                className={`card p-5 animate-fade-in group ${activeTab === 'past' ? 'cursor-pointer hover:border-white/20' : ''}`}
                 style={{ animationDelay: `${index * 40}ms` }}
+                onClick={() => activeTab === 'past' && openEventModal(event)}
+                onKeyDown={(e) =>
+                  activeTab === 'past' && e.key === 'Enter' && openEventModal(event)
+                }
+                tabIndex={activeTab === 'past' ? 0 : -1}
               >
                 <div className="flex items-start gap-5">
                   {/* Date Column */}
@@ -278,6 +397,7 @@ export default function EventsPage() {
                           >
                             {EVENT_TYPE_LABELS[event.eventType] || event.eventType}
                           </span>
+                          {getSummaryStatusBadge(event.summaryStatus)}
                         </div>
 
                         {event.description && (
@@ -462,6 +582,227 @@ export default function EventsPage() {
           </div>
         )}
       </div>
+
+      {/* Event Summary Modal */}
+      {selectedEvent && (
+        <div
+          className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeEventModal();
+          }}
+          onKeyDown={(e) => e.key === 'Escape' && closeEventModal()}
+        >
+          <div className="card max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
+            {/* ── Sticky Header ── */}
+            <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-white/[0.06] flex-shrink-0">
+              <div className="flex-1 min-w-0 pr-4">
+                <h2 className="text-xl font-semibold text-white truncate">{selectedEvent.title}</h2>
+                <div className="flex items-center flex-wrap gap-x-3 gap-y-1.5 mt-2">
+                  <p className="text-sm text-zinc-500">
+                    {new Date(selectedEvent.startTime).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  {selectedEvent.eventType && (
+                    <span className="badge badge-neutral text-[10px] uppercase tracking-wide">
+                      {selectedEvent.eventType}
+                    </span>
+                  )}
+                  {selectedEvent.summaryStatus === 'available' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Summary ready
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={closeEventModal}
+                className="flex-shrink-0 p-2 text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+                title="Close"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* ── Scrollable Body ── */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+              {/* Event meta row */}
+              <div className="flex items-center gap-4 text-sm text-zinc-500 py-3 px-4 bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center gap-1.5">
+                  <svg
+                    className="w-3.5 h-3.5 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-zinc-400">
+                    {formatEventTime(selectedEvent.startTime, selectedEvent.endTime)}
+                  </span>
+                </div>
+                {selectedEvent.community && (
+                  <>
+                    <span className="text-white/10">|</span>
+                    <div className="flex items-center gap-1.5">
+                      <svg
+                        className="w-3.5 h-3.5 flex-shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                        />
+                      </svg>
+                      <span className="text-zinc-400">{selectedEvent.community.name}</span>
+                    </div>
+                  </>
+                )}
+                {selectedEvent.description && (
+                  <>
+                    <span className="text-white/10 hidden sm:block">|</span>
+                    <p className="hidden sm:block text-zinc-500 truncate max-w-[200px]">
+                      {selectedEvent.description}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {/* Call ID Section */}
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">
+                  NotesBot Call ID
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={callIdInput}
+                    onChange={(e) => setCallIdInput(e.target.value)}
+                    placeholder="Paste the NotesBot call ID here..."
+                    className="input flex-1 text-sm mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleUpdateCallId}
+                    disabled={isUpdatingCallId || !callIdInput.trim()}
+                    className="btn-primary px-5 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  >
+                    {isUpdatingCallId ? (
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black animate-spin" />
+                    ) : (
+                      'Save'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Fetch Summary Button */}
+              {selectedEvent.callId && (
+                <button
+                  type="button"
+                  onClick={handleFetchSummary}
+                  disabled={isFetchingSummary}
+                  className="w-full btn-secondary flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isFetchingSummary ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin" />
+                      <span>Fetching Summary…</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                      <span>Fetch Summary from NotesBot</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Summary Display */}
+              {selectedEvent.summary && (
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">
+                    Summary
+                  </label>
+                  <div className="bg-white/[0.03] border border-white/[0.08] p-4 max-h-72 overflow-y-auto">
+                    <div className="text-sm text-zinc-300 space-y-2 leading-relaxed">
+                      {selectedEvent.summary.split('\n').map((line, i) => {
+                        // Bold headings: **text**
+                        const boldParsed = line.replace(
+                          /\*\*(.+?)\*\*/g,
+                          '<strong class="text-white font-semibold">$1</strong>'
+                        );
+                        // Bullet lines
+                        if (line.trim().startsWith('- ')) {
+                          return (
+                            <div key={i} className="flex gap-2">
+                              <span className="text-zinc-600 flex-shrink-0 mt-0.5">–</span>
+                              <span
+                                dangerouslySetInnerHTML={{ __html: boldParsed.replace(/^-\s/, '') }}
+                              />
+                            </div>
+                          );
+                        }
+                        // Empty line → spacer
+                        if (line.trim() === '') return <div key={i} className="h-1" />;
+                        // Normal line with bold support
+                        return <p key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} />;
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── Sticky Footer with description ── */}
+            {selectedEvent.description && (
+              <div className="flex-shrink-0 px-6 py-4 border-t border-white/[0.06] bg-white/[0.01]">
+                <p className="text-xs text-zinc-500 line-clamp-2">{selectedEvent.description}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

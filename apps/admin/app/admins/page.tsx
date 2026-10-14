@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import Sidebar from '../components/Sidebar';
 import { useRequireAuth } from '../../context/AuthContext';
-import { apiClient, ApiError } from '../../lib/api-client';
+import { ApiError, apiClient } from '../../lib/api-client';
+import Sidebar from '../components/Sidebar';
 
 export const dynamic = 'force-dynamic';
 

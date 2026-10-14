@@ -1,11 +1,11 @@
 'use client';
 
+import { formatDate } from '@sos-academy/shared';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { formatDate } from '@sos-academy/shared';
-import { apiClient } from '../../../lib/api-client';
 import { useRequireAuth } from '../../../context/AuthContext';
+import { apiClient } from '../../../lib/api-client';
 import DeleteModal from '../../components/DeleteModal';
 import QuickActionsMenu from '../../components/QuickActionsMenu';
 import Sidebar from '../../components/Sidebar';

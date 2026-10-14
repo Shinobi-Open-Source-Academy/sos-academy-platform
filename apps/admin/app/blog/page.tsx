@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { apiClient } from '../../lib/api-client';
 import { useRequireAuth } from '../../context/AuthContext';
+import { apiClient } from '../../lib/api-client';
 import MarkdownEditor from '../components/MarkdownEditor';
 import Sidebar from '../components/Sidebar';
 

@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { CodeBackground } from '@sos-academy/ui';
+import type { Metadata } from 'next';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import { SITE_CONFIG } from '../../lib/data';

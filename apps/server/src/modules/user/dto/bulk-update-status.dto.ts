@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsMongoId } from 'class-validator';
 import { UserStatus } from '@sos-academy/shared';
+import { IsArray, IsEnum, IsMongoId } from 'class-validator';
 
 export class BulkUpdateStatusDto {
   @ApiProperty({
