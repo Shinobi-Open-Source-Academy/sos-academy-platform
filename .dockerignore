@@ -1,0 +1,37 @@
+# Keep the build context small and, more importantly, keep secrets out of images.
+
+# Secrets and local environment files: never bake these into an image.
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Version control, CI, editor and agent tooling
+.git
+.github
+.husky
+.vscode
+.idea
+.claude
+memory
+
+# Dependencies and build output: always produced inside the image
+**/node_modules
+**/.next
+**/.turbo
+*.turbo
+**/dist
+**/out
+**/out-tsc
+**/*.tsbuildinfo
+coverage
+tmp
+
+# Not needed at build time
+docs
+apps/server-e2e
+Dockerfile
+docker-compose*.yml
+.dockerignore
+**/.DS_Store
+*.log

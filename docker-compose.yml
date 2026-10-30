@@ -1,0 +1,140 @@
+# Production stack: API + website + admin + hacker portal + blog (+ optional Discord bot).
+#
+#   cp .env.docker.example .env      # then fill in EVERY value
+#   docker compose up -d --build
+#
+# Nothing in this file falls back to a default. A missing or empty required variable stops Compose
+# with a message that names it, and the Next.js images refuse to build without their NEXT_PUBLIC_*
+# URLs. MongoDB is deliberately not part of this file: point MONGODB_URI at a managed database, or
+# add docker-compose.mongo.yml for a self-hosted one. See docs/deployment.md.
+
+name: sos-academy
+
+x-service: &service
+  restart: unless-stopped
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+
+# Compiled into the browser bundles at build time. Changing them means rebuilding the images.
+x-web-build-args: &web-build-args
+  NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is not set - the public URL of the API, including /api}"
+  NEXT_PUBLIC_WEBSITE_URL: "${NEXT_PUBLIC_WEBSITE_URL:?NEXT_PUBLIC_WEBSITE_URL is not set - the public URL of the website}"
+  NEXT_PUBLIC_BLOG_URL: "${NEXT_PUBLIC_BLOG_URL:?NEXT_PUBLIC_BLOG_URL is not set - the public URL of the blog}"
+  NEXT_PUBLIC_HACKER_URL: "${NEXT_PUBLIC_HACKER_URL:?NEXT_PUBLIC_HACKER_URL is not set - the public URL of the hacker portal}"
+
+services:
+  server:
+    <<: *service
+    build:
+      context: .
+      target: server
+    environment:
+      # Required. The API would otherwise fall back to insecure built-in defaults or fail later.
+      - "MONGODB_URI=${MONGODB_URI:?MONGODB_URI is not set - connection string of your MongoDB}"
+      - "JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set - long random string that signs access tokens}"
+      - "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is not set - long random string that signs refresh tokens, different from JWT_SECRET}"
+      - "SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is not set - long random string that signs admin sessions}"
+      - "RESEND_API_KEY=${RESEND_API_KEY:?RESEND_API_KEY is not set - the API refuses to start without it}"
+      - "ADMIN_EMAIL=${ADMIN_EMAIL:?ADMIN_EMAIL is not set - email of the admin account seeded on first start}"
+      - "ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD is not set - password of the seeded admin account}"
+      - "CORS_ORIGIN=${CORS_ORIGIN:?CORS_ORIGIN is not set - comma-separated public origins of the web apps}"
+      - "ADMIN_URL=${ADMIN_URL:?ADMIN_URL is not set - the public URL of the admin panel}"
+      - "HACKER_PORTAL_URL=${HACKER_PORTAL_URL:?HACKER_PORTAL_URL is not set - the public URL of the hacker portal, where GitHub login redirects}"
+      - "GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:?GITHUB_CLIENT_ID is not set - client id of the GitHub OAuth app}"
+      - "GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:?GITHUB_CLIENT_SECRET is not set - client secret of the GitHub OAuth app}"
+      - "GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:?GITHUB_CALLBACK_URL is not set - public URL of the API's /api/auth/github/callback}"
+      # Optional: passed to the container only when set, otherwise the API's own handling applies.
+      - APP_URL
+      - EMAIL_FROM
+      - LOG_LEVEL
+      - JWT_EXPIRATION
+      - JWT_REFRESH_EXPIRATION
+      - GITHUB_API_TOKEN
+      - GITHUB_ORG_NAME
+      - GITHUB_ORG_ADMIN_TOKEN
+    ports:
+      - "${BIND_ADDRESS:?BIND_ADDRESS is not set - interface to publish ports on, e.g. 127.0.0.1 behind a TLS proxy or 0.0.0.0 to expose directly}:4200:4200"
+
+  website:
+    <<: *service
+    build:
+      context: .
+      target: next
+      args:
+        <<: *web-build-args
+        APP: website
+        PORT: "3000"
+    environment:
+      # Server-side rendering reaches the API over the Docker network, not through its public URL.
+      - API_URL_INTERNAL=http://server:4200/api
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "${BIND_ADDRESS}:3000:3000"
+
+  admin:
+    <<: *service
+    build:
+      context: .
+      target: next
+      args:
+        <<: *web-build-args
+        APP: admin
+        PORT: "3001"
+    ports:
+      - "${BIND_ADDRESS}:3001:3001"
+
+  hacker:
+    <<: *service
+    build:
+      context: .
+      target: next
+      args:
+        <<: *web-build-args
+        APP: hacker
+        PORT: "3002"
+    ports:
+      - "${BIND_ADDRESS}:3002:3002"
+
+  blog:
+    <<: *service
+    build:
+      context: .
+      target: next
+      args:
+        <<: *web-build-args
+        APP: blog
+        PORT: "3003"
+    environment:
+      - API_URL_INTERNAL=http://server:4200/api
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "${BIND_ADDRESS}:3003:3003"
+
+  # Optional: docker compose --profile bot up -d. The bot validates its own settings on start and
+  # exits naming any that are missing.
+  kunai-bot:
+    <<: *service
+    profiles: ["bot"]
+    build:
+      context: .
+      target: kunai-bot
+    environment:
+      - DISCORD_BOT_TOKEN
+      - DISCORD_GENERAL_CHANNEL_ID
+      - DISCORD_MENTORS_CHANNEL_ID
+      - REMINDER_CRON
+      - TIMEZONE
+      - GITHUB_API_TOKEN
+      - DRY_RUN

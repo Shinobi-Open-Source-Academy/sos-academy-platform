@@ -156,7 +156,7 @@ export class User {
       company: String,
       blog: String,
       twitterUsername: String,
-      githubId: Number,
+      githubId: { type: Number, required: true },
     },
     required: false,
     _id: false,
@@ -191,6 +191,9 @@ export class User {
     twitter?: string;
     website?: string;
   };
+
+  @Prop({ required: false })
+  lastLoginAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -201,5 +204,6 @@ UserSchema.index({ status: 1 });
 UserSchema.index({ role: 1, status: 1 });
 UserSchema.index({ communities: 1 });
 UserSchema.index({ 'githubProfile.login': 1 });
+UserSchema.index({ 'githubProfile.githubId': 1 }, { unique: true, sparse: true });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ source: 1, status: 1 });

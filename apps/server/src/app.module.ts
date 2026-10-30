@@ -13,7 +13,8 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { CommunityModule } from './modules/community/community.module';
 import { ProjectModule } from './modules/project/project.module';
 import { SeederModule } from './modules/seeder/seeder.module';
-
+import { SquadModule } from './modules/squad/squad.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { UserModule } from './modules/user/user.module';
       envFilePath: [join(process.cwd(), '../../.env'), join(__dirname, '../../../../.env')],
     }),
     MongooseModule.forRoot(databaseConfig.uri),
+    AuthModule,
     UserModule,
     ProjectModule,
     CommunityModule,
@@ -30,6 +32,7 @@ import { UserModule } from './modules/user/user.module';
     BroadcastModule,
     BlogModule,
     SeederModule,
+    SquadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

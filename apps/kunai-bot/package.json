@@ -1,0 +1,22 @@
+{
+  "name": "kunai-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "preview": "tsx src/scripts/preview.ts",
+    "send-now": "tsx src/scripts/send-now.ts",
+    "lint": "biome lint ."
+  },
+  "dependencies": {
+    "axios": "^1.16.0",
+    "discord.js": "^14.26.5",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  }
+}

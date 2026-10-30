@@ -1,4 +1,8 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
+// API_URL_INTERNAL is read at runtime on the server only (undefined in the browser bundle): use it
+// when the API is reachable from the server at a different address than the public one, e.g.
+// http://server:4200/api inside a Docker network.
+const API_URL =
+  process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
 
 interface JoinCommunityData {
   email: string;

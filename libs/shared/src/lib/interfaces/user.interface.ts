@@ -37,3 +37,12 @@ export interface IUser {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface ICurrentUser {
+  _id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+  isActive: boolean;
+}

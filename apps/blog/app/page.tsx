@@ -1,14 +1,17 @@
+import { CodeBackground, HeroGrid } from '@sos-academy/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { CodeBackground, HeroGrid } from '@sos-academy/ui';
-import Navbar from './components/Navbar';
+import { BLOG_SNIPPETS } from './_data';
 import type { Post } from './_types';
+import Navbar from './components/Navbar';
 import { PostCard } from './components/PostCard';
 import SearchFilter from './components/SearchFilter';
-import { BLOG_SNIPPETS } from './_data';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4200/api';
+// Server component: API_URL_INTERNAL (runtime) wins when the API is reachable from the server at a
+// different address than the public one, e.g. http://server:4200/api inside a Docker network.
+const API_URL =
+  process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200/api';
 const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:3000';
 
 async function getFeaturedPosts(): Promise<Post[]> {
