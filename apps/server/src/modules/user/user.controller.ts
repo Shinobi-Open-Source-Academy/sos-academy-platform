@@ -3,10 +3,12 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -16,8 +18,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
-import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
 import {
   ApiBody,
   ApiOkResponse,
@@ -26,22 +26,44 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRole, UserStatus } from '@sos-academy/shared';
+import { ICurrentUser, UserRole, UserStatus } from '@sos-academy/shared';
+import { Auth } from '../../common/decorators/auth.decorator';
+import { AdminSessionGuard } from '../../common/guards/admin-session.guard';
+import { SelfOrAdminGuard } from '../../common/guards/self-or-admin.guard';
+import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
-import { InviteAdminDto } from './dto/invite-admin.dto';
 import { ApproveMentorDto } from './dto/approve-mentor.dto';
+import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto';
 import { CommunityJoinDto } from './dto/community-join.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersQueryDto } from './dto/get-user.dto';
+import { InviteAdminDto } from './dto/invite-admin.dto';
 import { MemberInvitationDto } from './dto/member-invitation.dto';
 import { MentorApplicationDto } from './dto/mentor-application.dto';
-import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto';
 import { RejectMentorDto } from './dto/reject-mentor.dto';
 import { SubscribeUserDto } from './dto/subscribe-user.dto';
+import { UpdateMentorDto } from './dto/update-mentor.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { UserService } from './user.service';
+import { MentorProfile, UserService } from './user.service';
+
+/**
+ * Fields users may change on their own record. Everything else (role, status, password,
+ * membership level...) can only be changed by an admin.
+ */
+const SELF_EDITABLE_FIELDS = new Set<string>([
+  'name',
+  'bio',
+  'profilePicture',
+  'skills',
+  'interests',
+  'title',
+  'description',
+  'socialLinks',
+]);
 
 @ApiTags('users')
 @Controller('users')
@@ -50,7 +72,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
+  @UseGuards(AdminSessionGuard)
+  @ApiOperation({ summary: 'Create a new user — admin only' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'User created successfully', type: UserResponseDto })
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
@@ -61,11 +84,34 @@ export class UserController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
+  @UseGuards(AdminSessionGuard)
+  @ApiOperation({ summary: 'Get all users — admin only' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [UserResponseDto] })
   async findAll() {
     const users = await this.userService.findAll();
     return users.map((user) => new UserResponseDto(JSON.parse(JSON.stringify(user))));
+  }
+
+  @Get('me/mentor-profile')
+  @Auth(UserRole.MENTOR, UserRole.KAGE)
+  @ApiOperation({ summary: "Get the logged-in mentor's public profile fields" })
+  async getMyMentorProfile(@CurrentUser() user: ICurrentUser): Promise<MentorProfile> {
+    return this.userService.getMentorProfile(user._id);
+  }
+
+  @Patch('me/mentor-profile')
+  @Auth(UserRole.MENTOR, UserRole.KAGE)
+  @ApiOperation({
+    summary: "Update the logged-in mentor's public profile (title, description, social links)",
+  })
+  @ApiBody({ type: UpdateMentorDto })
+  @ApiResponse({ status: 200, description: 'Profile updated' })
+  @ApiResponse({ status: 403, description: 'Not an active mentor or kage' })
+  async updateMyMentorProfile(
+    @CurrentUser() user: ICurrentUser,
+    @Body() dto: UpdateMentorDto
+  ): Promise<MentorProfile> {
+    return this.userService.updateMentorProfile(user._id, dto);
   }
 
   @Get(':id')
@@ -79,18 +125,37 @@ export class UserController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update user by ID' })
+  @UseGuards(OptionalJwtAuthGuard, SelfOrAdminGuard)
+  @ApiOperation({
+    summary: 'Update user by ID — admins, or users on their own non-privileged fields',
+  })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'User updated successfully', type: UserResponseDto })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 403, description: "Another user's record, or a privileged field" })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: { isAdmin?: boolean }
+  ) {
+    if (!req.isAdmin) {
+      const forbidden = Object.entries(updateUserDto)
+        .filter(([field, value]) => value !== undefined && !SELF_EDITABLE_FIELDS.has(field))
+        .map(([field]) => field);
+      if (forbidden.length) {
+        throw new ForbiddenException(`Only an admin can change: ${forbidden.join(', ')}`);
+      }
+    }
+
     const user = await this.userService.update(id, updateUserDto);
     return new UserResponseDto(JSON.parse(JSON.stringify(user)));
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete user by ID' })
+  @UseGuards(AdminSessionGuard)
+  @ApiOperation({ summary: 'Delete user by ID — admin only' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User deleted successfully', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })

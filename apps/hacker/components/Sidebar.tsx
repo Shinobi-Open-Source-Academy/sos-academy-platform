@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../app/providers/AuthProvider';
+import { isMentorRole } from '../lib/roles';
 
 interface User {
   name: string;
@@ -11,6 +12,7 @@ interface User {
   avatar: string;
   githubHandle: string;
   community: string;
+  role?: string;
 }
 
 const navItems = [
@@ -111,11 +113,60 @@ const navItems = [
   },
 ];
 
+const mentorNavItems = [
+  {
+    name: 'Mentor Space',
+    href: '/mentor',
+    exact: true,
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <title>mentor space</title>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: 'My Profile',
+    href: '/mentor/profile',
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.5}
+      >
+        <title>my profile</title>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"
+        />
+      </svg>
+    ),
+  },
+];
+
+// `/mentors/book` keeps "Mentors" active, but `/mentors` must not activate "Mentor Space" (`/mentor`)
+const isActivePath = (pathname: string, href: string, exact = href === '/') =>
+  exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -129,42 +180,77 @@ export default function Sidebar() {
     }
   }, []);
 
+  // Close the mobile menu after navigating
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
   const handleLogout = async () => {
     await logout();
   };
 
-  return (
-    <aside className="w-64 min-h-screen bg-[var(--color-surface-1)] border-r border-white/[0.06] flex flex-col">
-      {/* Logo */}
-      <div className="p-5 border-b border-white/[0.06]">
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/shinobiLogo.png" alt="SOS Academy" className="w-8 h-8 object-contain" />
-          <div>
-            <span className="text-sm font-semibold text-white">Hacker Portal</span>
-            <span className="block text-[10px] text-emerald-400 uppercase tracking-wider">
-              SOS Academy
-            </span>
-          </div>
-        </Link>
-      </div>
+  // Only decides whether to show the link: the mentor area checks the role with the server
+  const showMentorNav = mounted && isMentorRole(user?.role);
 
+  const logo = (
+    <Link href="/" className="flex items-center gap-3">
+      <img src="/shinobiLogo.png" alt="SOS Academy" className="w-8 h-8 object-contain" />
+      <div>
+        <span className="text-sm font-semibold text-white">Hacker Portal</span>
+        <span className="block text-[10px] text-emerald-400 uppercase tracking-wider">
+          SOS Academy
+        </span>
+      </div>
+    </Link>
+  );
+
+  const renderNavLink = (item: {
+    name: string;
+    href: string;
+    icon: React.ReactNode;
+    exact?: boolean;
+  }) => {
+    const isActive = isActivePath(pathname, item.href, item.exact);
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        aria-current={isActive ? 'page' : undefined}
+        className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
+      >
+        {item.icon}
+        <span>{item.name}</span>
+      </Link>
+    );
+  };
+
+  const content = (
+    <>
       {/* Navigation */}
-      <nav className="flex-1 p-3">
-        <div className="space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </div>
+      <nav className="flex-1 p-3 overflow-y-auto">
+        <div className="space-y-1">{navItems.map(renderNavLink)}</div>
+
+        {showMentorNav && (
+          <div className="mt-8 pt-6 border-t border-white/[0.06]">
+            <p className="px-3 mb-3 text-[10px] text-zinc-600 uppercase tracking-wider font-medium">
+              Mentor
+            </p>
+            <div className="space-y-1">{mentorNavItems.map(renderNavLink)}</div>
+          </div>
+        )}
 
         {/* Quick actions */}
         <div className="mt-8 pt-6 border-t border-white/[0.06]">
@@ -229,6 +315,82 @@ export default function Sidebar() {
           </div>
         </div>
       )}
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <header className="md:hidden sticky top-0 z-30 h-14 px-4 flex items-center justify-between bg-[var(--color-surface-1)] border-b border-white/[0.06]">
+        {logo}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          className="p-2 -mr-2 text-zinc-400 hover:text-white transition-colors"
+          aria-label="Open menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <title>open menu</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        </button>
+      </header>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMobileOpen(false)}
+            className="absolute inset-0 bg-black/70"
+          />
+          <aside
+            id="mobile-nav"
+            className="relative w-72 max-w-[85vw] h-full bg-[var(--color-surface-1)] border-r border-white/[0.06] flex flex-col"
+          >
+            <div className="p-5 border-b border-white/[0.06] flex items-center justify-between">
+              {logo}
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="p-1.5 -mr-1.5 text-zinc-400 hover:text-white transition-colors"
+                aria-label="Close menu"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <title>close menu</title>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {content}
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex w-64 shrink-0 min-h-screen bg-[var(--color-surface-1)] border-r border-white/[0.06] flex-col">
+        <div className="p-5 border-b border-white/[0.06]">{logo}</div>
+        {content}
+      </aside>
+    </>
   );
 }
