@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CommunityModule } from '../community/community.module';
 import { UserModule } from '../user/user.module';
 import { Squad, SquadSchema } from './schemas/squad.schema';
+import { SquadController } from './squad.controller';
 import { SquadService } from './squad.service';
 
 @Module({
@@ -11,6 +12,7 @@ import { SquadService } from './squad.service';
     UserModule,
     CommunityModule,
   ],
+  controllers: [SquadController],
   providers: [SquadService],
   exports: [MongooseModule, SquadService],
 })
