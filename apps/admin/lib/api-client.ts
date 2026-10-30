@@ -39,13 +39,15 @@ class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
+      // FormData sets its own multipart Content-Type (with the boundary)
+      const isFormData = body instanceof FormData;
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
           ...headers,
         },
-        body: body ? JSON.stringify(body) : undefined,
+        body: isFormData ? body : body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
         credentials: 'include', // send session cookie on every request
       });
@@ -100,6 +102,15 @@ class ApiClient {
 
   async delete<T>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>) {
     return this.request<T>(endpoint, { ...config, method: 'DELETE' });
+  }
+
+  /** POST a multipart form (file uploads) */
+  async upload<T>(
+    endpoint: string,
+    form: FormData,
+    config?: Omit<RequestConfig, 'method' | 'body'>
+  ) {
+    return this.request<T>(endpoint, { timeout: 60000, ...config, method: 'POST', body: form });
   }
 }
 

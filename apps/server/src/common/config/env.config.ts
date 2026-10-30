@@ -39,6 +39,12 @@ export const envConfig = {
   frontends: {
     hackerPortalUrl: env('HACKER_PORTAL_URL', 'http://localhost:3000'),
   },
+  cloudinary: {
+    cloudName: env('CLOUDINARY_CLOUD_NAME'),
+    apiKey: env('CLOUDINARY_API_KEY'),
+    apiSecret: env('CLOUDINARY_API_SECRET'),
+    folder: env('CLOUDINARY_FOLDER', 'sos-academy/blog'),
+  },
   github: {
     clientId: env('GITHUB_CLIENT_ID', 'default_github_client_id_change_in_production'),
     clientSecret: env('GITHUB_CLIENT_SECRET', 'default_github_client_secret_change_in_production'),
