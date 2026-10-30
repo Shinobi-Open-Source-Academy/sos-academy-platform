@@ -24,6 +24,10 @@ export class BlogService {
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
+  private escapeRegex(input: string): string {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   private generateSlug(title: string): string {
     return title
       .toLowerCase()
@@ -120,11 +124,13 @@ export class BlogService {
     if (featured !== undefined) filter.featured = featured;
     if (tag) filter.tags = tag;
     if (search) {
+      // The search text is matched literally, the way the project and user searches match it.
+      const pattern = this.escapeRegex(search);
       const matchingUsers = await this.userModel
         .find({
           $or: [
-            { name: { $regex: search, $options: 'i' } },
-            { 'githubProfile.login': { $regex: search, $options: 'i' } },
+            { name: { $regex: pattern, $options: 'i' } },
+            { 'githubProfile.login': { $regex: pattern, $options: 'i' } },
           ],
         })
         .select('_id')
@@ -134,9 +140,9 @@ export class BlogService {
       const authorIds = matchingUsers.map((u) => u._id);
 
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } },
+        { title: { $regex: pattern, $options: 'i' } },
+        { excerpt: { $regex: pattern, $options: 'i' } },
+        { tags: { $regex: pattern, $options: 'i' } },
         ...(authorIds.length ? [{ author: { $in: authorIds } }] : []),
       ];
     }
