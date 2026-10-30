@@ -42,6 +42,6 @@ export const envConfig = {
   github: {
     clientId: env('GITHUB_CLIENT_ID', 'default_github_client_id_change_in_production'),
     clientSecret: env('GITHUB_CLIENT_SECRET', 'default_github_client_secret_change_in_production'),
-    callbackUrl: env('GITHUB_CALLBACK_URL', 'http://localhost:4200/auth/github/callback'),
+    callbackUrl: env('GITHUB_CALLBACK_URL', 'http://localhost:4200/api/auth/github/callback'),
   },
 };
