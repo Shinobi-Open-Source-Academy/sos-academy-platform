@@ -1,0 +1,142 @@
+name: Docker
+
+# - On pull requests: validate the compose files and build every image (no push), so a broken
+#   Dockerfile or a variable the compose files require but the template omits is caught before merge.
+# - Called by release.yml with a `version`: build the same images from that release tag and push
+#   them to GitHub Container Registry as ghcr.io/<owner>/<repo>/<image>:<version>.
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - docker-compose*.yml
+      - .env.docker.example
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - apps/**
+      - libs/**
+      - .github/workflows/docker.yml
+  workflow_call:
+    inputs:
+      version:
+        description: Release version without the leading "v". When set, images are pushed.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  compose:
+    name: Compose files
+    # Skipped when called from release.yml (the event is then a push).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate against .env.docker.example
+        # Every empty value in the template gets a dummy (BIND_ADDRESS must be a real IP), so the
+        # only thing that can fail is a variable the compose files require that the template does
+        # not list.
+        run: |
+          sed -E 's/^([A-Z_]+)=$/\1=dummy/; s/^BIND_ADDRESS=.*/BIND_ADDRESS=127.0.0.1/' \
+            .env.docker.example > "$RUNNER_TEMP/compose.env"
+          docker compose --env-file "$RUNNER_TEMP/compose.env" --profile bot config --quiet
+          printf 'MONGO_ROOT_USERNAME=dummy\nMONGO_ROOT_PASSWORD=dummy\n' >> "$RUNNER_TEMP/compose.env"
+          docker compose --env-file "$RUNNER_TEMP/compose.env" \
+            -f docker-compose.yml -f docker-compose.mongo.yml --profile bot config --quiet
+
+  image:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: server, target: server }
+          - { name: website, target: next, app: website, port: '3000' }
+          - { name: admin, target: next, app: admin, port: '3001' }
+          - { name: hacker, target: next, app: hacker, port: '3002' }
+          - { name: blog, target: next, app: blog, port: '3003' }
+          - { name: kunai-bot, target: kunai-bot }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Build exactly what was released (the tag includes the version bump commit).
+          ref: ${{ inputs.version && format('v{0}', inputs.version) || github.sha }}
+
+      - name: Require NEXT_PUBLIC_* repository variables
+        # The web apps bake these URLs into the image and the Dockerfile has no defaults, so a
+        # release without them must fail here, naming what is missing.
+        if: inputs.version && matrix.app
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_WEBSITE_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_URL }}
+          NEXT_PUBLIC_BLOG_URL: ${{ vars.NEXT_PUBLIC_BLOG_URL }}
+          NEXT_PUBLIC_HACKER_URL: ${{ vars.NEXT_PUBLIC_HACKER_URL }}
+        run: |
+          missing=""
+          for name in NEXT_PUBLIC_API_URL NEXT_PUBLIC_WEBSITE_URL NEXT_PUBLIC_BLOG_URL NEXT_PUBLIC_HACKER_URL; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Repository variable(s) not set:$missing. Add them under Settings > Secrets and variables > Actions > Variables, then re-run this job."
+            exit 1
+          fi
+
+      - name: Compute tags
+        id: meta
+        env:
+          VERSION: ${{ inputs.version }}
+          IMAGE_NAME: ${{ matrix.name }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}/${IMAGE_NAME}"
+          if [ -n "$VERSION" ]; then
+            tags="${image}:${VERSION},${image}:${VERSION%.*},${image}:${VERSION%%.*},${image}:latest"
+          else
+            tags="${image}:pr-build"
+          fi
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: inputs.version
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build${{ inputs.version && ' and push' || '' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ matrix.target }}
+          push: ${{ inputs.version && 'true' || 'false' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.meta.outputs.revision }}
+            org.opencontainers.image.version=${{ inputs.version }}
+            org.opencontainers.image.licenses=MIT
+          # Releases use the repository variables (checked above). Pull request builds are never
+          # pushed or run, so they use obviously fake .invalid URLs just to satisfy the build.
+          build-args: |
+            APP=${{ matrix.app }}
+            PORT=${{ matrix.port }}
+            NEXT_PUBLIC_API_URL=${{ inputs.version && vars.NEXT_PUBLIC_API_URL || 'https://api.invalid/api' }}
+            NEXT_PUBLIC_WEBSITE_URL=${{ inputs.version && vars.NEXT_PUBLIC_WEBSITE_URL || 'https://website.invalid' }}
+            NEXT_PUBLIC_BLOG_URL=${{ inputs.version && vars.NEXT_PUBLIC_BLOG_URL || 'https://blog.invalid' }}
+            NEXT_PUBLIC_HACKER_URL=${{ inputs.version && vars.NEXT_PUBLIC_HACKER_URL || 'https://hacker.invalid' }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }},ignore-error=true

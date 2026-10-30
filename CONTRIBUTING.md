@@ -123,6 +123,18 @@ git commit -m "docs: update API documentation"
 - `test:` - Test updates
 - `chore:` - Maintenance tasks
 - `perf:` - Performance improvements
+- `build:` / `ci:` - Build system, Docker, and CI changes
+
+**Commit messages drive releases.** When changes land on `main`, [semantic-release](https://semantic-release.gitbook.io) reads them to pick the next version, tag it, update `CHANGELOG.md`, and publish Docker images:
+
+| Commit | Release |
+|--------|---------|
+| `fix:` / `perf:` | patch (1.2.3 → 1.2.4) |
+| `feat:` | minor (1.2.3 → 1.3.0) |
+| `feat!:` or a `BREAKING CHANGE:` footer | major (1.2.3 → 2.0.0) |
+| `docs:`, `chore:`, `refactor:`, `test:`, `build:`, `ci:`, `style:` | no release |
+
+A local `commit-msg` hook checks the format, and CI checks your PR title the same way (so use a Conventional Commit style title, e.g. `fix(admin): handle empty mentor list`).
 
 ### 4. Keep Your Branch Updated
 
